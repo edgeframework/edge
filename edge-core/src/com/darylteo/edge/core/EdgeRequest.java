@@ -43,33 +43,36 @@ public class EdgeRequest {
    * Handlers call this to indicate that the request should not pass through to
    * other handlers
    **/
-  public void stop() {
+  public EdgeRequest stop() {
     this.shouldStop = true;
+    return this;
   }
 
   /**
    * Renders a String to the response
    */
-  public void renderText(String text) {
-    this.renderText(text, 200);
+  public EdgeRequest renderText(String text) {
+    return this.renderText(text, 200);
   }
 
   /**
    * Renders a String to the response
    */
-  public void renderText(String text, int status) {
+  public EdgeRequest renderText(String text, int status) {
     this.response.end(text);
+    return this;
   }
 
   /**
    * Renders a String to the response
    */
-  public void renderTemplate(String templateName) {
-    this.renderTemplate(templateName, 200);
+  public EdgeRequest renderTemplate(String templateName) {
+    return this.renderTemplate(templateName, 200);
   }
 
-  public void renderTemplate(String templateName, int status) {
+  public EdgeRequest renderTemplate(String templateName, int status) {
     this.response.end("Rendered: " + templateName);
+    return this;
   }
 
   /**
@@ -77,6 +80,39 @@ public class EdgeRequest {
    */
   public String param(String identifier) {
     return this.params.get(identifier);
+  }
+
+  /**
+   * This sets the Http Response status value
+   * 
+   * @param value
+   * @return
+   */
+  public EdgeRequest status(int value) {
+    this.response.statusCode = value;
+    return this;
+  }
+
+  /**
+   * Retrieves a Http Response Header
+   * 
+   * @param header
+   * @return
+   */
+  public Object header(String header) {
+    return this.response.headers().get(header);
+  }
+
+  /**
+   * Sets a Http Response Header
+   * 
+   * @param header
+   * @param value
+   * @return
+   */
+  public EdgeRequest header(String header, Object value) {
+    this.response.headers().put(header, value);
+    return this;
   }
 
   /* Private Methods */

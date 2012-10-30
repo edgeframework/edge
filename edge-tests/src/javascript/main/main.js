@@ -1,9 +1,10 @@
-load('vertx.js');
+load('vertx.js')
 load('edge.js');
 
 var log = vertx.logger;
+var app = Edge();
 
-edge
+app
 .get('/', function(e,d){
 	e.renderText("This is a test");
 	e.stop();
