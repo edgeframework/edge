@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vertx.java.core.Handler;
+import org.vertx.java.deploy.impl.VertxLocator;
 
 import com.darylteo.edge.core.EdgeRequest;
 
@@ -15,7 +16,11 @@ public class Routing {
   }
 
   public void addRoute(String method, String stringPattern, Handler<EdgeRequest> handler) {
-    routes.add(new Route(method, stringPattern, handler));
+    try {
+      routes.add(new Route(method, stringPattern, handler));
+    } catch (Exception e) {
+      VertxLocator.container.getLogger().error("Could not create route", e);
+    }
   }
 
   public RouteMatcher getRouteMatcher(String method, String url) {

@@ -1,5 +1,9 @@
 package com.darylteo.edge.core.routing;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,59 +13,99 @@ import org.vertx.java.deploy.impl.VertxLocator;
 import com.darylteo.edge.core.EdgeRequest;
 
 public class Route {
+
+  private static final Pattern validParamPattern = Pattern.compile("^:(?<paramname>[A-Za-z0-9]+)$");
+
   private final String method;
-  private final Pattern pattern;
   private final Handler<EdgeRequest> handler;
 
-  public Route(String method, String stringPattern, Handler<EdgeRequest> handler) {
+  private Pattern pattern;
+  private String[] paramIdentifiers;
+
+  public Route(String method, String stringPattern, Handler<EdgeRequest> handler) throws Exception {
     this.method = method;
     this.handler = handler;
 
-    this.pattern = compilePattern(stringPattern);
+    compilePattern(stringPattern);
   }
 
-  public boolean matches(String method, String url) {
+  public RouteMatcherResult matches(String method, String url) {
     if (!this.method.equals(method)) {
-      return false;
+      return new RouteMatcherResult(false, this);
     }
 
     Matcher matcher = pattern.matcher(url);
     if (!matcher.matches()) {
-      return false;
+      return new RouteMatcherResult(false, this);
     }
-
-    return true;
+    
+    Map<String,String> params = new HashMap<>();
+    for (String identifier : this.paramIdentifiers) {
+      String value = matcher.group(identifier);
+      params.put(identifier, value);
+    }
+    return new RouteMatcherResult(true, this, params);
   }
 
   public Handler<EdgeRequest> getHandler() {
     return this.handler;
   }
 
-  private Pattern compilePattern(String stringPattern) {
+  private void compilePattern(String stringPattern) throws Exception {
+    /* Catch All url */
+    if (stringPattern.equals("*")) {
+      VertxLocator.container.getLogger().info(String.format("String %s Compiled %s", stringPattern, "^.*$"));
+      this.pattern = Pattern.compile("^.*$");
+      this.paramIdentifiers = new String[0];
+      return;
+    }
+
+    if (!stringPattern.startsWith("/")) {
+      throw new Exception("Route Pattern must start with '/'.");
+    }
+
+    /* Index url */
     if (stringPattern.equals("/")) {
       VertxLocator.container.getLogger().info(String.format("String %s Compiled %s", stringPattern, "^/$"));
-      return Pattern.compile("^/$");
+      this.pattern = Pattern.compile("^/$");
+      this.paramIdentifiers = new String[0];
+      return;
     }
 
     /* Split the url pattern into parts */
-    String[] parts = stringPattern.split("/");
+    /* -1 parameter is provided to include empty strings */
+    List<String> identifiers = new LinkedList<>();
+
+    String[] parts = stringPattern.split("/", -1);
     StringBuilder completed = new StringBuilder("^");
 
-    for (int i = 0; i < parts.length; i++) {
+    /* Start from 1 as the first part will always be empty */
+    for (int i = 1; i < parts.length; i++) {
+      completed.append("/");
+
       String part = parts[i];
 
-      part = part.replace("*", ".*");
+      /* If the string pattern contains :param then validate the parameter name */
+      if (part.startsWith(":")) {
+        Matcher matcher = validParamPattern.matcher(part);
+        if (!matcher.matches()) {
+          throw new Exception("Invalid Param Name");
+        }
 
-      if (i > 0) {
-        completed.append("/");
+        String identifier = matcher.group("paramname");
+
+        completed.append(String.format("(?<%s>[^ /]*)", identifier));
+        identifiers.add(identifier);
+      } else {
+        completed.append(part);
       }
-      completed.append(part);
     }
 
     completed.append("$");
 
     VertxLocator.container.getLogger().info(String.format("String %s Compiled %s", stringPattern, completed));
 
-    return Pattern.compile(completed.toString());
+    this.pattern = Pattern.compile(completed.toString());
+    this.paramIdentifiers = identifiers.toArray(new String[0]);
   }
 }

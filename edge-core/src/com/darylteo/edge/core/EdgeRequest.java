@@ -1,11 +1,13 @@
 package com.darylteo.edge.core;
 
+import java.util.Map;
+
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.deploy.impl.VertxLocator;
 
-import com.darylteo.edge.core.routing.Route;
 import com.darylteo.edge.core.routing.RouteMatcher;
+import com.darylteo.edge.core.routing.RouteMatcherResult;
 
 public class EdgeRequest {
   private final HttpServerRequest request;
@@ -14,6 +16,7 @@ public class EdgeRequest {
   private final RouteMatcher routeMatcher;
 
   private boolean shouldStop = false;
+  private Map<String, String> params;
 
   public final String method;
   public final String uri;
@@ -32,6 +35,8 @@ public class EdgeRequest {
     this.query = request.query;
 
     this.handle();
+
+    this.response.close();
   }
 
   /**
@@ -67,21 +72,31 @@ public class EdgeRequest {
     this.response.end("Rendered: " + templateName);
   }
 
+  /**
+   * Retrieve a URL Param
+   */
+  public String param(String identifier) {
+    return this.params.get(identifier);
+  }
+
+  /* Private Methods */
   private boolean handle() {
     boolean handled = false;
 
     while (true) {
-      Route route = routeMatcher.getNextMatch();
+      RouteMatcherResult result = routeMatcher.getNextMatch();
 
-      VertxLocator.container.getLogger().info("Route Match for " + this.uri + ":" + route);
-
-      if (route == null) {
+      if (result == null) {
         return handled;
       }
 
+      VertxLocator.container.getLogger().info("Route Match for " + this.uri);
+
       /* ShouldStop is used to determine if this will be the last handler */
       this.shouldStop = false;
-      route.getHandler().handle(this);
+      this.params = result.params;
+
+      result.route.getHandler().handle(this);
       handled = true;
 
       if (this.shouldStop) {

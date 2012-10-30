@@ -18,14 +18,15 @@ public class RouteMatcher {
     this.position = 0;
   }
 
-  public Route getNextMatch() {
+  public RouteMatcherResult getNextMatch() {
     while (this.position < this.routes.size()) {
       Route route = this.routes.get(this.position);
 
       this.position++;
 
-      if (route.matches(this.method, this.url)) {
-        return route;
+      RouteMatcherResult result = route.matches(this.method, this.url);
+      if (result.matches) {
+        return result;
       }
     }
 
