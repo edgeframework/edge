@@ -1,0 +1,20 @@
+Initial Commit
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+#
+# Initial commit
+#
+# Changes to be committed:
+#   (use "git rm --cached <file>..." to unstage)
+#
+#	new file:   edge-core/src/com/darylteo/edge/core/Edge.java
+#	new file:   edge-core/src/com/darylteo/edge/core/EdgeRequest.java
+#	new file:   edge-core/src/com/darylteo/edge/core/routing/Route.java
+#	new file:   edge-core/src/com/darylteo/edge/core/routing/RouteMatcher.java
+#	new file:   edge-core/src/com/darylteo/edge/core/routing/Routing.java
+#	new file:   edge-lang/javascript/edge.js
+#	new file:   edge-tests/src/javascript/main/edge.js
+#	new file:   edge-tests/src/javascript/main/main.js
+#
+

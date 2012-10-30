@@ -1,7 +1,5 @@
 package com.darylteo.edge.core;
 
-import java.util.regex.Pattern;
-
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
@@ -47,37 +45,21 @@ public class Edge {
 
   /* Server Functions */
   public Edge get(String urlPattern, Handler<EdgeRequest> handler) {
-    return this.get(Pattern.compile(urlPattern), handler);
-  }
-
-  public Edge get(Pattern urlPattern, Handler<EdgeRequest> handler) {
     this.routes.addRoute("GET", urlPattern, handler);
     return this;
   }
 
   public Edge post(String urlPattern, Handler<EdgeRequest> handler) {
-    return this.post(Pattern.compile(urlPattern), handler);
-  }
-
-  public Edge post(Pattern urlPattern, Handler<EdgeRequest> handler) {
     this.routes.addRoute("POST", urlPattern, handler);
     return this;
   }
 
   public Edge put(String urlPattern, Handler<EdgeRequest> handler) {
-    return this.put(Pattern.compile(urlPattern), handler);
-  }
-
-  public Edge put(Pattern urlPattern, Handler<EdgeRequest> handler) {
     this.routes.addRoute("PUT", urlPattern, handler);
     return this;
   }
 
   public Edge delete(String urlPattern, Handler<EdgeRequest> handler) {
-    return this.delete(Pattern.compile(urlPattern), handler);
-  }
-
-  public Edge delete(Pattern urlPattern, Handler<EdgeRequest> handler) {
     this.routes.addRoute("DELETE", urlPattern, handler);
     return this;
   }

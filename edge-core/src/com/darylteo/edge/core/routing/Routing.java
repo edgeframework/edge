@@ -2,7 +2,6 @@ package com.darylteo.edge.core.routing;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.vertx.java.core.Handler;
 
@@ -15,8 +14,8 @@ public class Routing {
     this.routes = new LinkedList<>();
   }
 
-  public void addRoute(String method, Pattern pattern, Handler<EdgeRequest> handler) {
-    routes.add(new Route(method, pattern, handler));
+  public void addRoute(String method, String stringPattern, Handler<EdgeRequest> handler) {
+    routes.add(new Route(method, stringPattern, handler));
   }
 
   public RouteMatcher getRouteMatcher(String method, String url) {

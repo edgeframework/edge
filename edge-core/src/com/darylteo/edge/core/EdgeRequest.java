@@ -8,12 +8,17 @@ import com.darylteo.edge.core.routing.Route;
 import com.darylteo.edge.core.routing.RouteMatcher;
 
 public class EdgeRequest {
-  public final HttpServerRequest request;
-  public final HttpServerResponse response;
+  private final HttpServerRequest request;
+  private final HttpServerResponse response;
 
   private final RouteMatcher routeMatcher;
 
   private boolean shouldStop = false;
+
+  public final String method;
+  public final String uri;
+  public final String path;
+  public final String query;
 
   public EdgeRequest(HttpServerRequest request, RouteMatcher routeMatcher) {
     this.request = request;
@@ -21,12 +26,45 @@ public class EdgeRequest {
 
     this.routeMatcher = routeMatcher;
 
+    this.method = request.method;
+    this.uri = request.uri;
+    this.path = request.path;
+    this.query = request.query;
+
     this.handle();
   }
 
-  /* Signals that the request should pass through */
-  public void lastHandler(boolean value) {
-    this.shouldStop = value;
+  /**
+   * Handlers call this to indicate that the request should not pass through to
+   * other handlers
+   **/
+  public void stop() {
+    this.shouldStop = true;
+  }
+
+  /**
+   * Renders a String to the response
+   */
+  public void renderText(String text) {
+    this.renderText(text, 200);
+  }
+
+  /**
+   * Renders a String to the response
+   */
+  public void renderText(String text, int status) {
+    this.response.end(text);
+  }
+
+  /**
+   * Renders a String to the response
+   */
+  public void renderTemplate(String templateName) {
+    this.renderTemplate(templateName, 200);
+  }
+
+  public void renderTemplate(String templateName, int status) {
+    this.response.end("Rendered: " + templateName);
   }
 
   private boolean handle() {
@@ -35,7 +73,7 @@ public class EdgeRequest {
     while (true) {
       Route route = routeMatcher.getNextMatch();
 
-      VertxLocator.container.getLogger().info("Route Match:" + route);
+      VertxLocator.container.getLogger().info("Route Match for " + this.uri + ":" + route);
 
       if (route == null) {
         return handled;
