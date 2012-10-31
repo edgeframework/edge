@@ -37,8 +37,8 @@ public class Route {
     if (!matcher.matches()) {
       return new RouteMatcherResult(false, this);
     }
-    
-    Map<String,String> params = new HashMap<>();
+
+    Map<String, String> params = new HashMap<>();
     for (String identifier : this.paramIdentifiers) {
       String value = matcher.group(identifier);
       params.put(identifier, value);
@@ -53,7 +53,6 @@ public class Route {
   private void compilePattern(String stringPattern) throws Exception {
     /* Catch All url */
     if (stringPattern.equals("*")) {
-      VertxLocator.container.getLogger().info(String.format("String %s Compiled %s", stringPattern, "^.*$"));
       this.pattern = Pattern.compile("^.*$");
       this.paramIdentifiers = new String[0];
       return;
@@ -65,7 +64,6 @@ public class Route {
 
     /* Index url */
     if (stringPattern.equals("/")) {
-      VertxLocator.container.getLogger().info(String.format("String %s Compiled %s", stringPattern, "^/$"));
       this.pattern = Pattern.compile("^/$");
       this.paramIdentifiers = new String[0];
       return;
@@ -102,7 +100,7 @@ public class Route {
 
     completed.append("$");
 
-    VertxLocator.container.getLogger().info(String.format("String %s Compiled %s", stringPattern, completed));
+    VertxLocator.container.getLogger().debug(String.format("String %s Compiled %s", stringPattern, completed));
 
     this.pattern = Pattern.compile(completed.toString());
     this.paramIdentifiers = identifiers.toArray(new String[0]);

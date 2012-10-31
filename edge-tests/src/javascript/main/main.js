@@ -10,6 +10,14 @@ app
 	res.renderText("This is a test");
 })
 
+.get('/favicon.ico', function(req,res){
+	res.renderText("");
+})
+
+.get('/info', function(req,res){
+	res.renderText(req.query);
+})
+
 .get('/:value', function(req,res){
 	res.renderText("Rendering a Value: " + req.param("value"));
 })

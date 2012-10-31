@@ -69,8 +69,6 @@ public class EdgeApplication {
 
   /* Server Wrapper */
   private void handleRequest(HttpServerRequest request) {
-    VertxLocator.container.getLogger().info("Request Received: " + request);
-
     RouteMatcher matcher = this.routes.getRouteMatcher(request.method, request.path);
     EdgeHandlerContainer requestWrapper = new EdgeHandlerContainer(request, matcher);
 
