@@ -15,15 +15,16 @@ app
 })
 
 .get('/info', function(req,res){
+	console.log(req.query.get('another'));
 	res.renderText(req.query);
 })
 
 .get('/:value', function(req,res){
-	res.renderText("Rendering a Value: " + req.param("value"));
+	res.renderText(req.params.get('value'));
 })
 
 .get('/blogs/:name', function(req,res){
-	var name = req.param('name');
+	var name = req.params.name;
 
 	if(name == ""){
 		res.renderText("Index of Blogs");

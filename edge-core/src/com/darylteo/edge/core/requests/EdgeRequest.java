@@ -4,13 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonObject;
 
 public class EdgeRequest {
   private final HttpServerRequest request;
 
-  public JsonObject params;
-  public JsonObject query;
+  public Map<String, String> params;
+  public Map<String, Object> query;
 
   public final String method;
   public final String uri;
@@ -22,6 +21,8 @@ public class EdgeRequest {
     this.method = request.method;
     this.uri = request.uri;
     this.path = request.path;
+
+    this.query = QueryParser.parse(request.query);
   }
 
   /**
@@ -40,16 +41,7 @@ public class EdgeRequest {
    * @param params
    */
   void setParams(Map<String, String> params) {
-    this.params = new JsonObject(new HashMap<String, Object>(params));
-  }
-
-  /**
-   * Used to update the params based on the route match
-   * 
-   * @param params
-   */
-  void setQuery(Map<String, String> params) {
-    this.query = new JsonObject(new HashMap<String, Object>(params));
+    this.params = new HashMap<String, String>(params);
   }
 
 }

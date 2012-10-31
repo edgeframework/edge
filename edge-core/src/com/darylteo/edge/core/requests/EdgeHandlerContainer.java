@@ -1,8 +1,5 @@
 package com.darylteo.edge.core.requests;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
@@ -19,8 +16,6 @@ public class EdgeHandlerContainer {
     this.routeMatcher = routeMatcher;
     this.request = new EdgeRequest(request);
     this.response = new EdgeResponse(request.response);
-
-    this.request.setQuery(this.queryToMap(request.query));
   }
 
   public boolean handle() {
@@ -42,23 +37,4 @@ public class EdgeHandlerContainer {
     return handled;
   }
 
-  private Map<String, String> queryToMap(String queryString) {
-    Map<String, String> query = new HashMap<>();
-
-    if (queryString == null) {
-      return query;
-    }
-
-    for (String pair : queryString.split("&")) {
-      String[] keyvaluepair = pair.split("=");
-      if (keyvaluepair.length == 2) {
-        query.put(keyvaluepair[0], keyvaluepair[1]);
-      } else {
-        query.put(keyvaluepair[0], null);
-      }
-
-    }
-
-    return query;
-  }
 }
