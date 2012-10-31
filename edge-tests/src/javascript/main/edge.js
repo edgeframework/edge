@@ -1,3 +1,3 @@
 function Edge(){
-  	return com.darylteo.edge.core.Edge.newApplication();
+  	return new com.darylteo.edge.core.EdgeApplication();
 }

@@ -6,30 +6,24 @@ import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
+import com.darylteo.edge.core.requests.EdgeHandler;
+import com.darylteo.edge.core.requests.EdgeHandlerContainer;
 import com.darylteo.edge.core.routing.RouteMatcher;
 import com.darylteo.edge.core.routing.Routing;
 
-public class Edge {
+public class EdgeApplication {
 
-  private final Edge that = this;
+  private final EdgeApplication that = this;
   private final Vertx vertx;
 
   private final HttpServer server;
   private final Routing routes;
 
-  public static Edge newApplication() {
-    return new Edge();
-  }
-
-  public static Edge newApplication(Vertx vertx) {
-    return new Edge(vertx);
-  }
-
-  public Edge() {
+  public EdgeApplication() {
     this(VertxLocator.vertx);
   }
 
-  public Edge(Vertx vertx) {
+  public EdgeApplication(Vertx vertx) {
     this.vertx = vertx;
 
     this.server = vertx.createHttpServer();
@@ -44,31 +38,31 @@ public class Edge {
   }
 
   /* Server Functions */
-  public Edge get(String urlPattern, Handler<EdgeRequest> handler) {
+  public EdgeApplication get(String urlPattern, EdgeHandler handler) {
     this.routes.addRoute("GET", urlPattern, handler);
     return this;
   }
 
-  public Edge post(String urlPattern, Handler<EdgeRequest> handler) {
+  public EdgeApplication post(String urlPattern, EdgeHandler handler) {
     this.routes.addRoute("POST", urlPattern, handler);
     return this;
   }
 
-  public Edge put(String urlPattern, Handler<EdgeRequest> handler) {
+  public EdgeApplication put(String urlPattern, EdgeHandler handler) {
     this.routes.addRoute("PUT", urlPattern, handler);
     return this;
   }
 
-  public Edge delete(String urlPattern, Handler<EdgeRequest> handler) {
+  public EdgeApplication delete(String urlPattern, EdgeHandler handler) {
     this.routes.addRoute("DELETE", urlPattern, handler);
     return this;
   }
 
-  public Edge listen(int port) {
+  public EdgeApplication listen(int port) {
     return this.listen(port, "localhost");
   }
 
-  public Edge listen(int port, String hostname) {
+  public EdgeApplication listen(int port, String hostname) {
     this.server.listen(port, hostname);
     return this;
   }
@@ -78,6 +72,8 @@ public class Edge {
     VertxLocator.container.getLogger().info("Request Received: " + request);
 
     RouteMatcher matcher = this.routes.getRouteMatcher(request.method, request.path);
-    EdgeRequest requestWrapper = new EdgeRequest(request, matcher);
+    EdgeHandlerContainer requestWrapper = new EdgeHandlerContainer(request, matcher);
+
+    requestWrapper.handle();
   }
 }

@@ -3,10 +3,9 @@ package com.darylteo.edge.core.routing;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.vertx.java.core.Handler;
 import org.vertx.java.deploy.impl.VertxLocator;
 
-import com.darylteo.edge.core.EdgeRequest;
+import com.darylteo.edge.core.requests.EdgeHandler;
 
 public class Routing {
   private final List<Route> routes;
@@ -15,7 +14,7 @@ public class Routing {
     this.routes = new LinkedList<>();
   }
 
-  public void addRoute(String method, String stringPattern, Handler<EdgeRequest> handler) {
+  public void addRoute(String method, String stringPattern, EdgeHandler handler) {
     try {
       routes.add(new Route(method, stringPattern, handler));
     } catch (Exception e) {
