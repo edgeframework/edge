@@ -64,11 +64,10 @@ class QueryParser {
       @Override
       public int compare(Parameter p1, Parameter p2) {
         if (p1.key.equals(p2.key)) {
-          if (p1.isArray == p2.isArray) {
-            return 0;
-          } else {
-            return p1.isArray ? 1 : -1;
-          }
+          int score1 = p1.isMap ? 2 : p1.isArray ? 1 : 0;
+          int score2 = p2.isMap ? 2 : p2.isArray ? 1 : 0;
+
+          return score1 - score2;
         } else {
           return p1.key.compareTo(p2.key);
         }

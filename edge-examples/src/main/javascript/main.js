@@ -1,3 +1,5 @@
+// run edge-tests/src/javascript/main/main.js -cp bin;edge-tests/src/javascript/main/
+
 load('vertx.js')
 load('edge.js');
 
@@ -6,12 +8,7 @@ var app = Edge();
 
 app
 .get('/', function(req,res){
-	log.info('Res: ' + res);
-	res.renderText("This is a test");
-})
-
-.get('/favicon.ico', function(req,res){
-	res.renderText("");
+	res.renderText("This is the index page");
 })
 
 .get('/info', function(req,res){
