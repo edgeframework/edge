@@ -9,6 +9,10 @@ public abstract class EdgeHandler {
   public EdgeHandler() {
   }
 
+  /**
+   * Abandons the current hierarchy of requests. All parameters and request data
+   * is discarded, and the next route handler (if any) will handle the request.
+   */
   protected void next() {
     this.container.next();
   }

@@ -23,6 +23,8 @@ public class EdgeHandlerContainer {
   private final RouteMatcher routeMatcher;
   private RouteMatcherResult currentResult;
 
+  private final Map<String, Object> params = new HashMap<>();
+
   public EdgeHandlerContainer(HttpServerRequest request, RouteMatcher routeMatcher) {
     this.routeMatcher = routeMatcher;
 
@@ -34,6 +36,7 @@ public class EdgeHandlerContainer {
 
   void next() {
     this.currentHandlers.clear();
+    this.params.clear();
 
     this.currentResult = routeMatcher.getNextMatch();
 
@@ -45,8 +48,6 @@ public class EdgeHandlerContainer {
   }
 
   private void handle() {
-    Map<String, Object> params = new HashMap<>();
-
     final EdgeRequest request = new EdgeRequest(_request, params);
     final EdgeResponse response = new EdgeResponse(_request.response);
 

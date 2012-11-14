@@ -16,6 +16,15 @@ public class BasicExample extends Verticle {
     EdgeApplication edge = new EdgeApplication();
 
     edge
+
+    .post("/", new EdgeHandler() {
+      @Override
+      public void handleRequest(EdgeRequest request, EdgeResponse response) {
+        System.out.println("This should be ignored with Get requests!");
+        response.renderText("POST!");
+      }
+    })
+
     /* Index */
     .get("/", new EdgeHandler() {
       @Override
