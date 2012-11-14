@@ -1,19 +1,27 @@
 package com.darylteo.edge.core.requests;
 
+import org.vertx.java.deploy.impl.VertxLocator;
+
 public abstract class EdgeHandler {
 
   private EdgeHandlerContainer container;
 
   public EdgeHandler() {
-
-  }
-
-  EdgeHandler(EdgeHandlerContainer container) {
-    this.container = container;
   }
 
   protected void next() {
-    System.out.println("Next");
+    this.container.next();
+  }
+
+  void handle(EdgeHandlerContainer container, EdgeRequest request, EdgeResponse response) {
+    if (this.container != null) {
+      VertxLocator.container.getLogger().warn("Container for EdgeRequest not set... did you call handleRequest by mistake?");
+      return;
+    }
+
+    this.container = container;
+    this.handleRequest(request, response);
+    this.container = null;
   }
 
   /**

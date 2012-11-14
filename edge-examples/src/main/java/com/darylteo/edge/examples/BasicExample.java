@@ -21,12 +21,21 @@ public class BasicExample extends Verticle {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
         System.out.println("Before!");
+        request.getParams().put("pass", "through");
       }
     }, new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        System.out.println("After");
-        response.renderText("This is the index page");
+        Object param = request.getParams().get("pass");
+        System.out.println("After: ");
+        response.renderText("This is the index page:" + param.toString());
+      }
+    })
+
+    .get("/", new EdgeHandler() {
+      @Override
+      public void handleRequest(EdgeRequest request, EdgeResponse response) {
+        response.renderText("This is the overriden index page");
       }
     })
 

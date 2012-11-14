@@ -1,20 +1,19 @@
 package com.darylteo.edge.core.requests;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.vertx.java.core.http.HttpServerRequest;
 
-import com.darylteo.edge.core.routing.RouteMatcherResult;
-
 public class EdgeRequest {
   private final HttpServerRequest request;
 
-  private RouteMatcherResult routeMatcherResult;
+  private Map<String, Object> params;
   private Map<String, Object> query;
 
-  public EdgeRequest(HttpServerRequest request, RouteMatcherResult result) {
+  public EdgeRequest(HttpServerRequest request, Map<String, Object> params) {
     this.request = request;
-    this.routeMatcherResult = result;
+    this.params = new HashMap<>(params);
 
     this.query = QueryParser.parse(request.query);
   }
@@ -30,13 +29,13 @@ public class EdgeRequest {
   }
 
   /**
-   * Retrieves a value given the parameter name.
+   * Retrieves a map of route parameters and their associated values
    * 
    * @param name
    * @return
    */
-  public String getRouteParam(String name) {
-    return this.routeMatcherResult.params.get(name);
+  public Map<String, Object> getParams() {
+    return this.params;
   }
 
   /**
@@ -68,12 +67,12 @@ public class EdgeRequest {
   }
 
   /**
-   * Returns the Query component of this request
+   * Returns the Query of this request
    * 
    * @return
    */
-  public String getQuery() {
-    return request.query;
+  public Map<String, Object> getQuery() {
+    return this.query;
   }
 
 }

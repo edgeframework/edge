@@ -39,7 +39,7 @@ public class Route {
       return new RouteMatcherResult(false, this);
     }
 
-    Map<String, String> params = new HashMap<>();
+    Map<String, Object> params = new HashMap<>();
     for (String identifier : this.paramIdentifiers) {
       String value = matcher.group(identifier);
       params.put(identifier, value);
