@@ -38,23 +38,33 @@ public class EdgeApplication {
   }
 
   /* Server Functions */
-  public EdgeApplication get(String urlPattern, EdgeHandler handler) {
-    this.routes.addRoute("GET", urlPattern, handler);
+  public EdgeApplication get(String urlPattern, EdgeHandler... handlers) {
+    for (EdgeHandler handler : handlers) {
+      this.routes.addRoute("GET", urlPattern, handler);
+    }
     return this;
   }
 
-  public EdgeApplication post(String urlPattern, EdgeHandler handler) {
-    this.routes.addRoute("POST", urlPattern, handler);
+  public EdgeApplication post(String urlPattern, EdgeHandler... handlers) {
+    for (EdgeHandler handler : handlers) {
+      this.routes.addRoute("POST", urlPattern, handler);
+    }
     return this;
   }
 
-  public EdgeApplication put(String urlPattern, EdgeHandler handler) {
-    this.routes.addRoute("PUT", urlPattern, handler);
+  public EdgeApplication put(String urlPattern, EdgeHandler... handlers) {
+    for (EdgeHandler handler : handlers) {
+
+      this.routes.addRoute("PUT", urlPattern, handler);
+    }
     return this;
   }
 
-  public EdgeApplication delete(String urlPattern, EdgeHandler handler) {
-    this.routes.addRoute("DELETE", urlPattern, handler);
+  public EdgeApplication delete(String urlPattern, EdgeHandler... handlers) {
+    for (EdgeHandler handler : handlers) {
+
+      this.routes.addRoute("DELETE", urlPattern, handler);
+    }
     return this;
   }
 
@@ -70,8 +80,6 @@ public class EdgeApplication {
   /* Server Wrapper */
   private void handleRequest(HttpServerRequest request) {
     RouteMatcher matcher = this.routes.getRouteMatcher(request.method, request.path);
-    EdgeHandlerContainer requestWrapper = new EdgeHandlerContainer(request, matcher);
-
-    requestWrapper.handle();
+    new EdgeHandlerContainer(request, matcher);
   }
 }

@@ -1,28 +1,31 @@
 package com.darylteo.edge.core.routing;
 
-import java.util.List;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class RouteMatcher {
 
   private final String method;
   private final String url;
 
-  private final List<Route> routes;
-  private int position = 0;
+  private final Iterator<Route> iterator;
 
-  public RouteMatcher(String method, String url, List<Route> routes) {
+  public RouteMatcher(String method, String url, Collection<Route> routes) {
     this.method = method;
     this.url = url;
 
-    this.routes = routes;
-    this.position = 0;
+    this.iterator = new LinkedList<Route>(routes).iterator();
   }
 
+  /**
+   * Returns the next matched handler. Returns null if none left.
+   * 
+   * @return the route handler
+   */
   public RouteMatcherResult getNextMatch() {
-    while (this.position < this.routes.size()) {
-      Route route = this.routes.get(this.position);
-
-      this.position++;
+    while (iterator.hasNext()) {
+      Route route = iterator.next();
 
       RouteMatcherResult result = route.matches(this.method, this.url);
       if (result.matches) {

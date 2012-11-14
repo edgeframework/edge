@@ -7,18 +7,19 @@ import com.darylteo.edge.core.routing.RouteMatcher;
 import com.darylteo.edge.core.routing.RouteMatcherResult;
 
 public class EdgeHandlerContainer {
-  private final EdgeRequest request;
-  private final EdgeResponse response;
+  private final HttpServerRequest _request;
 
   private final RouteMatcher routeMatcher;
 
   public EdgeHandlerContainer(HttpServerRequest request, RouteMatcher routeMatcher) {
     this.routeMatcher = routeMatcher;
-    this.request = new EdgeRequest(request);
-    this.response = new EdgeResponse(request.response);
+
+    this._request = request;
+
+    this.handle();
   }
 
-  public boolean handle() {
+  private boolean handle() {
     boolean handled = false;
 
     RouteMatcherResult result = routeMatcher.getNextMatch();
@@ -27,11 +28,17 @@ public class EdgeHandlerContainer {
       return handled;
     }
 
-    VertxLocator.container.getLogger().info("Route Match for " + this.request.path);
+    EdgeRequest request = new EdgeRequest(_request, result);
+    EdgeResponse response = new EdgeResponse(_request.response);
 
-    this.request.setParams(result.params);
+    VertxLocator.container.getLogger().info("Route Match for " + request.getPath());
 
-    result.route.getHandler().handleRequest(this.request, this.response);
+    EdgeHandler[] handlers = result.route.getHandlers();
+
+    for (EdgeHandler handler : handlers) {
+      handler.handleRequest(request, response);
+    }
+
     handled = true;
 
     return handled;

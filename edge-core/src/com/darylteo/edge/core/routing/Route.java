@@ -16,14 +16,14 @@ public class Route {
   private static final Pattern validParamPattern = Pattern.compile("^:(?<paramname>[A-Za-z0-9]+)$");
 
   private final String method;
-  private final EdgeHandler handler;
+  private final List<EdgeHandler> handlers;
 
   private Pattern pattern;
   private String[] paramIdentifiers;
 
-  public Route(String method, String stringPattern, EdgeHandler handler) throws Exception {
+  public Route(String method, String stringPattern) throws Exception {
     this.method = method;
-    this.handler = handler;
+    this.handlers = new LinkedList<>();
 
     compilePattern(stringPattern);
   }
@@ -46,8 +46,12 @@ public class Route {
     return new RouteMatcherResult(true, this, params);
   }
 
-  public EdgeHandler getHandler() {
-    return this.handler;
+  public void addHandler(EdgeHandler handler) {
+    this.handlers.add(handler);
+  }
+
+  public EdgeHandler[] getHandlers() {
+    return this.handlers.toArray(new EdgeHandler[0]);
   }
 
   private void compilePattern(String stringPattern) throws Exception {

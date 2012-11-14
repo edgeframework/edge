@@ -42,13 +42,15 @@ repositories {
 }
 
 dependencies {
-  compile      "org.vert-x:vertx-core:$vertxVersion"
-  compile      "org.vert-x:vertx-platform:$vertxVersion"
+  provided     "org.vert-x:vertx-core:$vertxVersion"
+  provided     "org.vert-x:vertx-platform:$vertxVersion"
 
-  testCompile( "org.vert-x:vertx-testframework:$vertxVersion" ) {
+  compile  "org.mozilla:rhino:$rhinoVersion"
+
+  testCompile ( "org.vert-x:vertx-testframework:$vertxVersion" ) {
     transitive = false
   }
-  testCompile  "org.mozilla:rhino:$rhinoVersion"
+
   testCompile  "junit:junit:$junitVersion"
 }
 

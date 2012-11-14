@@ -1,26 +1,20 @@
 package com.darylteo.edge.core.requests;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.vertx.java.core.http.HttpServerRequest;
 
+import com.darylteo.edge.core.routing.RouteMatcherResult;
+
 public class EdgeRequest {
   private final HttpServerRequest request;
 
-  public Map<String, String> params;
-  public Map<String, Object> query;
+  private RouteMatcherResult routeMatcherResult;
+  private Map<String, Object> query;
 
-  public final String method;
-  public final String uri;
-  public final String path;
-
-  public EdgeRequest(HttpServerRequest request) {
+  public EdgeRequest(HttpServerRequest request, RouteMatcherResult result) {
     this.request = request;
-
-    this.method = request.method;
-    this.uri = request.uri;
-    this.path = request.path;
+    this.routeMatcherResult = result;
 
     this.query = QueryParser.parse(request.query);
   }
@@ -36,12 +30,50 @@ public class EdgeRequest {
   }
 
   /**
-   * Used to update the params based on the route match
+   * Retrieves a value given the parameter name.
    * 
-   * @param params
+   * @param name
+   * @return
    */
-  void setParams(Map<String, String> params) {
-    this.params = new HashMap<String, String>(params);
+  public String getRouteParam(String name) {
+    return this.routeMatcherResult.params.get(name);
+  }
+
+  /**
+   * Returns the method of this request.
+   * 
+   * @return
+   */
+  public String getMethod() {
+    return request.method;
+  }
+
+  /**
+   * Returns the full uri of this request. For example,
+   * "http://domain.org/index.html?query=1"
+   * 
+   * @return
+   */
+  public String getUri() {
+    return request.uri;
+  }
+
+  /**
+   * Returns the path component of this request. For example, "/index.html"
+   * 
+   * @return
+   */
+  public String getPath() {
+    return request.path;
+  }
+
+  /**
+   * Returns the Query component of this request
+   * 
+   * @return
+   */
+  public String getQuery() {
+    return request.query;
   }
 
 }

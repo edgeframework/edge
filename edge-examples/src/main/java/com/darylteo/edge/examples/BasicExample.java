@@ -18,42 +18,44 @@ public class BasicExample extends Verticle {
     edge
     /* Index */
     .get("/", new EdgeHandler() {
-
+      @Override
+      public void handleRequest(EdgeRequest request, EdgeResponse response) {
+        System.out.println("Ha!");
+      }
+    }, new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
         response.renderText("This is the index page");
       }
     })
 
-    /* Static Path - give a query and it'll print out the query */
-    .get("/info", new EdgeHandler() {
+    // /* Static Path - give a query and it'll print out the query */
+    // .get("/info", new EdgeHandler() {
+    //
+    // @Override
+    // public void handleRequest(EdgeRequest request, EdgeResponse response) {
+    // response.renderText(request.getQuery().toString());
+    // }
+    // })
+    //
+    // /* Static Path - give a query and it'll print out the query */
+    // .get("/info/:param", new EdgeHandler() {
+    //
+    // @Override
+    // public void handleRequest(EdgeRequest request, EdgeResponse response) {
+    // response.renderText(request.getQuery().toString());
+    // }
+    // })
+    //
+    // .get("*", new EdgeHandler() {
+    //
+    // @Override
+    // public void handleRequest(EdgeRequest request, EdgeResponse response) {
+    // response.status(404).renderText("File Not Found");
+    // }
+    // })
 
-      @Override
-      public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        response.renderText(request.query.toString());
-      }
-    })
-
-    /* Static Path - give a query and it'll print out the query */
-    .get("/info/:param", new EdgeHandler() {
-
-      @Override
-      public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        response.renderText(request.params.toString());
-      }
-    })
-
-    .get("*", new EdgeHandler() {
-
-      @Override
-      public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        response
-          .status(404)
-          .renderText("File Not Found");
-      }
-    })
-
-    .listen(8080, "localhost");
+        .listen(8080, "localhost");
 
   }
 }
