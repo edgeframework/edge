@@ -20,11 +20,12 @@ public class BasicExample extends Verticle {
     .get("/", new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        System.out.println("Ha!");
+        System.out.println("Before!");
       }
     }, new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
+        System.out.println("After");
         response.renderText("This is the index page");
       }
     })

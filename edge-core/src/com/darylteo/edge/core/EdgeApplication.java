@@ -39,32 +39,22 @@ public class EdgeApplication {
 
   /* Server Functions */
   public EdgeApplication get(String urlPattern, EdgeHandler... handlers) {
-    for (EdgeHandler handler : handlers) {
-      this.routes.addRoute("GET", urlPattern, handler);
-    }
+    this.routes.addRoute("GET", urlPattern, handlers);
     return this;
   }
 
   public EdgeApplication post(String urlPattern, EdgeHandler... handlers) {
-    for (EdgeHandler handler : handlers) {
-      this.routes.addRoute("POST", urlPattern, handler);
-    }
+    this.routes.addRoute("POST", urlPattern, handlers);
     return this;
   }
 
   public EdgeApplication put(String urlPattern, EdgeHandler... handlers) {
-    for (EdgeHandler handler : handlers) {
-
-      this.routes.addRoute("PUT", urlPattern, handler);
-    }
+    this.routes.addRoute("PUT", urlPattern, handlers);
     return this;
   }
 
   public EdgeApplication delete(String urlPattern, EdgeHandler... handlers) {
-    for (EdgeHandler handler : handlers) {
-
-      this.routes.addRoute("DELETE", urlPattern, handler);
-    }
+    this.routes.addRoute("DELETE", urlPattern, handlers);
     return this;
   }
 

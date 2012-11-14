@@ -1,5 +1,6 @@
 package com.darylteo.edge.core.routing;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,9 +22,9 @@ public class Route {
   private Pattern pattern;
   private String[] paramIdentifiers;
 
-  public Route(String method, String stringPattern) throws Exception {
+  public Route(String method, String stringPattern, EdgeHandler... handlers) throws Exception {
     this.method = method;
-    this.handlers = new LinkedList<>();
+    this.handlers = Arrays.asList(handlers);
 
     compilePattern(stringPattern);
   }
