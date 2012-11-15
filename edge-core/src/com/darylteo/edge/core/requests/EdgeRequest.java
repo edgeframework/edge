@@ -1,6 +1,5 @@
 package com.darylteo.edge.core.requests;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.vertx.java.core.http.HttpServerRequest;
@@ -8,12 +7,16 @@ import org.vertx.java.core.http.HttpServerRequest;
 public class EdgeRequest {
   private final HttpServerRequest request;
 
-  private Map<String, Object> params;
-  private Map<String, Object> query;
+  private ParamCollection params;
+  private QueryCollection query;
 
   public EdgeRequest(HttpServerRequest request, Map<String, Object> params) {
     this.request = request;
-    this.params = new HashMap<>(params);
+
+    this.params = new ParamCollection();
+    for (Map.Entry<String, Object> entry : params.entrySet()) {
+      this.params.put(entry.getKey(), entry.getValue());
+    }
 
     this.query = QueryParser.parse(request.query);
   }
@@ -34,7 +37,7 @@ public class EdgeRequest {
    * @param name
    * @return
    */
-  public Map<String, Object> getParams() {
+  public ParamCollection getParams() {
     return this.params;
   }
 
@@ -71,7 +74,7 @@ public class EdgeRequest {
    * 
    * @return
    */
-  public Map<String, Object> getQuery() {
+  public QueryCollection getQuery() {
     return this.query;
   }
 

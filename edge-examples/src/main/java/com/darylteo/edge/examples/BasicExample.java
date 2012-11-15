@@ -35,7 +35,7 @@ public class BasicExample extends Verticle {
     }, new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        Object param = request.getParams().get("pass");
+        String param = request.getParams().get("pass");
         System.out.println("After: ");
         response.renderText("This is the index page:" + param.toString());
       }
