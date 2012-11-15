@@ -13,7 +13,6 @@ import org.vertx.java.deploy.impl.VertxLocator;
 
 import com.darylteo.edge.core.routing.RouteMatcher;
 import com.darylteo.edge.core.routing.RouteMatcherResult;
-import com.darylteo.edge.middleware.Middleware;
 
 public class EdgeHandlerContainer {
   private final EdgeHandlerContainer that = this;
@@ -27,9 +26,9 @@ public class EdgeHandlerContainer {
 
   private final Map<String, Object> params = new HashMap<>();
 
-  private final List<Middleware> middleware;
+  private final List<EdgeHandler> middleware;
 
-  public EdgeHandlerContainer(HttpServerRequest request, RouteMatcher routeMatcher, List<Middleware> middleware) {
+  public EdgeHandlerContainer(HttpServerRequest request, RouteMatcher routeMatcher, List<EdgeHandler> middleware) {
     this.routeMatcher = routeMatcher;
 
     this.request = request;
@@ -61,7 +60,7 @@ public class EdgeHandlerContainer {
 
   private void middleware(final EdgeRequest request, final EdgeResponse response) {
 
-    final Iterator<Middleware> iterator = this.middleware.iterator();
+    final Iterator<EdgeHandler> iterator = this.middleware.iterator();
 
     final Handler<Void> loopHandler = new Handler<Void>() {
 
@@ -75,8 +74,8 @@ public class EdgeHandlerContainer {
           return;
         }
 
-        Middleware middleware = iterator.next();
-        middleware.handle(request, response);
+        EdgeHandler middleware = iterator.next();
+        middleware.handle(that, request, response);
 
         VertxLocator.vertx.runOnLoop(this);
       }

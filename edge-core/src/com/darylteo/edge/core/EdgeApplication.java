@@ -14,11 +14,10 @@ import com.darylteo.edge.core.requests.EdgeHandlerContainer;
 import com.darylteo.edge.core.routing.RouteMatcher;
 import com.darylteo.edge.core.routing.Routing;
 import com.darylteo.edge.middleware.BodyParser;
-import com.darylteo.edge.middleware.Middleware;
 
 public class EdgeApplication {
 
-  public static final Middleware bodyParser = new BodyParser();
+  public static final EdgeHandler bodyParser = new BodyParser();
 
   private final EdgeApplication that = this;
   private final Vertx vertx;
@@ -26,7 +25,7 @@ public class EdgeApplication {
   private final HttpServer server;
   private final Routing routes;
 
-  public final List<Middleware> middleware;
+  public final List<EdgeHandler> middleware;
 
   public EdgeApplication() {
     this(VertxLocator.vertx);
@@ -44,7 +43,7 @@ public class EdgeApplication {
     });
 
     this.routes = new Routing();
-    this.middleware = new LinkedList<Middleware>();
+    this.middleware = new LinkedList<>();
   }
 
   /* Server Functions */
@@ -78,8 +77,10 @@ public class EdgeApplication {
   }
 
   /* Middleware */
-  public EdgeApplication use(Middleware middleware) {
-    this.middleware.add(middleware);
+  public EdgeApplication use(EdgeHandler... handlers) {
+    for (EdgeHandler handler : handlers) {
+      this.middleware.add(handler);
+    }
     return this;
   }
 
