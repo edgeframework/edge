@@ -1,5 +1,8 @@
 package com.darylteo.edge.core;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
@@ -10,14 +13,20 @@ import com.darylteo.edge.core.requests.EdgeHandler;
 import com.darylteo.edge.core.requests.EdgeHandlerContainer;
 import com.darylteo.edge.core.routing.RouteMatcher;
 import com.darylteo.edge.core.routing.Routing;
+import com.darylteo.edge.middleware.BodyParser;
+import com.darylteo.edge.middleware.Middleware;
 
 public class EdgeApplication {
+
+  public static final Middleware bodyParser = new BodyParser();
 
   private final EdgeApplication that = this;
   private final Vertx vertx;
 
   private final HttpServer server;
   private final Routing routes;
+
+  public final List<Middleware> middleware;
 
   public EdgeApplication() {
     this(VertxLocator.vertx);
@@ -35,6 +44,7 @@ public class EdgeApplication {
     });
 
     this.routes = new Routing();
+    this.middleware = new LinkedList<Middleware>();
   }
 
   /* Server Functions */
@@ -67,9 +77,15 @@ public class EdgeApplication {
     return this;
   }
 
+  /* Middleware */
+  public EdgeApplication use(Middleware middleware) {
+    this.middleware.add(middleware);
+    return this;
+  }
+
   /* Server Wrapper */
   private void handleRequest(HttpServerRequest request) {
     RouteMatcher matcher = this.routes.getRouteMatcher(request.method, request.path);
-    new EdgeHandlerContainer(request, matcher);
+    new EdgeHandlerContainer(request, matcher, this.middleware);
   }
 }

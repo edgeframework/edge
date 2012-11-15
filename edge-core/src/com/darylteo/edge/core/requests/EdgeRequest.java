@@ -9,6 +9,7 @@ public class EdgeRequest {
 
   private ParamCollection params;
   private QueryCollection query;
+  private DataCollection data;
 
   public EdgeRequest(HttpServerRequest request, Map<String, Object> params) {
     this.request = request;
@@ -19,6 +20,8 @@ public class EdgeRequest {
     }
 
     this.query = QueryParser.parse(request.query);
+
+    this.data = new DataCollection();
   }
 
   /**
@@ -29,16 +32,6 @@ public class EdgeRequest {
    */
   public String header(String header) {
     return this.request.headers().get(header);
-  }
-
-  /**
-   * Retrieves a map of route parameters and their associated values
-   * 
-   * @param name
-   * @return
-   */
-  public ParamCollection getParams() {
-    return this.params;
   }
 
   /**
@@ -76,6 +69,27 @@ public class EdgeRequest {
    */
   public QueryCollection getQuery() {
     return this.query;
+  }
+
+  /**
+   * Retrieves a map of route parameters and their associated values
+   * 
+   * @param name
+   * @return
+   */
+  public ParamCollection getParams() {
+    return this.params;
+  }
+
+  /**
+   * Retrieves a map of data parameters and their associated values. These are
+   * preserved between a handler chain for a route.
+   * 
+   * @param name
+   * @return
+   */
+  public DataCollection getData() {
+    return this.data;
   }
 
 }

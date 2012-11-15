@@ -2,6 +2,7 @@ package com.darylteo.edge.core.requests;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -12,11 +13,12 @@ import org.vertx.java.deploy.impl.VertxLocator;
 
 import com.darylteo.edge.core.routing.RouteMatcher;
 import com.darylteo.edge.core.routing.RouteMatcherResult;
+import com.darylteo.edge.middleware.Middleware;
 
 public class EdgeHandlerContainer {
   private final EdgeHandlerContainer that = this;
 
-  private final HttpServerRequest _request;
+  private final HttpServerRequest request;
 
   private final List<EdgeHandler> currentHandlers = new LinkedList<>();
 
@@ -25,13 +27,16 @@ public class EdgeHandlerContainer {
 
   private final Map<String, Object> params = new HashMap<>();
 
-  public EdgeHandlerContainer(HttpServerRequest request, RouteMatcher routeMatcher) {
+  private final List<Middleware> middleware;
+
+  public EdgeHandlerContainer(HttpServerRequest request, RouteMatcher routeMatcher, List<Middleware> middleware) {
     this.routeMatcher = routeMatcher;
 
-    this._request = request;
+    this.request = request;
 
-    this.next();
-    this.handle();
+    this.middleware = middleware;
+
+    main();
   }
 
   void next() {
@@ -47,9 +52,41 @@ public class EdgeHandlerContainer {
     this.currentHandlers.addAll(Arrays.asList(this.currentResult.route.getHandlers()));
   }
 
-  private void handle() {
-    final EdgeRequest request = new EdgeRequest(_request, params);
-    final EdgeResponse response = new EdgeResponse(_request.response);
+  private void main() {
+    final EdgeRequest request = new EdgeRequest(this.request, params);
+    final EdgeResponse response = new EdgeResponse(this.request.response);
+
+    middleware(request, response);
+  }
+
+  private void middleware(final EdgeRequest request, final EdgeResponse response) {
+
+    final Iterator<Middleware> iterator = this.middleware.iterator();
+
+    final Handler<Void> loopHandler = new Handler<Void>() {
+
+      @Override
+      public void handle(Void event) {
+        VertxLocator.container.getLogger().info("Handling: " + request.getPath());
+
+        if (!iterator.hasNext()) {
+          that.next();
+          that.handle(request, response);
+          return;
+        }
+
+        Middleware middleware = iterator.next();
+        middleware.handle(request, response);
+
+        VertxLocator.vertx.runOnLoop(this);
+      }
+
+    };
+
+    VertxLocator.vertx.runOnLoop(loopHandler);
+  }
+
+  private void handle(final EdgeRequest request, final EdgeResponse response) {
 
     final Handler<Void> loopHandler = new Handler<Void>() {
 

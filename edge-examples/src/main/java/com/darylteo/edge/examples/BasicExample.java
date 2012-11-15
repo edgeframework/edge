@@ -30,12 +30,12 @@ public class BasicExample extends Verticle {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
         System.out.println("Before!");
-        request.getParams().put("pass", "through");
+        request.getData().put("pass", "through");
       }
     }, new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        String param = request.getParams().get("pass");
+        String param = request.getData().get("pass");
         System.out.println("After: ");
         response.renderText("This is the index page:" + param.toString());
       }
@@ -47,6 +47,8 @@ public class BasicExample extends Verticle {
         response.renderText("This is the overriden index page");
       }
     })
+
+    .use(EdgeApplication.bodyParser)
 
     // /* Static Path - give a query and it'll print out the query */
     // .get("/info", new EdgeHandler() {
