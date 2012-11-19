@@ -55,6 +55,13 @@ public class EdgeHandlerContainer {
     VertxLocator.vertx.runOnLoop(this.loopHandler);
   }
 
+  public void exception() {
+    this.response.status(500);
+    /* TODO: trigger exception handlers */
+
+    this.response.renderHtml("<p>Server Error: 500</p>");
+  }
+
   private void main() {
 
     /* Add chain of Middleware to the beginning of the request chain */
@@ -71,4 +78,5 @@ public class EdgeHandlerContainer {
     this.next();
 
   }
+
 }

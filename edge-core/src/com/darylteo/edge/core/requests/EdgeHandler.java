@@ -24,7 +24,12 @@ public abstract class EdgeHandler {
     }
 
     this.container = container;
-    this.handleRequest(request, response);
+
+    try {
+      this.handleRequest(request, response);
+    } catch (Throwable e) {
+      container.exception();
+    }
     this.container = null;
   }
 
@@ -36,5 +41,5 @@ public abstract class EdgeHandler {
    * @param response
    *          - the response
    */
-  public abstract void handleRequest(EdgeRequest request, EdgeResponse response);
+  public abstract void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception;
 }

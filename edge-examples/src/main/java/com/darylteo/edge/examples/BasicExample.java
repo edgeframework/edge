@@ -35,7 +35,7 @@ public class BasicExample extends Verticle {
       }
     }, new EdgeHandler() {
       @Override
-      public void handleRequest(EdgeRequest request, EdgeResponse response) {
+      public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
         String param = request.getData().get("pass");
         System.out.println("After: ");
         response.renderTemplate("basic");
@@ -49,35 +49,19 @@ public class BasicExample extends Verticle {
       }
     })
 
+    .get("/exception", new EdgeHandler() {
+
+      @Override
+      public void handleRequest(EdgeRequest request, EdgeResponse response) {
+        String[] array = new String[0];
+        array[1] = "Throw!";
+      }
+
+    })
+
     .use(EdgeApplication.bodyParser)
 
-    // /* Static Path - give a query and it'll print out the query */
-    // .get("/info", new EdgeHandler() {
-    //
-    // @Override
-    // public void handleRequest(EdgeRequest request, EdgeResponse response) {
-    // response.renderText(request.getQuery().toString());
-    // }
-    // })
-    //
-    // /* Static Path - give a query and it'll print out the query */
-    // .get("/info/:param", new EdgeHandler() {
-    //
-    // @Override
-    // public void handleRequest(EdgeRequest request, EdgeResponse response) {
-    // response.renderText(request.getQuery().toString());
-    // }
-    // })
-    //
-    // .get("*", new EdgeHandler() {
-    //
-    // @Override
-    // public void handleRequest(EdgeRequest request, EdgeResponse response) {
-    // response.status(404).renderText("File Not Found");
-    // }
-    // })
-
-        .listen(8080, "localhost");
+    .listen(8080, "localhost");
 
   }
 }

@@ -1,15 +1,9 @@
 package com.darylteo.edge.core.requests;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Scanner;
 
 import org.vertx.java.core.http.HttpServerResponse;
 
@@ -58,21 +52,16 @@ public class EdgeResponse {
    * Renders a Template to the response
    */
 
-  public EdgeResponse renderTemplate(String templateName) {
+  public EdgeResponse renderTemplate(String templateName) throws IOException {
     this.response.putHeader("Content-Type", "text/html");
 
     Handlebars hb = new Handlebars();
     Path templatePath = Paths.get("edge-examples", "templates", templateName + ".hbs");
 
-    try {
-      String contents = new String(Files.readAllBytes(templatePath));
+    String contents = new String(Files.readAllBytes(templatePath));
+    String compiled = hb.compile(contents).apply("Hello World");
 
-      String compiled = hb.compile(contents).apply("Hello World");
-
-      this.response.end(compiled);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    this.response.end(compiled);
 
     return this;
   }
