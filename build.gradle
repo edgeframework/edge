@@ -47,6 +47,8 @@ dependencies {
   
   compile      "io.netty:netty:$nettyVersion"
   compile      "org.mozilla:rhino:$rhinoVersion"
+  
+  compile      "com.github.jknack:handlebars:$handlebarsVersion"
 
   testCompile ( "org.vert-x:vertx-testframework:$vertxVersion" ) {
     transitive = false

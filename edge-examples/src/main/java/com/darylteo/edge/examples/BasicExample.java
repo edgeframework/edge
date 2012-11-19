@@ -38,7 +38,7 @@ public class BasicExample extends Verticle {
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
         String param = request.getData().get("pass");
         System.out.println("After: ");
-        response.renderHtml("This is the index page:" + param.toString() + "<br /><form method=\"post\"><input type=\"name\" /><input type=\"Submit\" /></form>");
+        response.renderTemplate("basic");
       }
     })
 
