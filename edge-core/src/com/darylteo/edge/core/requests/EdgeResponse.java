@@ -35,15 +35,16 @@ public class EdgeResponse {
   /**
    * Renders a String to the response
    */
-  public EdgeResponse renderText(String text) {
-    return this.renderText(text, 200);
+  public EdgeResponse renderHtml(String html) {
+    return this.renderHtml(html, 200);
   }
 
   /**
    * Renders a String to the response
    */
-  public EdgeResponse renderText(String text, int status) {
-    this.response.end(text);
+  public EdgeResponse renderHtml(String html, int status) {
+    this.response.putHeader("Content-Type", "text/html");
+    this.response.end(html);
     return this;
   }
 

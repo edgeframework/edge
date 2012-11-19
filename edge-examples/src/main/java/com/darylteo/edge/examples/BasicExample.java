@@ -21,7 +21,7 @@ public class BasicExample extends Verticle {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
         System.out.println("This should be ignored with Get requests!");
-        response.renderText("POST!");
+        response.renderHtml("Post Data! : " + request.getData());
       }
     })
 
@@ -31,20 +31,21 @@ public class BasicExample extends Verticle {
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
         System.out.println("Before!");
         request.getData().put("pass", "through");
+        next();
       }
     }, new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
         String param = request.getData().get("pass");
         System.out.println("After: ");
-        response.renderText("This is the index page:" + param.toString());
+        response.renderHtml("This is the index page:" + param.toString() + "<br /><form method=\"post\"><input type=\"name\" /><input type=\"Submit\" /></form>");
       }
     })
 
     .get("/", new EdgeHandler() {
       @Override
       public void handleRequest(EdgeRequest request, EdgeResponse response) {
-        response.renderText("This is the overriden index page");
+        response.renderHtml("This is the overriden index page");
       }
     })
 

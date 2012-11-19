@@ -11,17 +11,17 @@ public class EdgeRequest {
   private QueryCollection query;
   private DataCollection data;
 
-  public EdgeRequest(HttpServerRequest request, Map<String, Object> params) {
+  public EdgeRequest(HttpServerRequest request) {
     this.request = request;
 
     this.params = new ParamCollection();
-    for (Map.Entry<String, Object> entry : params.entrySet()) {
-      this.params.put(entry.getKey(), entry.getValue());
-    }
-
     this.query = QueryParser.parse(request.query);
 
     this.data = new DataCollection();
+  }
+
+  public HttpServerRequest getUnderlyingRequest() {
+    return this.request;
   }
 
   /**
@@ -30,8 +30,18 @@ public class EdgeRequest {
    * @param header
    * @return
    */
-  public String header(String header) {
+  public String getHeader(String header) {
     return this.request.headers().get(header);
+  }
+
+  /**
+   * Retrieves all Http Response Headers
+   * 
+   * @param header
+   * @return
+   */
+  public Map<String, String> getHeaders() {
+    return this.request.headers();
   }
 
   /**
