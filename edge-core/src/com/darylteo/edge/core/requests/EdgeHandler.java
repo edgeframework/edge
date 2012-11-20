@@ -28,7 +28,7 @@ public abstract class EdgeHandler {
     try {
       this.handleRequest(request, response);
     } catch (Throwable e) {
-      container.exception();
+      container.exception(e);
     }
     this.container = null;
   }

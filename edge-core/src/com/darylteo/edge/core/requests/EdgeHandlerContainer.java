@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
@@ -41,14 +42,25 @@ public class EdgeHandlerContainer {
 
   };
 
-  public EdgeHandlerContainer(HttpServerRequest request, RouteMatcher routeMatcher, List<EdgeHandler> middleware) {
+  public EdgeHandlerContainer(final HttpServerRequest request, final RouteMatcher routeMatcher, final List<EdgeHandler> middleware) {
     this.routeMatcher = routeMatcher;
     this.middleware = middleware;
 
     this.request = new EdgeRequest(request);
     this.response = new EdgeResponse(request.response);
 
-    main();
+    if (this.request.isPost()) {
+      request.bodyHandler(new Handler<Buffer>() {
+        @Override
+        public void handle(Buffer buffer) {
+          that.request.setRawBody(buffer);
+          main();
+        }
+      });
+    } else {
+      main();
+    }
+
   }
 
   void next() {
@@ -56,10 +68,20 @@ public class EdgeHandlerContainer {
   }
 
   public void exception() {
+    this.exception("Internal Server Error");
+  }
+
+  public void exception(Throwable t) {
+    this.exception(t.toString());
+  }
+
+  public void exception(String message) {
     this.response.status(500);
     /* TODO: trigger exception handlers */
 
-    this.response.renderHtml("<p>Server Error: 500</p>");
+    VertxLocator.container.getLogger().error(message);
+
+    this.response.renderHtml("<p>Server Error (500): " + message + "</p>");
   }
 
   private void main() {

@@ -1,0 +1,75 @@
+<html>
+  <title>Mod Edge - Basic Example</title>
+  <body>
+    <div>
+      <h2>Url Encoded Form Data</h2>
+      <form method="post">
+        <div>
+          <input type="text" name="simple_text" />
+        </div>
+        <div>
+          <textarea name="large_text"></textarea>
+        </div>
+        <div>
+          Check 1: <input type="checkbox" name="checkboxes[]" value="check 1" />
+          Check 2: <input type="checkbox" name="checkboxes[]" value="check 2" />
+          Check 3: <input type="checkbox" name="checkboxes[]" value="check 3" />
+        </div>
+        <div>
+          Radio 1: <input type="radio" name="radios" value="radio 1" />
+          Radio 2: <input type="radio" name="radios" value="radio 2" />
+          Radio 3: <input type="radio" name="radios" value="radio 3" />
+        </div>
+        <div>
+          <select>
+            <option value="option 1">Option 1</option>
+            <option value="option 2">Option 2</option>
+            <option value="option 3">Option 3</option>
+          </select>
+        </div>
+        <div>
+          <input type="submit" name="submit" value="submit" />
+        </div>
+      </form>
+    </div>
+    <div>
+      <h2>Multipart Form Data</h2>
+      <form method="post" enctype="multipart/form-data" >
+        <div>
+          <input type="text" name="simple_text" />
+        </div>
+        <div>
+          <textarea name="large_text"></textarea>
+        </div>
+        <div>
+          Check 1: <input type="checkbox" name="checkboxes[]" value="check 1" />
+          Check 2: <input type="checkbox" name="checkboxes[]" value="check 2" />
+          Check 3: <input type="checkbox" name="checkboxes[]" value="check 3" />
+        </div>
+        <div>
+          Radio 1: <input type="radio" name="radios" value="radio 1" />
+          Radio 2: <input type="radio" name="radios" value="radio 2" />
+          Radio 3: <input type="radio" name="radios" value="radio 3" />
+        </div>
+        <div>
+          <select>
+            <option value="option 1">Option 1</option>
+            <option value="option 2">Option 2</option>
+            <option value="option 3">Option 3</option>
+          </select>
+        </div>
+        <div>
+          <input type="file" name="file_upload" />
+        </div>
+        <div>
+          <input type="submit" value="submit" />
+        </div>
+      </form>
+    </div>
+    
+    <div>
+      <h2>Post Data</h2>
+      {{this}}
+    </div>
+  </body>
+</html>

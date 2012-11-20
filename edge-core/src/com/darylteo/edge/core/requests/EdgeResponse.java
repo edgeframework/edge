@@ -51,15 +51,21 @@ public class EdgeResponse {
   /**
    * Renders a Template to the response
    */
-
   public EdgeResponse renderTemplate(String templateName) throws IOException {
+    return this.renderTemplate(templateName, null);
+  }
+
+  /**
+   * Renders a Template to the response
+   */
+  public EdgeResponse renderTemplate(String templateName, Object data) throws IOException {
     this.response.putHeader("Content-Type", "text/html");
 
     Handlebars hb = new Handlebars();
     Path templatePath = Paths.get("edge-examples", "templates", templateName + ".hbs");
 
     String contents = new String(Files.readAllBytes(templatePath));
-    String compiled = hb.compile(contents).apply("Hello World");
+    String compiled = hb.compile(contents).apply(data);
 
     this.response.end(compiled);
 

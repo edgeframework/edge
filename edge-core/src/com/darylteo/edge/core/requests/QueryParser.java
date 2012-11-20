@@ -42,8 +42,8 @@ class QueryParser {
     }
   }
 
-  public static QueryCollection parse(String queryString) {
-    QueryCollection query = new QueryCollection();
+  public static Map<String, Object> parse(String queryString) {
+    Map<String, Object> query = new HashMap<>();
 
     if (queryString == null) {
       return query;
