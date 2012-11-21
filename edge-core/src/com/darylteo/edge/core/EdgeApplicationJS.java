@@ -44,6 +44,16 @@ public class EdgeApplicationJS {
     return this;
   }
 
+  public EdgeApplicationJS all(String urlPattern, NativeFunction... handlers) {
+    EdgeHandler[] wrapped = wrapFunctions(handlers);
+    app.get(urlPattern, wrapped)
+        .post(urlPattern, wrapped)
+        .put(urlPattern, wrapped)
+        .delete(urlPattern, wrapped);
+
+    return this;
+  }
+
   public EdgeApplicationJS listen(int port) {
     app.listen(port);
     return this;

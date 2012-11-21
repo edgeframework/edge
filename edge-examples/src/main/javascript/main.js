@@ -23,8 +23,12 @@ app
                 url: "/examples/post"
             },
             {
-                name: "Server Error Example",
+                name: "Server Error (500)",
                 url: "/examples/exception"
+            },
+            {
+                name: "File Not Found (404)",
+                url: "/examples/random"
             }
         ]
     });
@@ -55,6 +59,12 @@ app
 .get("/examples/exception", function(req,res){
     var obj = undefined;
     obj.doSomething();
+})
+
+.all("*", function(req,res){
+    res
+        .status(404)
+        .renderTemplate("404");
 })
 
 .use(app.bodyParser)

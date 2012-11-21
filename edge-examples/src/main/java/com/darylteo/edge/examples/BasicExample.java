@@ -38,8 +38,12 @@ public class BasicExample extends Verticle {
                         .putString("url", "/examples/post")
                     )
                     .addObject(new JsonObject()
-                        .putString("name", "Server Error Example")
+                        .putString("name", "Server Error (500)")
                         .putString("url", "/examples/exception")
+                    )
+                    .addObject(new JsonObject()
+                        .putString("name", "File Not Found (404)")
+                        .putString("url", "/examples/random")
                     )
                 );
 
@@ -94,6 +98,16 @@ public class BasicExample extends Verticle {
             obj.toString();
           }
 
+        })
+
+        .all("*", new EdgeHandler() {
+          @Override
+          public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+            /* 404 */
+            response
+                .status(404)
+                .renderTemplate("404");
+          }
         })
 
         .use(EdgeApplication.bodyParser)

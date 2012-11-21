@@ -67,6 +67,13 @@ public class EdgeApplication {
     return this;
   }
 
+  public EdgeApplication all(String urlPattern, EdgeHandler... handlers) {
+    return this.get(urlPattern, handlers)
+        .post(urlPattern, handlers)
+        .put(urlPattern, handlers)
+        .delete(urlPattern, handlers);
+  }
+
   public EdgeApplication listen(int port) {
     return this.listen(port, "localhost");
   }
