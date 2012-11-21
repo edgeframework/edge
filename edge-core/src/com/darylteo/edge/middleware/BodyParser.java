@@ -41,92 +41,93 @@ public class BodyParser extends EdgeHandler {
   @Override
   public void handleRequest(final EdgeRequest request, final EdgeResponse response) {
 
-    /* Ignore methods without request body */
-    String method = request.getMethod().toLowerCase();
-    if (!method.equalsIgnoreCase("post") &&
-        !method.equalsIgnoreCase("patch") &&
-        !method.equalsIgnoreCase("put")) {
-      next();
-      return;
-    }
-
-    /* Check ContentType is Url Encoded or Multipart Form-Data */
-    String contentType = request.getHeader(HttpHeaders.Names.CONTENT_TYPE);
-    if (contentType == null) {
-      return;
-    }
-
-    contentType = contentType.toLowerCase();
-    if (!contentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED) &&
-        !contentType.startsWith(HttpHeaders.Values.MULTIPART_FORM_DATA)) {
-      return;
-    }
-
-    /* Attempt to Parse */
     try {
-      /* Create a dummy Netty Request with the body */
-      final HttpServerRequest vertxReq = request.getUnderlyingRequest();
-      final HttpRequest nettyReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1, new HttpMethod(vertxReq.method), vertxReq.uri);
-
-      nettyReq.setChunked(false);
-      nettyReq.setContent(ChannelBuffers.wrappedBuffer(request.getRawBody()));
-
-      for (Map.Entry<String, String> header : vertxReq.headers().entrySet()) {
-        System.out.println(header);
-        nettyReq.addHeader(header.getKey(), header.getValue());
+      /* Ignore methods without request body */
+      String method = request.getMethod().toLowerCase();
+      if (!method.equalsIgnoreCase("post") &&
+          !method.equalsIgnoreCase("patch") &&
+          !method.equalsIgnoreCase("put")) {
+        return;
       }
 
-      final HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(BodyParser.factory, nettyReq);
+      /* Check ContentType is Url Encoded or Multipart Form-Data */
+      String contentType = request.getHeader(HttpHeaders.Names.CONTENT_TYPE);
+      if (contentType == null) {
+        return;
+      }
 
-      for (InterfaceHttpData data : decoder.getBodyHttpDatas()) {
-        HttpDataType type = data.getHttpDataType();
+      contentType = contentType.toLowerCase();
+      if (!contentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED) &&
+          !contentType.startsWith(HttpHeaders.Values.MULTIPART_FORM_DATA)) {
+        return;
+      }
 
-        if (type == HttpDataType.Attribute) {
+      /* Attempt to Parse */
+      try {
+        /* Create a dummy Netty Request with the body */
+        final HttpServerRequest vertxReq = request.getUnderlyingRequest();
+        final HttpRequest nettyReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1, new HttpMethod(vertxReq.method), vertxReq.uri);
 
-          Attribute attribute = (Attribute) data;
-          System.out.println(attribute.getName());
-          System.out.println(attribute.getValue());
+        nettyReq.setChunked(false);
+        nettyReq.setContent(ChannelBuffers.wrappedBuffer(request.getRawBody()));
 
-          Map<String, Object> body = request.getBody();
-          String key = attribute.getName();
+        for (Map.Entry<String, String> header : vertxReq.headers().entrySet()) {
+          System.out.println(header);
+          nettyReq.addHeader(header.getKey(), header.getValue());
+        }
 
-          Object value = body.get(key);
-          if (value == null) {
-            body.put(key, attribute.getValue());
-          } else {
-            if (!(value instanceof List<?>)) {
-              List<Object> list = new LinkedList<>();
-              list.add(value);
+        final HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(BodyParser.factory, nettyReq);
 
-              body.put(key, list);
-              value = list;
+        for (InterfaceHttpData data : decoder.getBodyHttpDatas()) {
+          HttpDataType type = data.getHttpDataType();
+
+          if (type == HttpDataType.Attribute) {
+
+            Attribute attribute = (Attribute) data;
+            System.out.println(attribute.getName());
+            System.out.println(attribute.getValue());
+
+            Map<String, Object> body = request.getBody();
+            String key = attribute.getName();
+
+            Object value = body.get(key);
+            if (value == null) {
+              body.put(key, attribute.getValue());
+            } else {
+              if (!(value instanceof List<?>)) {
+                List<Object> list = new LinkedList<>();
+                list.add(value);
+
+                body.put(key, list);
+                value = list;
+              }
+
+              ((List<Object>) value).add(attribute.getValue());
             }
 
-            ((List<Object>) value).add(attribute.getValue());
+          } else if (type == HttpDataType.FileUpload) {
+
+            FileUpload file = (FileUpload) data;
+            System.out.println(file.getName());
+
+            if (!file.isCompleted() || file.length() == 0) {
+              return;
+            }
+
+            /* Factory specifies in-memory file store */
+            byte[] fileContents = file.get();
+
+            request.getBody().put(file.getName(), file.getFilename());
+            request.getFiles().put(file.getName(), fileContents);
+
+          } else {
+            System.out.println(data);
           }
-
-        } else if (type == HttpDataType.FileUpload) {
-
-          FileUpload file = (FileUpload) data;
-          System.out.println(file.getName());
-
-          if (!file.isCompleted() || file.length() == 0) {
-            return;
-          }
-
-          /* Factory specifies in-memory file store */
-          byte[] fileContents = file.get();
-
-          request.getBody().put(file.getName(), file.getFilename());
-          request.getFiles().put(file.getName(), fileContents);
-
-        } else {
-          System.out.println(data);
         }
-      }
 
-    } catch (Exception e) {
-      VertxLocator.container.getLogger().error("Error in BodyParser", e);
+      } catch (Exception e) {
+        VertxLocator.container.getLogger().error("Error in BodyParser", e);
+      }
     } finally {
       next();
     }
