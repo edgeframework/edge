@@ -1,8 +1,5 @@
 package com.darylteo.edge.examples;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.Verticle;
@@ -11,7 +8,6 @@ import com.darylteo.edge.core.EdgeApplication;
 import com.darylteo.edge.core.requests.EdgeHandler;
 import com.darylteo.edge.core.requests.EdgeRequest;
 import com.darylteo.edge.core.requests.EdgeResponse;
-import com.github.jknack.handlebars.Context;
 
 // run com.darylteo.edge.examples.BasicExample -cp bin;
 
@@ -47,7 +43,7 @@ public class BasicExample extends Verticle {
                     )
                 );
 
-            response.renderTemplate("index", Context.newContext(context.toMap()));
+            response.renderTemplate("index", context);
           }
         })
 
@@ -67,8 +63,10 @@ public class BasicExample extends Verticle {
         }, new EdgeHandler() {
           @Override
           public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
-            String param = (String) request.getData().get("pass");
-            response.renderTemplate("basic", param);
+            JsonObject context = new JsonObject()
+                .putString("pass", (String) request.getData().get("pass"));
+
+            response.renderTemplate("basic", context);
           }
         })
 
@@ -81,16 +79,19 @@ public class BasicExample extends Verticle {
         .post("/examples/post", new EdgeHandler() {
           @Override
           public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
-            response.renderTemplate("post", request.getBody());
+            JsonObject context = new JsonObject()
+                .putObject("body", new JsonObject(request.getBody()));
+
+            response.renderTemplate("post", context);
           }
         })
 
-        .get("/exception", new EdgeHandler() {
+        .get("/examples/exception", new EdgeHandler() {
 
           @Override
           public void handleRequest(EdgeRequest request, EdgeResponse response) {
-            String[] array = new String[0];
-            array[1] = "Throw!";
+            Object obj = null;
+            obj.toString();
           }
 
         })

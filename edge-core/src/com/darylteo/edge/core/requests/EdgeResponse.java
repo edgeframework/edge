@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.json.JsonObject;
 
 import com.github.jknack.handlebars.Handlebars;
 
@@ -52,13 +54,13 @@ public class EdgeResponse {
    * Renders a Template to the response
    */
   public EdgeResponse renderTemplate(String templateName) throws IOException {
-    return this.renderTemplate(templateName, null);
+    return this.renderTemplate(templateName, (Map<String, Object>) null);
   }
 
   /**
    * Renders a Template to the response
    */
-  public EdgeResponse renderTemplate(String templateName, Object data) throws IOException {
+  public EdgeResponse renderTemplate(String templateName, Map<String, Object> data) throws IOException {
     this.response.putHeader("Content-Type", "text/html");
 
     Handlebars hb = new Handlebars();
@@ -70,5 +72,9 @@ public class EdgeResponse {
     this.response.end(compiled);
 
     return this;
+  }
+
+  public EdgeResponse renderTemplate(String templateName, JsonObject data) throws IOException {
+    return renderTemplate(templateName, data.toMap());
   }
 }
