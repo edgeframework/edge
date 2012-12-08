@@ -1,18 +1,13 @@
 package com.darylteo.edge.core.requests;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 import com.github.jknack.handlebars.Handlebars;
 
