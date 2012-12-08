@@ -47,14 +47,14 @@ public class BasicExample extends Verticle {
                     )
                 );
 
-            response.renderTemplate("index", context);
+            response.render("index", context);
           }
         })
 
         .get("/examples/basic", new EdgeHandler() {
           @Override
           public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
-            response.renderTemplate("basic");
+            response.render("basic");
           }
         })
 
@@ -70,14 +70,14 @@ public class BasicExample extends Verticle {
             JsonObject context = new JsonObject()
                 .putString("pass", (String) request.getData().get("pass"));
 
-            response.renderTemplate("basic", context);
+            response.render("basic", context);
           }
         })
 
         .get("/examples/post", new EdgeHandler() {
           @Override
           public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
-            response.renderTemplate("post");
+            response.render("post");
           }
         })
         .post("/examples/post", new EdgeHandler() {
@@ -86,7 +86,7 @@ public class BasicExample extends Verticle {
             JsonObject context = new JsonObject()
                 .putObject("body", new JsonObject(request.getBody()));
 
-            response.renderTemplate("post", context);
+            response.render("post", context);
           }
         })
 
@@ -106,11 +106,12 @@ public class BasicExample extends Verticle {
             /* 404 */
             response
                 .status(404)
-                .renderTemplate("404");
+                .render("404");
           }
         })
 
-        .use(EdgeApplication.bodyParser)
+        .use(EdgeApplication.assets("public"))
+        .use(EdgeApplication.bodyParser())
 
         .listen(8080, "localhost");
 

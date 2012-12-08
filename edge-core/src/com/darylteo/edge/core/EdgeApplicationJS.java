@@ -17,8 +17,6 @@ public class EdgeApplicationJS {
 
   private EdgeApplication app;
 
-  public final EdgeHandler bodyParser = EdgeApplication.bodyParser;
-
   public EdgeApplicationJS() {
     this.app = new EdgeApplication();
   }

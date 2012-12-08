@@ -13,11 +13,10 @@ import com.darylteo.edge.core.requests.EdgeHandler;
 import com.darylteo.edge.core.requests.EdgeHandlerContainer;
 import com.darylteo.edge.core.routing.RouteMatcher;
 import com.darylteo.edge.core.routing.Routing;
+import com.darylteo.edge.middleware.Assets;
 import com.darylteo.edge.middleware.BodyParser;
 
 public class EdgeApplication {
-
-  public static final EdgeHandler bodyParser = new BodyParser();
 
   private final EdgeApplication that = this;
   private final Vertx vertx;
@@ -84,6 +83,16 @@ public class EdgeApplication {
   }
 
   /* Middleware */
+  private static final EdgeHandler bodyParser = new BodyParser();
+  
+  public static EdgeHandler bodyParser(){
+    return EdgeApplication.bodyParser;
+  }
+  
+  public static EdgeHandler assets(String path){
+    return new Assets(path);
+  }
+  
   public EdgeApplication use(EdgeHandler... handlers) {
     for (EdgeHandler handler : handlers) {
       this.middleware.add(handler);

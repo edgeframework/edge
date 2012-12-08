@@ -14,20 +14,21 @@ public abstract class EdgeHandler {
    * is discarded, and the next route handler (if any) will handle the request.
    */
   protected void next() {
-    this.container.next();
-  }
-
-  void handle(EdgeHandlerContainer container, EdgeRequest request, EdgeResponse response) {
-    if (this.container != null) {
+    if (this.container == null) {
       VertxLocator.container.getLogger().warn("Container for EdgeRequest not set... did you call handleRequest by mistake?");
       return;
     }
 
+    this.container.next();
+  }
+
+  void handle(EdgeHandlerContainer container, EdgeRequest request, EdgeResponse response) {
     this.container = container;
 
     try {
       this.handleRequest(request, response);
     } catch (Throwable e) {
+      VertxLocator.container.getLogger().error("Error", e);
       container.exception(e);
     }
     this.container = null;

@@ -81,7 +81,7 @@ public class EdgeHandlerContainer {
 
     VertxLocator.container.getLogger().error(message);
 
-    this.response.renderHtml("<p>Server Error (500): " + message + "</p>");
+    this.response.send("<p>Server Error (500): " + message + "</p>");
   }
 
   private void main() {
