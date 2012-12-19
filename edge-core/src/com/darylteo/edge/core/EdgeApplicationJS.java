@@ -8,6 +8,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeFunction;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.vertx.java.deploy.impl.VertxLocator;
 
 import com.darylteo.edge.core.requests.EdgeHandler;
 import com.darylteo.edge.core.requests.EdgeRequest;
@@ -76,19 +77,16 @@ public class EdgeApplicationJS {
   }
   
   public EdgeApplicationJS use(Object... handlers) {
-    List<EdgeHandler> middleware = new LinkedList<>();
-
     for (Object handler : handlers) {
       if (handler instanceof NativeFunction) {
-        middleware.add(wrapFunction((NativeFunction) handler));
+        app.use(wrapFunction((NativeFunction) handler));
       } else if (handler instanceof EdgeHandler) {
-        middleware.add((EdgeHandler) handler);
+        app.use((EdgeHandler) handler);
       } else {
-        throw new IllegalArgumentException("Invalid Parameter for use: Not a function handler");
+        VertxLocator.container.getLogger().warn("Invalid Parameter for EdgeApplication.use(): Not a function handler");
       }
     }
 
-    app.use(middleware.toArray(new EdgeHandler[0]));
     return this;
   }
 
