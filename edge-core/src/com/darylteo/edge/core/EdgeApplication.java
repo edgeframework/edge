@@ -83,7 +83,7 @@ public class EdgeApplication {
   }
 
   /* Middleware */
-  private static final EdgeHandler bodyParser = new BodyParser();
+  public static final EdgeHandler bodyParser = new BodyParser();
   
   public static EdgeHandler bodyParser(){
     return EdgeApplication.bodyParser;

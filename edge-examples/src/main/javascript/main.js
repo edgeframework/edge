@@ -8,7 +8,7 @@ var app = new com.darylteo.edge.core.EdgeApplicationJS();
 app
 
 .get('/', function(req,res){
-    res.renderTemplate("index", {
+    res.render("index", {
         links: [
             {
                 name: "Basic Example",
@@ -35,23 +35,23 @@ app
 })
 
 .get("/examples/basic", function(req,res){
-    res.renderTemplate("basic");
+    res.render("basic");
 })
 
 .get("/examples/multiple", function(req,res,next){
     req.getData().put("pass", "through");
     next();
 }, function(req,res){
-    res.renderTemplate("basic",{
+    res.render("basic",{
         pass: "through"
     });
 })
 
 .get("/examples/post", function(req,res){
-    res.renderTemplate("post");
+    res.render("post");
 })
 .post("/examples/post", function(req,res){
-    res.renderTemplate("post", {
+    res.render("post", {
         body: req.body
     });
 })
@@ -64,9 +64,10 @@ app
 .all("*", function(req,res){
     res
         .status(404)
-        .renderTemplate("404");
+        .render("404");
 })
 
-.use(app.bodyParser)
+.use(app.assets("public"))
+.use(app.bodyParser())
 
 .listen(8080,'localhost');

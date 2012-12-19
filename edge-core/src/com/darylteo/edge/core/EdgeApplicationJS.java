@@ -12,6 +12,8 @@ import org.mozilla.javascript.ScriptableObject;
 import com.darylteo.edge.core.requests.EdgeHandler;
 import com.darylteo.edge.core.requests.EdgeRequest;
 import com.darylteo.edge.core.requests.EdgeResponse;
+import com.darylteo.edge.middleware.Assets;
+import com.darylteo.edge.middleware.BodyParser;
 
 public class EdgeApplicationJS {
 
@@ -63,6 +65,16 @@ public class EdgeApplicationJS {
   }
 
   /* Middleware */
+  private static final EdgeHandler bodyParser = new BodyParser();
+  
+  public static EdgeHandler bodyParser(){
+    return EdgeApplication.bodyParser;
+  }
+  
+  public static EdgeHandler assets(String path){
+    return new Assets(path);
+  }
+  
   public EdgeApplicationJS use(Object... handlers) {
     List<EdgeHandler> middleware = new LinkedList<>();
 
@@ -80,6 +92,7 @@ public class EdgeApplicationJS {
     return this;
   }
 
+  /* NativeFunction wrappers */
   private EdgeHandler wrapFunction(NativeFunction function) {
     return new JSHandler(function);
   }
