@@ -39,7 +39,6 @@ public class RouteMatcherTestClient extends TestClientBase {
     EdgeApplication edge = new EdgeApplication();
 
     edge
-
         /* Index */
         .get("/basic-test", new EdgeHandler() {
           @Override
@@ -59,6 +58,16 @@ public class RouteMatcherTestClient extends TestClientBase {
           public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
             JsonObject context = new JsonObject()
                 .putString("echo", (String) request.getData().get("echo"));
+
+            response.render("basic-test", context);
+          }
+        })
+
+        .get("/params/:echo", new EdgeHandler() {
+          @Override
+          public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+            JsonObject context = new JsonObject()
+                .putString("echo", (String) request.getParams().get("echo"));
 
             response.render("basic-test", context);
           }
@@ -189,6 +198,22 @@ public class RouteMatcherTestClient extends TestClientBase {
           @Override
           public Void handle(Integer value) {
             tu.azzert(value.equals(404), "Failed to get correct HTTP Status");
+
+            tu.testComplete();
+            return null;
+          }
+
+        });
+  }
+
+  public void testRouteParams1() throws Exception {
+    this.client
+        .getPage("/params/HelloWorld")
+        .then(new PromiseHandler<String, Void>() {
+
+          @Override
+          public Void handle(String value) {
+            tu.azzert(value.equals("HelloWorld"), "Did not manage to pass through the route parameter");
 
             tu.testComplete();
             return null;

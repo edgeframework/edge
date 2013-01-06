@@ -95,7 +95,7 @@ public class Route {
 
         String identifier = matcher.group("paramname");
 
-        completed.append(String.format("(?<%s>[^ /]*)", identifier));
+        completed.append(String.format("(?<%s>.+)", identifier));
         identifiers.add(identifier);
       } else {
         completed.append(part);

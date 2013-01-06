@@ -33,4 +33,6 @@ public class RouteMatcherTests extends TestBase {
   
   @Test public void test404_1() { startTest(getMethodName()); }
   @Test public void test404_2() { startTest(getMethodName()); }
+  
+  @Test public void testRouteParams1() { startTest(getMethodName()); }
 }

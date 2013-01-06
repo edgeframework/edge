@@ -4,16 +4,18 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.RouteMatcher;
 import org.edgeframework.routing.RouteMatcherResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.SimpleHandler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
-public class HandlerChain {
+public class HandlerChain extends SimpleHandler {
   private final HandlerChain that = this;
 
   private final List<EdgeHandler> currentHandlers = new LinkedList<>();
@@ -23,25 +25,6 @@ public class HandlerChain {
 
   private final EdgeRequest request;
   private final EdgeResponse response;
-
-  /* RunLoop handler */
-  private final Handler<Void> loopHandler = new Handler<Void>() {
-
-    @Override
-    public void handle(Void event) {
-      VertxLocator.container.getLogger().info("Handling: " + request.getPath());
-
-      /* No other handlers to process */
-      if (that.currentHandlers.isEmpty()) {
-        return;
-      }
-
-      /* Process the handler */
-      EdgeHandler handler = currentHandlers.remove(0);
-      handler.handle(that, request, response);
-    }
-
-  };
 
   public HandlerChain(final HttpServerRequest request, final RouteMatcher routeMatcher, final List<EdgeHandler> middleware) {
     this.routeMatcher = routeMatcher;
@@ -57,12 +40,18 @@ public class HandlerChain {
             main();
             return null;
           }
+        }, new FailureHandler<Void>() {
+          @Override
+          public Void handle(Throwable e) {
+            exception(e);
+            return null;
+          }
         });
 
   }
 
   void next() {
-    VertxLocator.vertx.runOnLoop(this.loopHandler);
+    VertxLocator.vertx.runOnLoop(this);
   }
 
   public void exception() {
@@ -92,10 +81,25 @@ public class HandlerChain {
     /* Add chain of Middleware to the beginning of the request chain */
     this.currentHandlers.addAll(this.middleware);
     this.currentHandlers.addAll(Arrays.asList(routeResult.route.getHandlers()));
+    this.request.setParams(routeResult.params);
 
     this.next();
   }
 
+  @Override
+  // The Loop Handler
+  protected void handle() {
+    /* No other handlers to process */
+    if (this.currentHandlers.isEmpty()) {
+      return;
+    }
+
+    /* Process the handler */
+    EdgeHandler handler = currentHandlers.remove(0);
+    handler.handle(that, request, response);
+  }
+
+  /* TODO: Why is this here? Shouldn't this be in the middleware? */
   private Promise<Void> processPostBody(final EdgeRequest request) {
     final Promise<Void> promise = Promise.defer();
 
@@ -113,4 +117,5 @@ public class HandlerChain {
 
     return promise;
   }
+
 }

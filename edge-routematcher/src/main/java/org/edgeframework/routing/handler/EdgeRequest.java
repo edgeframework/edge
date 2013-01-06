@@ -107,6 +107,10 @@ public class EdgeRequest {
     return this.params;
   }
 
+  void setParams(Map<String, Object> params) {
+    this.params = new HashMap<>(params);
+  }
+
   /**
    * Retrieves a map of request body attribute data and their associated values.
    * 
