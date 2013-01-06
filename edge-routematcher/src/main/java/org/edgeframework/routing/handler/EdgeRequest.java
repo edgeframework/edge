@@ -15,6 +15,7 @@ public class EdgeRequest {
   private Map<String, byte[]> files;
   private Map<String, Object> data;
 
+  private Buffer bodyBuffer;
   private byte[] bodyBytes;
 
   public EdgeRequest(HttpServerRequest request) {
@@ -28,12 +29,16 @@ public class EdgeRequest {
     this.query = QueryParser.parse(request.query);
   }
 
-  public void setRawBody(Buffer buffer) {
-    this.bodyBytes = buffer.getBytes();
+  public byte[] getPostBody() {
+    if (this.bodyBytes == null) {
+      this.bodyBytes = this.bodyBuffer.getBytes();
+    }
+
+    return this.bodyBytes;
   }
 
-  public byte[] getRawBody() {
-    return this.bodyBytes;
+  public void setPostBody(Buffer buffer) {
+    this.bodyBuffer = buffer;
   }
 
   public HttpServerRequest getUnderlyingRequest() {

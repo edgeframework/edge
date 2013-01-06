@@ -25,7 +25,6 @@ import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataTy
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
-
 public class BodyParser extends EdgeHandler {
 
   static {
@@ -69,7 +68,7 @@ public class BodyParser extends EdgeHandler {
         final HttpRequest nettyReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1, new HttpMethod(vertxReq.method), vertxReq.uri);
 
         nettyReq.setChunked(false);
-        nettyReq.setContent(ChannelBuffers.wrappedBuffer(request.getRawBody()));
+        nettyReq.setContent(ChannelBuffers.wrappedBuffer(request.getPostBody()));
 
         for (Map.Entry<String, String> header : vertxReq.headers().entrySet()) {
           System.out.println(header);

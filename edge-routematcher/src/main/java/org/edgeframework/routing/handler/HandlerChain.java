@@ -107,7 +107,7 @@ public class HandlerChain extends SimpleHandler {
       request.getUnderlyingRequest().bodyHandler(new Handler<Buffer>() {
         @Override
         public void handle(Buffer buffer) {
-          request.setRawBody(buffer);
+          request.setPostBody(buffer);
           promise.fulfill(null);
         }
       });
