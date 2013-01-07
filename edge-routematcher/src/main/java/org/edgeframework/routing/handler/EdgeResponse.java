@@ -13,9 +13,9 @@ import com.github.jknack.handlebars.Handlebars;
 
 public class EdgeResponse {
   private EdgeResponse that = this;
-  
+
   private final HttpServerResponse response;
-  
+
   public EdgeResponse(HttpServerResponse response) {
     this.response = response;
   }
@@ -43,22 +43,31 @@ public class EdgeResponse {
     return this;
   }
 
+  public EdgeResponse setContentType(String contentType) {
+    this.header("Content-Type", contentType);
+    return this;
+  }
+
   /**
    * Renders a String to the response
    */
   public EdgeResponse send(String content) {
-    this.response.putHeader("Content-Type", "text/html");
+    if (!this.response.headers().containsKey("Content-Type")) {
+      this.response.putHeader("Content-Type", "text/plain; charset=utf-8");
+    }
+
+    this.response.putHeader("Content-Length", content.length());
     this.response.end(content);
     return this;
   }
-  
+
   public EdgeResponse sendFile(Path path) {
     return this.sendFile(path.toString());
   }
-  
+
   public EdgeResponse sendFile(String path) {
-      that.response.sendFile(path);
-      return this;
+    that.response.sendFile(path);
+    return this;
   }
 
   /**
