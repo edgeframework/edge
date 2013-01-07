@@ -53,6 +53,7 @@ public class PromiseTests extends TestBase {
       startTest(getMethodName());
       fail("Exception of type " + clazz.getName() + " was not thrown");
     }catch(Throwable e){
+      System.out.println(e.getCause());
       assertTrue(e.getClass().equals(clazz));
     }
   }

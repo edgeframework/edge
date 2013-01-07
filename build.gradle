@@ -48,6 +48,33 @@ allprojects {
 	}
 }
 
+project(':edge-core'){
+	dependencies {
+		compile	project(':edge-promises')
+		compile	project(':edge-routematcher')
+		compile	project(':edge-controllers')
+	}
+}
+
+project(':edge-routematcher'){
+	dependencies {
+		compile	project(':edge-promises')
+		compile	"com.github.jknack:handlebars:$handlebarsVersion"
+	}
+}
+
+project('edge-tests'){
+	dependencies {
+		testCompile	project(':edge-core')
+	}
+
+	test {
+		// Some vert.x properties
+		systemProperties['vertx.test.timeout'] = 4
+	}
+
+}
+
 // Root Project Configuration
 apply plugin: 'eclipse'
 apply plugin: 'idea'

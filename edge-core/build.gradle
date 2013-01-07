@@ -1,3 +1,0 @@
-dependencies {
-	provided	"org.mozilla:rhino:$rhinoVersion"
-}

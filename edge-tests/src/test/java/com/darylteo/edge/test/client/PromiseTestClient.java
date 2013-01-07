@@ -225,7 +225,6 @@ public class PromiseTestClient extends TestClientBase {
   public void testException5() throws Exception {
     makePromise("Hello World")
         .then(new PromiseHandler<String, Character>() {
-
           @Override
           public Character handle(String result) {
             return result.charAt(20); // Exception

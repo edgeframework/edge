@@ -1,6 +1,0 @@
-dependencies {
-	provided	"io.netty:netty:$nettyVersion"
-	provided	"org.mozilla:rhino:$rhinoVersion"
-
-	compile		"com.github.jknack:handlebars:$handlebarsVersion"
-}
