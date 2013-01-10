@@ -63,14 +63,23 @@ project(':edge-routematcher'){
 	}
 }
 
-project('edge-tests'){
+project(':edge-controllers'){
 	dependencies {
-		testCompile	project(':edge-core')
+		compile project(':edge-promises')
+		compile project(':edge-routematcher')
+	}
+}
+
+project(':edge-tests'){
+	dependencies {
+		compile	project(':edge-core')
 	}
 
 	test {
 		// Some vert.x properties
-		systemProperties['vertx.test.timeout'] = 4
+		systemProperties['vertx.test.timeout'] = 4\
+
+		workingDir = "$projectDir/test-dir"
 	}
 
 }

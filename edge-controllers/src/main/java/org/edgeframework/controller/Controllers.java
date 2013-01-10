@@ -13,8 +13,6 @@ import org.edgeframework.routing.handler.EdgeHandler;
 import org.edgeframework.routing.handler.EdgeRequest;
 import org.edgeframework.routing.handler.EdgeResponse;
 import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.impl.VertxLocator;
 
 public class Controllers {

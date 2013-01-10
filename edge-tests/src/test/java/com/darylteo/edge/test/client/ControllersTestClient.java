@@ -15,7 +15,7 @@ public class ControllersTestClient extends TestClientBase {
   private TestHttpClient client;
 
   private static final String HOSTNAME = "localhost";
-  private static final int PORT = 8080;
+  private static final int PORT = 8081;
 
   private Controllers controllers;
 
