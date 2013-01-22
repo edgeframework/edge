@@ -39,7 +39,7 @@ public final class EventBus {
             } else {
               // TODO: Serialize
               JsonObject data = new JsonObject();
-              
+
               VertxLocator.vertx.eventBus().send(methodName, args[0].toString());
             }
 
@@ -68,11 +68,11 @@ public final class EventBus {
 
       try {
         final MethodHandle handle = lookup.unreflect(m);
-        eb.registerHandler(m.getName(), new Handler<Message<JsonObject>>() {
+        eb.registerHandler(m.getName(), new Handler<Message<String>>() {
           @Override
-          public void handle(Message<JsonObject> message) {
+          public void handle(Message<String> message) {
             try {
-              handle.invoke(receiver, message.body);
+              handle.invokeWithArguments(receiver, message.body);
             } catch (Throwable e) {
               VertxLocator.container.getLogger().error(e);
             }
