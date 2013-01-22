@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
@@ -32,18 +33,33 @@ public final class EventBus {
           @Override
           public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             String methodName = method.getName();
-            System.out.println(method.toGenericString());
 
-            if (args == null || args.length == 0) {
-              VertxLocator.vertx.eventBus().send(methodName, (JsonObject) null);
+            Promise<String> p = null;
+            Handler<Message<String>> replyHandler = null;
+
+            if (method.getReturnType().equals(void.class) || method.getReturnType().equals(Void.class)) {
+              System.out.println("No Return Type");
             } else {
-              // TODO: Serialize
-              JsonObject data = new JsonObject();
+              System.out.println("Has Return Type, assuming its a Promise");
 
-              VertxLocator.vertx.eventBus().send(methodName, args[0].toString());
+              p = Promise.defer();
+              final Promise<String> promise = p;
+              replyHandler = new Handler<Message<String>>() {
+                @Override
+                public void handle(Message<String> reply) {
+                  promise.fulfill(reply.body);
+                }
+              };
             }
 
-            return null;
+            if (args == null || args.length == 0) {
+              VertxLocator.vertx.eventBus().send(methodName, (String) null, replyHandler);
+            } else {
+              // TODO: Serialize
+              VertxLocator.vertx.eventBus().send(methodName, args[0].toString(), replyHandler);
+            }
+
+            return p;
           }
         });
 
@@ -72,7 +88,11 @@ public final class EventBus {
           @Override
           public void handle(Message<String> message) {
             try {
-              handle.invokeWithArguments(receiver, message.body);
+              Object result = handle.invokeWithArguments(receiver, message.body);
+              if (!handle.type().returnType().equals(void.class) && !handle.type().returnType().equals(Void.class)) {
+                // Return Type is valid, so we need to send it back
+                message.reply((String) result);
+              }
             } catch (Throwable e) {
               VertxLocator.container.getLogger().error(e);
             }

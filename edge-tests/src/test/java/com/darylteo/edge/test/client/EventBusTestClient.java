@@ -1,6 +1,7 @@
 package com.darylteo.edge.test.client;
 
 import org.edgeframework.eventbus.EventBus;
+import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
@@ -43,10 +44,14 @@ public class EventBusTestClient extends TestClientBase {
   public void testReceive() {
     EventBus.registerReceiver(new TestEventBusReceiver() {
       @Override
-      public String testString(String message) {
+      public void testString(String message) {
         tu.azzert(message.equals("Hello World"));
         tu.testComplete();
+      }
 
+      @Override
+      public String testReply(String message) {
+        // TODO Auto-generated method stub
         return null;
       }
     });
@@ -59,14 +64,47 @@ public class EventBusTestClient extends TestClientBase {
 
     EventBus.registerReceiver(new TestEventBusReceiver() {
       @Override
-      public String testString(String message) {
+      public void testString(String message) {
         tu.azzert(message.equals("Hello World"));
         tu.testComplete();
+      }
 
+      @Override
+      public String testReply(String message) {
+        // TODO Auto-generated method stub
         return null;
       }
     });
 
     server.testString("Hello World");
+  }
+
+  public void testReply() {
+    TestEventBusSender server = EventBus.createProxy(TestEventBusSender.class);
+
+    EventBus.registerReceiver(new TestEventBusReceiver() {
+      @Override
+      public void testString(String message) {
+      }
+
+      @Override
+      public String testReply(String message) {
+        return message.toUpperCase();
+      }
+    });
+
+    server
+        .testReply("Hello World")
+        .then(new PromiseHandler<String, Void>() {
+
+          @Override
+          public Void handle(String value) {
+            tu.azzert(value.equals("HELLO WORLD"), "Did not reply message properly");
+            tu.testComplete();
+
+            return null;
+          }
+        });
+
   }
 }
