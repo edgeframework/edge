@@ -1,6 +1,5 @@
 package com.darylteo.edge.test.util;
 
-
-public interface TestEventBusReceiver {
+public interface TestEventBusInterface {
   public void testString(String message);
 }

@@ -4,12 +4,10 @@ import org.edgeframework.eventbus.EventBus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.java.framework.TestClientBase;
 
-import com.darylteo.edge.test.util.TestEventBusReceiver;
-import com.darylteo.edge.test.util.TestEventBusSender;
+import com.darylteo.edge.test.util.TestEventBusInterface;
 
 public class EventBusTestClient extends TestClientBase {
   private Vertx vertx = VertxLocator.vertx;
@@ -36,13 +34,13 @@ public class EventBusTestClient extends TestClientBase {
       }
     });
 
-    TestEventBusSender target = EventBus.createProxy(TestEventBusSender.class);
+    TestEventBusInterface server = EventBus.createProxy(TestEventBusInterface.class);
 
-    target.testString("Hello World");
+    server.testString("Hello World");
   }
 
   public void testReceive() {
-    EventBus.registerReceiver(new TestEventBusReceiver() {
+    EventBus.registerReceiver(new TestEventBusInterface() {
       @Override
       public void testString(String message) {
         tu.azzert(message.equals("Hello World"));
@@ -54,9 +52,9 @@ public class EventBusTestClient extends TestClientBase {
   }
 
   public void testBothEnds() {
-    TestEventBusSender target = EventBus.createProxy(TestEventBusSender.class);
+    TestEventBusInterface server = EventBus.createProxy(TestEventBusInterface.class);
 
-    EventBus.registerReceiver(new TestEventBusReceiver() {
+    EventBus.registerReceiver(new TestEventBusInterface() {
       @Override
       public void testString(String message) {
         tu.azzert(message.equals("Hello World"));
@@ -64,6 +62,6 @@ public class EventBusTestClient extends TestClientBase {
       }
     });
 
-    target.testString("Hello World");
+    server.testString("Hello World");
   }
 }

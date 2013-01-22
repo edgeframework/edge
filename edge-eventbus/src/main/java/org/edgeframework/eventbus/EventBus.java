@@ -2,9 +2,7 @@ package org.edgeframework.eventbus;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -12,8 +10,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.impl.VertxLocator;
-
-import com.darylteo.edge.test.util.TestEventBusSender;
 
 public final class EventBus {
 
@@ -36,11 +32,14 @@ public final class EventBus {
           @Override
           public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
             String methodName = method.getName();
+            System.out.println(method.toGenericString());
 
             if (args == null || args.length == 0) {
               VertxLocator.vertx.eventBus().send(methodName, (JsonObject) null);
             } else {
               // TODO: Serialize
+              JsonObject data = new JsonObject();
+              
               VertxLocator.vertx.eventBus().send(methodName, args[0].toString());
             }
 
@@ -69,9 +68,9 @@ public final class EventBus {
 
       try {
         final MethodHandle handle = lookup.unreflect(m);
-        eb.registerHandler(m.getName(), new Handler<Message<?>>() {
+        eb.registerHandler(m.getName(), new Handler<Message<JsonObject>>() {
           @Override
-          public void handle(Message<?> message) {
+          public void handle(Message<JsonObject> message) {
             try {
               handle.invoke(receiver, message.body);
             } catch (Throwable e) {
