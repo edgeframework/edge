@@ -94,7 +94,7 @@ task dist(type: Zip, dependsOn:jar) {
 		from fileTree(dir: "$b/libs", include: '*.jar')
 	}
 
-	destinationDir = file("$buildDir/dist")
+	destinationDir = file("$rootProject.buildDir/dist")
 	archiveName
 }
 
