@@ -63,7 +63,6 @@ public final class EventBus {
 
     for (Method m : clazz.getMethods()) {
       // Ignore Object methods
-      System.out.println(m.getName());
       if (m.getDeclaringClass().equals(Object.class)) {
         continue;
       }

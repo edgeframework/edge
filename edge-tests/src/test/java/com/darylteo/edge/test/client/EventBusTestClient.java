@@ -52,4 +52,18 @@ public class EventBusTestClient extends TestClientBase {
 
     VertxLocator.vertx.eventBus().send("testString", "Hello World");
   }
+
+  public void testBothEnds() {
+    TestEventBusSender target = EventBus.createProxy(TestEventBusSender.class);
+
+    EventBus.registerReceiver(new TestEventBusReceiver() {
+      @Override
+      public void testString(String message) {
+        tu.azzert(message.equals("Hello World"));
+        tu.testComplete();
+      }
+    });
+
+    target.testString("Hello World");
+  }
 }

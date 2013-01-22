@@ -20,4 +20,5 @@ public class EventBusTests extends TestBase {
 
   @Test public void testSend() { startTest(getMethodName()); }
   @Test public void testReceive() { startTest(getMethodName()); }
+  @Test public void testBothEnds() { startTest(getMethodName()); }
 }
