@@ -1,4 +1,4 @@
-package com.darylteo.edge.tests;
+package com.darylteo.edge.test;
 
 import org.junit.Test;
 import org.vertx.java.framework.TestBase;
