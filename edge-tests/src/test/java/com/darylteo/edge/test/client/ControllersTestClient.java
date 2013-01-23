@@ -6,7 +6,7 @@ import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.impl.VertxLocator;
-import org.vertx.java.framework.TestClientBase;
+import org.vertx.java.testframework.TestClientBase;
 
 import com.darylteo.edge.test.util.TestHttpClient;
 

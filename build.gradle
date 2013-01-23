@@ -9,12 +9,12 @@ allprojects {
 	configurations {
 		// Exclude vertx jars
 		// Ensure you run tests to make sure dependencies do not conflict
-		for (File jar : coreJars){
-			String moduleName = jar.getName();
-			moduleName = moduleName.substring(0, moduleName.lastIndexOf('-'))
+		// for (File jar : coreJars){
+		//	String moduleName = jar.getName();
+		//	moduleName = moduleName.substring(0, moduleName.lastIndexOf('-'))
 
-			compile.exclude module: moduleName
-		}
+		//	compile.exclude module: moduleName
+		// }
 
 		core
 		provided
@@ -23,7 +23,9 @@ allprojects {
 	dependencies {
 		testCompile	"junit:junit:$junitVersion"
 
-		core	coreJars	// this is just for collectDeps
+		runtime files("$System.env.VERTX_HOME/conf")
+
+		core	coreJars		// this is just for collectDeps
 		compile coreJars	// this is for compiling
 	}
 
@@ -41,7 +43,11 @@ allprojects {
 		}
 		into("compile") {
 			from configurations.compile
+			exclude {
+				it.file in coreJars
+			}
 		}
+
 		into("test") {
 			from configurations.testCompile
 		}
@@ -53,6 +59,7 @@ project(':edge-core'){
 		compile	project(':edge-promises')
 		compile	project(':edge-routematcher')
 		compile	project(':edge-controllers')
+		compile project(':edge-eventbus')
 	}
 }
 
@@ -70,6 +77,12 @@ project(':edge-controllers'){
 	}
 }
 
+project(':edge-eventbus'){
+	dependencies {
+		compile	project(':edge-promises')
+	}
+}
+
 project(':edge-tests'){
 	dependencies {
 		compile	project(':edge-core')
@@ -77,9 +90,13 @@ project(':edge-tests'){
 
 	test {
 		// Some vert.x properties
-		systemProperties['vertx.test.timeout'] = 4\
+		systemProperties['vertx.test.timeout'] = 4
 
 		workingDir = "$projectDir/test-dir"
+
+		for (File f : classpath){
+			println(f)
+		}
 	}
 
 }

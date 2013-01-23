@@ -1,7 +1,7 @@
 package com.darylteo.edge.test;
 
 import org.junit.Test;
-import org.vertx.java.framework.TestBase;
+import org.vertx.java.testframework.TestBase;
 
 import com.darylteo.edge.test.client.PromiseTestClient;
 

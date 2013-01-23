@@ -6,7 +6,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.deploy.impl.VertxLocator;
-import org.vertx.java.framework.TestClientBase;
+import org.vertx.java.testframework.TestClientBase;
 
 import com.darylteo.edge.test.util.TestEventBusReceiver;
 import com.darylteo.edge.test.util.TestEventBusSender;

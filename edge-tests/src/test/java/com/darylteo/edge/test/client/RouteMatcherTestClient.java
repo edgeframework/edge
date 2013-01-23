@@ -7,7 +7,7 @@ import org.edgeframework.routing.handler.EdgeHandler;
 import org.edgeframework.routing.handler.EdgeRequest;
 import org.edgeframework.routing.handler.EdgeResponse;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.framework.TestClientBase;
+import org.vertx.java.testframework.TestClientBase;
 
 import com.darylteo.edge.test.util.TestHttpClient;
 
