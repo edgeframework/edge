@@ -1,5 +1,6 @@
 package com.darylteo.edge.test;
 
+import org.edgeframework.eventbus.EventBusParams;
 import org.junit.Test;
 import org.vertx.java.testframework.TestBase;
 

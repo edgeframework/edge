@@ -14,7 +14,7 @@ import org.vertx.java.deploy.impl.VertxLocator;
  * @param T
  *          - the data type of the result contained by this Promise.
  */
-public class Promise<T> {
+public class Promise<T extends Object> {
 
   private Promise<T> that = this;
 

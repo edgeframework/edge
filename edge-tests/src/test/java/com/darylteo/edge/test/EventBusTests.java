@@ -22,4 +22,10 @@ public class EventBusTests extends TestBase {
   @Test public void testReceive() { startTest(getMethodName()); }
   @Test public void testBothEnds() { startTest(getMethodName()); }
   @Test public void testReply() { startTest(getMethodName()); }
+  @Test public void testMultipleParameters() { startTest(getMethodName()); }
+  
+  @Test public void testParameterTypes1() { startTest(getMethodName()); }
+  @Test public void testParameterTypes2() { startTest(getMethodName()); }
+  @Test public void testParameterTypes3() { startTest(getMethodName()); }
+  @Test public void testParameterTypes4() { startTest(getMethodName()); }
 }
