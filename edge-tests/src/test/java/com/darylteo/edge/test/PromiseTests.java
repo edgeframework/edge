@@ -36,6 +36,10 @@ public class PromiseTests extends TestBase {
   @Test public void testFinally1() { perform(); }
   @Test public void testFinally2() { perform(); }
   
+  @Test public void testTimeout1() { perform(); }
+  @Test public void testTimeout2() { perform(); }
+  @Test public void testTimeout3() { perform(); }
+  
   private void perform(){
     startTest(getMethodName());
   }

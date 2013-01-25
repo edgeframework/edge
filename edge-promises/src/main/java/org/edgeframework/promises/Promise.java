@@ -14,7 +14,7 @@ import org.vertx.java.deploy.impl.VertxLocator;
  * @param T
  *          - the data type of the result contained by this Promise.
  */
-public class Promise<T extends Object> {
+public class Promise<T> {
 
   private Promise<T> that = this;
 
@@ -38,21 +38,11 @@ public class Promise<T extends Object> {
 
   private Promise.State state;
 
-  public static <T> Promise<T> defer() {
-    return new Promise<T>();
-  }
+  private long timerTimeout = -1;
+  private long timerId = -1;
 
-  public static <T> Promise<T> defer(final Handler<Promise<T>> promiser) {
-    final Promise<T> promise = Promise.defer();
-
-    Promise.enqueue(new Runnable() {
-      @Override
-      public void run() {
-        promiser.handle(promise);
-      }
-    });
-
-    return promise;
+  private Promise() {
+    this.state = Promise.State.PENDING;
   }
 
   /**
@@ -64,12 +54,7 @@ public class Promise<T extends Object> {
    * @return the new deferred Promise.
    */
   public <O> Promise<O> then(PromiseHandler<T, O> fulfilled) {
-    this.fulfilled = fulfilled;
-
-    Promise<O> deferred = Promise.defer();
-    this.deferred = deferred;
-
-    return deferred;
+    return this.then(fulfilled, null, -1);
   }
 
   /**
@@ -83,11 +68,42 @@ public class Promise<T extends Object> {
    * @return the new deferred Promise.
    */
   public <O> Promise<O> then(PromiseHandler<T, O> fulfilled, FailureHandler<O> rejected) {
+    return this.then(fulfilled, rejected, -1);
+  }
+
+  /**
+   * Chains a promise handler and returns a new Promise that is fulfilled by
+   * that handler. This handler will be executed on the next event loop.
+   * 
+   * @param fulfilled
+   *          - the handler that is called when the Promise is fulfilled
+   * @param timeout
+   *          - number of milliseconds before failure handler is triggered
+   * @return the new deferred Promise.
+   */
+  public <O> Promise<O> then(PromiseHandler<T, O> fulfilled, long timeout) {
+    return this.then(fulfilled, null, timeout);
+  }
+
+  /**
+   * Chains a promise handler and returns a new Promise that is fulfilled by
+   * that handler. This handler will be executed on the next event loop.
+   * 
+   * @param fulfilled
+   *          - the handler that is called when the Promise is fulfilled
+   * @param rejected
+   *          - the handler that is called when the Promise is rejected
+   * @param timeout
+   *          - number of milliseconds before failure handler is triggered
+   * @return the new deferred Promise.
+   */
+  public <O> Promise<O> then(PromiseHandler<T, O> fulfilled, FailureHandler<O> rejected, long timeout) {
     this.fulfilled = fulfilled;
     this.rejected = rejected;
 
     Promise<O> deferred = Promise.defer();
     this.deferred = deferred;
+    this.deferred.timerTimeout = timeout;
 
     return deferred;
   }
@@ -103,12 +119,23 @@ public class Promise<T extends Object> {
    * @return the new deferred Promise.
    */
   public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled) {
-    this.fulfilled = fulfilled;
+    return this.then(fulfilled, null, -1);
+  }
 
-    Promise<O> deferred = Promise.defer();
-    this.deferred = deferred;
-
-    return deferred;
+  /**
+   * Chains a promise handler and returns a new Promise that is fulfilled by
+   * that handler. This handler will be executed on the next event loop. The
+   * handler must return a new promise that can then be subsequently handled.
+   * This handler must fulfill the returned promise.
+   * 
+   * @param fulfilled
+   *          - the handler that is called when the Promise is fulfilled
+   * @param timeout
+   *          - number of milliseconds before failure handler is triggered
+   * @return the new deferred Promise.
+   */
+  public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled, long timeout) {
+    return this.then(fulfilled, null, timeout);
   }
 
   /**
@@ -124,11 +151,30 @@ public class Promise<T extends Object> {
    * @return the new deferred Promise.
    */
   public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled, FailureHandler<O> rejected) {
+    return this.then(fulfilled, rejected, -1);
+  }
+
+  /**
+   * Chains a promise handler and returns a new Promise that is fulfilled by
+   * that handler. This handler will be executed on the next event loop. The
+   * handler must return a new promise that can then be subsequently handled.
+   * This handler must fulfill the returned promise.
+   * 
+   * @param fulfilled
+   *          - the handler that is called when the Promise is fulfilled
+   * @param rejected
+   *          - the handler that is called when the Promise is rejected
+   * @param timeout
+   *          - number of milliseconds before failure handler is triggered
+   * @return the new deferred Promise.
+   */
+  public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled, FailureHandler<O> rejected, long timeout) {
     this.fulfilled = fulfilled;
     this.rejected = rejected;
 
     Promise<O> deferred = Promise.defer();
     this.deferred = deferred;
+    this.deferred.timerTimeout = timeout;
 
     return deferred;
   }
@@ -214,8 +260,17 @@ public class Promise<T extends Object> {
    *          - the value to fulfill the promise with.
    */
   public void fulfill(final T result) {
+    if (this.state != State.PENDING) {
+      return;
+    }
+
     this.result = result;
     this.state = State.FULFILLED;
+
+    // Begin any timeout handlers for the deferred promise
+    if (this.deferred != null) {
+      this.deferred.beginTimeout();
+    }
 
     Promise.enqueue(new Runnable() {
       @SuppressWarnings("unchecked")
@@ -275,8 +330,17 @@ public class Promise<T extends Object> {
    *          - the exception that caused the rejection.
    */
   public void reject(final Throwable e) {
+    if (this.state != State.PENDING) {
+      return;
+    }
+
     this.result = null;
     this.state = State.REJECTED;
+
+    // Begin any timeout handlers for the deferred promise
+    if (this.deferred != null) {
+      this.deferred.beginTimeout();
+    }
 
     Promise.enqueue(new Runnable() {
       @SuppressWarnings("unchecked")
@@ -318,6 +382,53 @@ public class Promise<T extends Object> {
    */
   public void reject(String reason) {
     this.reject(new Exception(reason));
+  }
+
+  private void beginTimeout() {
+    this.timerId = this.setTimeout(this.timerTimeout);
+  }
+
+  private long setTimeout(long timeout) {
+    if (timeout < 0) {
+      return -1;
+    }
+
+    return VertxLocator.vertx.setTimer(timeout, new Handler<Long>() {
+      @Override
+      public void handle(Long timerid) {
+        Promise<?> that = Promise.this;
+        System.out.println(that.state);
+        if (that.state == State.PENDING) {
+          that.reject("Promise Timed Out");
+        }
+      }
+    });
+  }
+
+  public static <T> Promise<T> defer() {
+    return Promise.defer(null, -1);
+  }
+
+  public static <T> Promise<T> defer(final Handler<Promise<T>> promiser) {
+    return Promise.defer(promiser, -1);
+  }
+
+  public static <T> Promise<T> defer(final Handler<Promise<T>> promiser, long timeout) {
+    final Promise<T> promise = new Promise<>();
+
+    if (promiser != null) {
+      Promise.enqueue(new Runnable() {
+        @Override
+        public void run() {
+          promiser.handle(promise);
+        }
+      });
+    }
+
+    promise.timerTimeout = timeout;
+    promise.beginTimeout();
+
+    return promise;
   }
 
   private static void enqueue(final Runnable task) {

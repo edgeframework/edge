@@ -5,6 +5,7 @@ import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.promises.RepromiseHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.java.testframework.TestClientBase;
 
 public class PromiseTestClient extends TestClientBase {
@@ -293,7 +294,7 @@ public class PromiseTestClient extends TestClientBase {
   }
 
   public void testPrefilled() throws Exception {
-    Promise<String> p = new Promise<String>();
+    Promise<String> p = Promise.defer();
 
     p.fulfill("Hello World");
 
@@ -308,16 +309,141 @@ public class PromiseTestClient extends TestClientBase {
   }
 
   public void testTimeout1() throws Exception {
-    Promise<String> p = new Promise<String>();
-
-    p.then(new PromiseHandler<String, Void>() {
+    Promise.defer(new Handler<Promise<String>>() {
       @Override
-      public Void handle(String value) {
-        tu.azzert(value.equals("Hello World"));
-        tu.testComplete();
-        return null;
+      public void handle(final Promise<String> promise) {
+        VertxLocator.vertx.runOnLoop(new Handler<Void>() {
+          private int counter = 0;
+
+          @Override
+          public void handle(Void arg0) {
+            try {
+              Thread.sleep(100);
+              if (counter < 10) {
+                System.out.println(counter);
+                counter++;
+                VertxLocator.vertx.runOnLoop(this);
+              } else {
+                promise.fulfill("Hello World");
+              }
+            } catch (InterruptedException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+          }
+        });
       }
-    });
+    }, -1)
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String result) {
+            tu.testComplete();
+            return null;
+          }
+        }, new FailureHandler<Void>() {
+          @Override
+          public Void handle(Throwable e) {
+            tu.azzert(false, "Timeout should not trigger");
+            tu.testComplete();
+            return null;
+          }
+        });
   }
 
+  public void testTimeout2() throws Exception {
+    Promise.defer(new Handler<Promise<String>>() {
+      @Override
+      public void handle(final Promise<String> promise) {
+        VertxLocator.vertx.runOnLoop(new Handler<Void>() {
+          private int counter = 0;
+
+          @Override
+          public void handle(Void arg0) {
+            try {
+              Thread.sleep(100);
+              if (counter < 10) {
+                System.out.println(counter);
+                counter++;
+                VertxLocator.vertx.runOnLoop(this);
+              } else {
+                promise.fulfill("Hello World");
+              }
+            } catch (InterruptedException e) {
+              // TODO Auto-generated catch block
+              e.printStackTrace();
+            }
+          }
+        });
+      }
+    }, 500)
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String result) {
+            tu.azzert(false, "Timeout did not trigger");
+            tu.testComplete();
+            return null;
+          }
+        }, new FailureHandler<Void>() {
+          @Override
+          public Void handle(Throwable e) {
+            tu.testComplete();
+            return null;
+          }
+        });
+  }
+
+  public void testTimeout3() throws Exception {
+    Promise.defer(new Handler<Promise<String>>() {
+      @Override
+      public void handle(final Promise<String> promise) {
+        promise.fulfill("Hello World");
+      }
+    })
+        .then(new RepromiseHandler<String, String>() {
+          @Override
+          public Promise<String> handle(String result) {
+            return Promise.defer(new Handler<Promise<String>>() {
+              @Override
+              public void handle(final Promise<String> promise) {
+                VertxLocator.vertx.runOnLoop(new Handler<Void>() {
+                  private int counter = 0;
+
+                  @Override
+                  public void handle(Void arg0) {
+                    try {
+                      Thread.sleep(100);
+                      if (counter < 10) {
+                        System.out.println(counter);
+                        counter++;
+                        VertxLocator.vertx.runOnLoop(this);
+                      } else {
+                        promise.fulfill("Hello World");
+                      }
+                    } catch (InterruptedException e) {
+                      // TODO Auto-generated catch block
+                      e.printStackTrace();
+                    }
+                  }
+                });
+              }
+
+            });
+          }
+        }, 500)
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String value) {
+            tu.azzert(false, "Timeout did not trigger");
+            tu.testComplete();
+            return null;
+          }
+        }, new FailureHandler<Void>() {
+          @Override
+          public Void handle(Throwable e) {
+            tu.testComplete();
+            return null;
+          }
+        });
+
+  }
 }
