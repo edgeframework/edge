@@ -5,6 +5,7 @@ import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.java.testframework.TestClientBase;
 
@@ -28,10 +29,10 @@ public class EventBusTestClient extends TestClientBase {
 
   public void testSend() {
 
-    VertxLocator.vertx.eventBus().registerHandler("testString", new Handler<Message<String>>() {
+    VertxLocator.vertx.eventBus().registerHandler("testString", new Handler<Message<JsonObject>>() {
       @Override
-      public void handle(Message<String> message) {
-        tu.azzert(message.body.equals("Hello World"), "Message sent on event bus is not correct");
+      public void handle(Message<JsonObject> message) {
+        tu.azzert(message.body.getString("message").equals("Hello World"), "Message sent on event bus is not correct");
         tu.testComplete();
       }
     });
@@ -51,12 +52,11 @@ public class EventBusTestClient extends TestClientBase {
 
       @Override
       public String testReply(String message) {
-        // TODO Auto-generated method stub
         return null;
       }
     });
 
-    VertxLocator.vertx.eventBus().send("testString", "Hello World");
+    VertxLocator.vertx.eventBus().send("testString", new JsonObject().putString("message", "Hello World"));
   }
 
   public void testBothEnds() {

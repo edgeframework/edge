@@ -7,7 +7,6 @@ import org.edgeframework.promises.RepromiseHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.testframework.TestClientBase;
 
-
 public class PromiseTestClient extends TestClientBase {
 
   @Override

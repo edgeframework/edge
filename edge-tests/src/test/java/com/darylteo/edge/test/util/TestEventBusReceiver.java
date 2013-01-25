@@ -1,7 +1,11 @@
 package com.darylteo.edge.test.util;
 
-public interface TestEventBusReceiver {
-  public void testString(String message);
+import org.edgeframework.eventbus.EventBusParams;
 
+public interface TestEventBusReceiver {
+  @EventBusParams({"message"})
+  public void testString(String message);
+  
+  @EventBusParams({"message"})
   public String testReply(String message);
 }
