@@ -196,6 +196,6 @@ public final class EventBus {
 
   // Workaround to instantiate new Promise by using type wildcard
   private static <T> Promise<T> createReturnPromise(Class<T> returnType) throws Exception {
-    return Promise.defer();
+    return Promise.defer(30000); // 30 second timeout
   }
 }

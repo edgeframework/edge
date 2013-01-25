@@ -409,6 +409,10 @@ public class Promise<T> {
     return Promise.defer(null, -1);
   }
 
+  public static <T> Promise<T> defer(long timeout) {
+    return Promise.defer(null, timeout);
+  }
+
   public static <T> Promise<T> defer(final Handler<Promise<T>> promiser) {
     return Promise.defer(promiser, -1);
   }
