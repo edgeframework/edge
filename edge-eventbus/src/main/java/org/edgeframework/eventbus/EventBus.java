@@ -7,10 +7,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;
@@ -23,19 +21,10 @@ public final class EventBus {
   private static final String MESSAGE_RESULT_KEY = "result";
   private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
+  private static final org.vertx.java.core.eventbus.EventBus eb = VertxLocator.vertx.eventBus();
+
   @SuppressWarnings("unchecked")
-  public static <T> T createProxy(final Class<T> clazz) {
-
-    // for (Method method : clazz.getMethods()) {
-    // // Ignore Object methods
-    // if (method.getDeclaringClass().equals(Object.class)) {
-    // continue;
-    // }
-    //
-    // System.out.println(method.getName());
-    // System.out.println(method.getAnnotations().length);
-    // }
-
+  public static <T> T registerSender(final String namespace, final Class<T> clazz) {
     T t = (T) Proxy.newProxyInstance(
         clazz.getClassLoader(),
         new Class[] { clazz },
@@ -88,7 +77,9 @@ public final class EventBus {
 
             VertxLocator.container.getLogger().debug(jsonMessage.toString());
 
-            VertxLocator.vertx.eventBus().send(methodName, jsonMessage, replyHandler);
+            String address = namespace.isEmpty() ? methodName : String.format("%s.%s", namespace, methodName);
+
+            eb.send(address, jsonMessage, replyHandler);
             return promise;
           }
         });
@@ -96,9 +87,7 @@ public final class EventBus {
     return t;
   }
 
-  public static <T> void registerReceiver(final T receiver, Class<T> clazz) {
-    org.vertx.java.core.eventbus.EventBus eb = VertxLocator.vertx.eventBus();
-
+  public static <T> void registerReceiver(String namespace, final T receiver, Class<T> clazz) {
     for (Method method : clazz.getMethods()) {
       // Ignore Object methods
       if (method.getDeclaringClass().equals(Object.class)) {
@@ -111,7 +100,9 @@ public final class EventBus {
 
       try {
         final MethodHandle handle = lookup.unreflect(method);
-        eb.registerHandler(method.getName(), new Handler<Message<JsonObject>>() {
+        String address = namespace.isEmpty() ? method.getName() : String.format("%s.%s", namespace, method.getName());
+
+        eb.registerHandler(address, new Handler<Message<JsonObject>>() {
           @Override
           public void handle(Message<JsonObject> message) {
             List<Object> params = messageToParams(receiver, paramNames, paramTypes, message.body);

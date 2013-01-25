@@ -307,4 +307,17 @@ public class PromiseTestClient extends TestClientBase {
     });
   }
 
+  public void testTimeout1() throws Exception {
+    Promise<String> p = new Promise<String>();
+
+    p.then(new PromiseHandler<String, Void>() {
+      @Override
+      public Void handle(String value) {
+        tu.azzert(value.equals("Hello World"));
+        tu.testComplete();
+        return null;
+      }
+    });
+  }
+
 }
