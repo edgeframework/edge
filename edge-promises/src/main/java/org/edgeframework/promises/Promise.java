@@ -3,6 +3,11 @@ package org.edgeframework.promises;
 import org.vertx.java.core.Handler;
 import org.vertx.java.deploy.impl.VertxLocator;
 
+import rx.Observable;
+import rx.Observer;
+import rx.Subscription;
+import rx.util.functions.Func1;
+
 /**
  * A Promise represents a request that will be fulfilled sometime in the future,
  * most usually by an asynchrous task executed on the Vert.x Event Loop. It
@@ -240,20 +245,6 @@ public class Promise<T> {
   }
 
   /**
-   * Returns the result of this promise
-   * 
-   * @return
-   * @throws IllegalStateException
-   *           - thrown if the promise is not in a fulfilled state
-   */
-  public T get() {
-    if (this.state != State.FULFILLED) {
-      throw new IllegalStateException("Promise has not been fulfilled yet");
-    }
-    return this.result;
-  }
-
-  /**
    * Fulfills the promise with the value given.
    * 
    * @param result
@@ -384,6 +375,18 @@ public class Promise<T> {
     this.reject(new Exception(reason));
   }
 
+  public boolean isFulfilled() {
+    return this.state == State.FULFILLED;
+  }
+
+  public boolean isRejected() {
+    return this.state == State.REJECTED;
+  }
+
+  public boolean isPending() {
+    return this.state == State.PENDING;
+  }
+
   private void beginTimeout() {
     this.timerId = this.setTimeout(this.timerTimeout);
   }
@@ -440,6 +443,49 @@ public class Promise<T> {
       @Override
       public void handle(Void event) {
         task.run();
+      }
+    });
+  }
+
+  /**
+   * Returns the fulfilled value of this promise.
+   * 
+   * @throws IllegalStateException
+   *           if it has not been fulfilled.
+   */
+  public T get() throws IllegalStateException {
+    if (this.state != State.FULFILLED) {
+      throw new IllegalStateException("Promise has not been fulfilled yet");
+    }
+    return this.result;
+  }
+
+  public static <R> Observable<R> toObservable(final Promise<R> promise) {
+    return Observable.create(new Func1<Observer<R>, Subscription>() {
+      @Override
+      public Subscription call(final Observer<R> obs) {
+
+        if (promise.isFulfilled()) {
+          obs.onNext(promise.get());
+          obs.onCompleted();
+
+        } else if (promise.isRejected()) {
+          // TODO: Exception handling causing rejection
+          obs.onError(new Exception("Promise Rejected"));
+
+        } else if (promise.isPending()) {
+          promise.then(new PromiseHandler<R, Void>() {
+            @Override
+            public Void handle(R value) {
+              obs.onNext(value);
+              obs.onCompleted();
+              return null;
+            }
+          });
+
+        }
+
+        return Observable.noOpSubscription();
       }
     });
   }

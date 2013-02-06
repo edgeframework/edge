@@ -34,6 +34,17 @@ allprojects {
 		mavenCentral()
 	}
 
+  test {
+    // Some vert.x properties
+    systemProperties['vertx.test.timeout'] = 4
+
+    workingDir = "$buildDir"
+
+    for (File f : classpath){
+      println(f)
+    }
+  }
+
 	// Pulls all dependencies into local project directory for IDEs
 	task collectDeps(type: Copy) {
 		description = 'conveniently collect dependencies for other IDEs'
@@ -83,23 +94,12 @@ project(':edge-eventbus'){
 	}
 }
 
-project(':edge-tests'){
-	dependencies {
-		compile	project(':edge-core')
-	}
-
-	test {
-		// Some vert.x properties
-		systemProperties['vertx.test.timeout'] = 4
-
-		workingDir = "$projectDir/test-dir"
-
-		for (File f : classpath){
-			println(f)
-		}
-	}
-
+project(':edge-promises'){
+  dependencies {
+    compile "com.netflix.rxjava:rxjava-core:0.5.0"
+  }
 }
+
 
 // Root Project Configuration
 apply plugin: 'eclipse'

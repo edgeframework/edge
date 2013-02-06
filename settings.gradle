@@ -1,5 +1,4 @@
-include	'edge-tests',
-	'edge-core',
+include	'edge-core',
 	'edge-routematcher',
 	'edge-promises',
 	'edge-controllers',
