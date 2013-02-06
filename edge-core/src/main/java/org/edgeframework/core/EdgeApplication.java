@@ -1,4 +1,4 @@
-package org.edgeframework.app;
+package org.edgeframework.core;
 
 import org.edgeframework.routing.Routing;
 import org.edgeframework.routing.handler.EdgeHandler;

@@ -1,4 +1,4 @@
-package org.edgeframework.test;
+package org.edgeframework.promises.test;
 
 import org.junit.Test;
 import org.vertx.java.testframework.TestBase;

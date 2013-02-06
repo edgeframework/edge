@@ -1,4 +1,4 @@
-package org.edgeframework.test;
+package org.edgeframework.core.test;
 
 import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;

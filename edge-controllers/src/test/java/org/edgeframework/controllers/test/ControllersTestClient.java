@@ -1,7 +1,8 @@
-package org.edgeframework.test;
+package org.edgeframework.controllers.test;
 
-import org.edgeframework.controller.Controllers;
-import org.edgeframework.controller.RouteControllerDefinition;
+import org.edgeframework.controllers.Controllers;
+import org.edgeframework.controllers.RouteControllerDefinition;
+import org.edgeframework.controllers.test.TestHttpClient;
 import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
@@ -111,7 +112,7 @@ public class ControllersTestClient extends TestClientBase {
 
   public void testRouteParams1() throws Exception {
     this.client
-        .getPage("/params/HelloWorld")
+        .getPage("/testRouteParams/HelloWorld")
         .then(new PromiseHandler<String, Void>() {
 
           @Override

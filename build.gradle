@@ -1,97 +1,99 @@
 // All Projects Configuration - Repositories and Dependencies
 allprojects {
-	// Java Configuration
-	apply plugin: 'java'
+  // Java Configuration
+  apply plugin: 'java'
 
-	// Vertx Jars
-	FileCollection coreJars = fileTree(dir: "$System.env.VERTX_HOME/lib", include: '*.jar')
+  // Vertx Jars
+  FileCollection coreJars = fileTree(dir: "$System.env.VERTX_HOME/lib", include: '*.jar')
 
-	configurations {
-		// Exclude vertx jars
-		// Ensure you run tests to make sure dependencies do not conflict
-		// for (File jar : coreJars){
-		//	String moduleName = jar.getName();
-		//	moduleName = moduleName.substring(0, moduleName.lastIndexOf('-'))
+  configurations {
+    // Exclude vertx jars
+    // Ensure you run tests to make sure dependencies do not conflict
+    // for (File jar : coreJars){
+    //  String moduleName = jar.getName();
+    //  moduleName = moduleName.substring(0, moduleName.lastIndexOf('-'))
 
-		//	compile.exclude module: moduleName
-		// }
+    //  compile.exclude module: moduleName
+    // }
 
-		core
-		provided
-	}
+    core
+    provided
+  }
 
-	dependencies {
-		testCompile	"junit:junit:$junitVersion"
+  dependencies {
+    testCompile "junit:junit:$junitVersion"
 
-		runtime files("$System.env.VERTX_HOME/conf")
+    runtime files("$System.env.VERTX_HOME/conf")
 
-		core	coreJars		// this is just for collectDeps
-		compile coreJars	// this is for compiling
-	}
+    core  coreJars    // this is just for collectDeps
+    compile coreJars  // this is for compiling
+  }
 
-	repositories {
-		maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-		mavenCentral()
-	}
+  repositories {
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    mavenCentral()
+  }
 
   test {
     // Some vert.x properties
     systemProperties['vertx.test.timeout'] = 4
-
-    workingDir = "$buildDir"
-
-    for (File f : classpath){
-      println(f)
-    }
   }
 
-	// Pulls all dependencies into local project directory for IDEs
-	task collectDeps(type: Copy) {
-		description = 'conveniently collect dependencies for other IDEs'
-		destinationDir = file("$rootDir/build/deps")
-		into("core") {
-			from configurations.core
-		}
-		into("compile") {
-			from configurations.compile
-			exclude {
-				it.file in coreJars
-			}
-		}
+  // Pulls all dependencies into local project directory for IDEs
+  task collectDeps(type: Copy) {
+    description = 'conveniently collect dependencies for other IDEs'
+    destinationDir = file("$rootDir/build/deps")
+    into("core") {
+      from configurations.core
+    }
+    into("compile") {
+      from configurations.compile
+      exclude {
+        it.file in coreJars
+      }
+    }
 
-		into("test") {
-			from configurations.testCompile
-		}
-	}
+    into("test") {
+      from configurations.testCompile
+    }
+  }
 }
 
 project(':edge-core'){
-	dependencies {
-		compile	project(':edge-promises')
-		compile	project(':edge-routematcher')
-		compile	project(':edge-controllers')
-		compile project(':edge-eventbus')
-	}
+  dependencies {
+    compile project(':edge-promises')
+    compile project(':edge-routematcher')
+    compile project(':edge-controllers')
+    compile project(':edge-eventbus')
+  }
 }
 
 project(':edge-routematcher'){
-	dependencies {
-		compile	project(':edge-promises')
-		compile	"com.github.jknack:handlebars:$handlebarsVersion"
-	}
+  dependencies {
+    compile project(':edge-promises')
+    compile "com.github.jknack:handlebars:$handlebarsVersion"
+  }
+
+  test {
+    workingDir = "$buildDir/resources/test/"
+  }
 }
 
 project(':edge-controllers'){
-	dependencies {
-		compile project(':edge-promises')
-		compile project(':edge-routematcher')
-	}
+  dependencies {
+    compile project(':edge-promises')
+    compile project(':edge-routematcher')
+  }
+
+  test {
+    workingDir = "$buildDir/resources/test/"
+  }
 }
 
 project(':edge-eventbus'){
-	dependencies {
-		compile	project(':edge-promises')
-	}
+  dependencies {
+    compile project(':edge-promises')
+  }
 }
 
 project(':edge-promises'){
@@ -107,17 +109,17 @@ apply plugin: 'idea'
 jar.enabled = false
 
 task dist(type: Zip, dependsOn:jar) {
-	for (String b : subprojects.buildDir){
-		from fileTree(dir: "$b/libs", include: '*.jar')
-	}
+  for (String b : subprojects.buildDir){
+    from fileTree(dir: "$b/libs", include: '*.jar')
+  }
 
-	destinationDir = file("$rootProject.buildDir/dist")
-	archiveName
+  destinationDir = file("$rootProject.buildDir/dist")
+  archiveName
 }
 
 // Wrapper Configuration
 task wrapper(type: Wrapper) {
-	gradleVersion = "$gradleVersion"
+  gradleVersion = "$gradleVersion"
 }
 
 // IDE Configuration

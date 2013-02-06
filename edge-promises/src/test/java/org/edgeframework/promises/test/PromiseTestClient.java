@@ -1,4 +1,4 @@
-package org.edgeframework.test;
+package org.edgeframework.promises.test;
 
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;

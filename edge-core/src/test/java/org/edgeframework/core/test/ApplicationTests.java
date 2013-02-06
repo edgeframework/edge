@@ -1,14 +1,14 @@
-package org.edgeframework.test;
+package org.edgeframework.core.test;
 
 import org.junit.Test;
 import org.vertx.java.testframework.TestBase;
 
-public class RouteMatcherTests extends TestBase {
+public class ApplicationTests extends TestBase {
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    startApp(RouteMatcherTestClient.class.getName());
+    startApp(ApplicationTestClient.class.getName());
   }
 
   @Override

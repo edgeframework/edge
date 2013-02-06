@@ -1,4 +1,4 @@
-package org.edgeframework.app;
+package org.edgeframework.core;
 
 import java.util.LinkedList;
 import java.util.List;

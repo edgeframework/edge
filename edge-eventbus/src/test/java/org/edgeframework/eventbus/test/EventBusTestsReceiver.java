@@ -1,17 +1,16 @@
-package org.edgeframework.test;
+package org.edgeframework.eventbus.test;
 
 import org.edgeframework.eventbus.EventBusParams;
-import org.edgeframework.promises.Promise;
 
-public interface EventBusTestsSender {
+public interface EventBusTestsReceiver {
   @EventBusParams({ "message" })
   public void testString(String message);
 
   @EventBusParams({ "message" })
-  public Promise<String> testReply(String message);
+  public String testReply(String message);
 
   @EventBusParams({ "message", "integer" })
-  public Promise<String> testMultipleParameters(String message, int integer);
+  public String testMultipleParameters(String message, Number integer);
 
   @EventBusParams({ "n1", "n2", "n3", "n4" })
   public void testParameterTypes1(byte n1, short n2, int n3, long n4);

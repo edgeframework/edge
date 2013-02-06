@@ -1,7 +1,7 @@
-package org.edgeframework.test;
+package org.edgeframework.controllers.test;
 
-import org.edgeframework.controller.Controller;
-import org.edgeframework.controller.Result;
+import org.edgeframework.controllers.Controller;
+import org.edgeframework.controllers.Result;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.Handler;
@@ -14,7 +14,7 @@ public class TestController extends Controller {
   }
 
   public static Result testRenderResult() {
-    return render("basic-test", new JsonObject().putString("echo", "Hello World"));
+    return render("basic", new JsonObject().putString("echo", "Hello World"));
   }
 
   public static Result testJsonResult() {
@@ -46,7 +46,7 @@ public class TestController extends Controller {
     return async(promise);
   }
 
-  public static Result TestRouteParams(String echoString) {
+  public static Result testRouteParams(String echoString) {
     return ok(echoString);
   }
 }

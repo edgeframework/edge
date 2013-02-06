@@ -1,4 +1,4 @@
-package org.edgeframework.controller;
+package org.edgeframework.controllers;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;

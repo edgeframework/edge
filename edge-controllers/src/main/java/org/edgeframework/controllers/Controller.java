@@ -1,4 +1,4 @@
-package org.edgeframework.controller;
+package org.edgeframework.controllers;
 
 import java.util.Map;
 

@@ -1,4 +1,4 @@
-package org.edgeframework.test;
+package org.edgeframework.eventbus.test;
 
 import org.edgeframework.eventbus.EventBus;
 import org.edgeframework.promises.PromiseHandler;

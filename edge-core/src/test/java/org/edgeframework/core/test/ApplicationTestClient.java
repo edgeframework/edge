@@ -1,6 +1,6 @@
-package org.edgeframework.test;
+package org.edgeframework.core.test;
 
-import org.edgeframework.app.EdgeApplication;
+import org.edgeframework.core.EdgeApplication;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.handler.EdgeHandler;
@@ -9,7 +9,7 @@ import org.edgeframework.routing.handler.EdgeResponse;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.testframework.TestClientBase;
 
-public class RouteMatcherTestClient extends TestClientBase {
+public class ApplicationTestClient extends TestClientBase {
 
   private TestHttpClient client;
 
