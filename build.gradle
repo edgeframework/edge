@@ -66,16 +66,16 @@ project(':edge-core'){
     compile project(':edge-controllers')
     compile project(':edge-eventbus')
   }
+  
+  test {
+    workingDir = "$buildDir/resources/test/"
+  }
 }
 
 project(':edge-routematcher'){
   dependencies {
     compile project(':edge-promises')
     compile "com.github.jknack:handlebars:$handlebarsVersion"
-  }
-
-  test {
-    workingDir = "$buildDir/resources/test/"
   }
 }
 
