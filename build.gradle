@@ -36,7 +36,7 @@ allprojects {
 
   test {
     // Some vert.x properties
-    systemProperties['vertx.test.timeout'] = 4
+    systemProperties['vertx.test.timeout'] = 5
   }
 
   // Pulls all dependencies into local project directory for IDEs
