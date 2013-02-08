@@ -33,6 +33,8 @@ public class PromiseTests extends TestBase {
   @Test public void testFinally1() { perform(); }
   @Test public void testFinally2() { perform(); }
   
+  @Test public void testPrefilled() { perform(); }
+  
   @Test public void testRxBasic() { perform(); }
   
   private void perform(){

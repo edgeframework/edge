@@ -9,6 +9,7 @@ import rx.Observer;
 import rx.Subscription;
 import rx.util.AtomicObservableSubscription;
 import rx.util.functions.Func1;
+import sun.security.util.PendingException;
 
 /**
  * A Promise represents a request that will be fulfilled sometime in the future,
@@ -22,8 +23,18 @@ import rx.util.functions.Func1;
  *          - the data type of the result contained by this Promise.
  */
 public class Promise<T> extends Observable<T> {
+  private static enum STATE {
+    PENDING,
+    FULFILLED,
+    REJECTED
+  }
+
   private Promise<T> that = this;
+
   private T value = null;
+  private Exception reason;
+
+  private STATE state = STATE.PENDING;
 
   // private CompletedHandler<Void> onFinally = null;
   // private CompletedHandler<T> onFulfilled = null;
@@ -95,7 +106,7 @@ public class Promise<T> extends Observable<T> {
       final CompletedHandler<Void> onFinally)
   {
     final Promise<O> promise = Promise.defer();
-    this.subscribe(new Observer<T>() {
+    Observer<T> observer = new Observer<T>() {
       @Override
       public void onCompleted() {
         // No op
@@ -172,13 +183,27 @@ public class Promise<T> extends Observable<T> {
           promise.fulfill((O) result);
         }
       }
-    });
+    };
+
+    this.subscribe(observer);
+    if (this.state == STATE.FULFILLED) {
+      observer.onNext(this.value);
+    } else if (this.state == STATE.REJECTED) {
+      observer.onError(this.reason);
+    }
 
     return promise;
   }
 
   /* Result Methods */
   public void fulfill(T value) {
+    if (this.state != STATE.PENDING) {
+      throw new IllegalStateException();
+    }
+
+    this.state = STATE.FULFILLED;
+    this.value = value;
+
     for (Observer<T> obs : this.observers.values()) {
       obs.onNext(value);
       obs.onCompleted();
@@ -186,6 +211,13 @@ public class Promise<T> extends Observable<T> {
   }
 
   public void reject(Exception reason) {
+    if (this.state != STATE.PENDING) {
+      throw new IllegalStateException();
+    }
+
+    this.state = STATE.REJECTED;
+    this.reason = reason;
+
     for (Observer<T> obs : this.observers.values()) {
       obs.onError(new Exception(reason));
     }

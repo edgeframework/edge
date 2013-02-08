@@ -297,6 +297,21 @@ public class PromiseTestClient extends TestClientBase {
         });
   }
 
+  public void testPrefilled() throws Exception {
+    Promise<String> p = Promise.defer();
+
+    p.fulfill("Hello World");
+
+    p.then(new PromiseHandler<String, Void>() {
+      @Override
+      public Void handle(String value) {
+        tu.azzert(value.equals("Hello World"));
+        tu.testComplete();
+        return null;
+      }
+    });
+  }
+
   public void testRxBasic() {
     makePromise("Hello World")
         .subscribe(new Action1<String>() {

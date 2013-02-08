@@ -1,6 +1,7 @@
 package org.edgeframework.controllers;
 
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,8 @@ public class Controllers {
   private Routing routeMatcher = new Routing();
 
   public Controllers(String file, HttpServer server) throws Exception {
+    System.out.println(Files.exists(Paths.get(file), LinkOption.NOFOLLOW_LINKS));
+
     try (
         Scanner s = new Scanner(
             new String(Files.readAllBytes(Paths.get(file)))
@@ -47,6 +50,7 @@ public class Controllers {
         this.addRoute(method, route, controller);
       }
     } catch (Exception e) {
+      e.printStackTrace();
       throw new Exception("Could not load the route configuration file", e);
     }
 
