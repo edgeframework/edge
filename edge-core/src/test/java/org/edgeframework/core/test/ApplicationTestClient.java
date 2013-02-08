@@ -163,7 +163,7 @@ public class ApplicationTestClient extends TestClientBase {
             new FailureHandler<Void>() {
 
               @Override
-              public Void handle(Throwable e) {
+              public Void handle(Exception e) {
                 e.printStackTrace();
                 tu.azzert(false, "Exception");
                 return null;

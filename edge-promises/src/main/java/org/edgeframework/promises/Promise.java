@@ -1,11 +1,13 @@
 package org.edgeframework.promises;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.deploy.impl.VertxLocator;
+import java.util.Map;
+
+import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
+import rx.util.AtomicObservableSubscription;
 import rx.util.functions.Func1;
 
 /**
@@ -19,474 +21,177 @@ import rx.util.functions.Func1;
  * @param T
  *          - the data type of the result contained by this Promise.
  */
-public class Promise<T> {
-
+public class Promise<T> extends Observable<T> {
   private Promise<T> that = this;
+  private T value = null;
 
-  public static enum State {
-    PENDING,
-    FULFILLED,
-    REJECTED
-  }
+  // private CompletedHandler<Void> onFinally = null;
+  // private CompletedHandler<T> onFulfilled = null;
+  // private CompletedHandler<Throwable> onRejected = null;
 
-  // Handler that is called when the promise is fulfilled
-  private CompletedHandler<T> fulfilled;
-  private FailureHandler<?> rejected;
-  private CompletedHandler<Void> finaled;
-
-  // A deferred promise that is chained on top of this one
-  @SuppressWarnings("rawtypes")
-  private Promise deferred;
-
-  // The result that can be retrieved from the Promise
-  private T result;
-
-  private Promise.State state;
-
-  private long timerTimeout = -1;
-  private long timerId = -1;
-
-  private Promise() {
-    this.state = Promise.State.PENDING;
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(PromiseHandler<T, O> fulfilled) {
-    return this.then(fulfilled, null, -1);
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @param rejected
-   *          - the handler that is called when the Promise is rejected
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(PromiseHandler<T, O> fulfilled, FailureHandler<O> rejected) {
-    return this.then(fulfilled, rejected, -1);
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @param timeout
-   *          - number of milliseconds before failure handler is triggered
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(PromiseHandler<T, O> fulfilled, long timeout) {
-    return this.then(fulfilled, null, timeout);
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @param rejected
-   *          - the handler that is called when the Promise is rejected
-   * @param timeout
-   *          - number of milliseconds before failure handler is triggered
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(PromiseHandler<T, O> fulfilled, FailureHandler<O> rejected, long timeout) {
-    this.fulfilled = fulfilled;
-    this.rejected = rejected;
-
-    Promise<O> deferred = Promise.defer();
-    this.deferred = deferred;
-    this.deferred.timerTimeout = timeout;
-
-    return deferred;
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop. The
-   * handler must return a new promise that can then be subsequently handled.
-   * This handler must fulfill the returned promise.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled) {
-    return this.then(fulfilled, null, -1);
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop. The
-   * handler must return a new promise that can then be subsequently handled.
-   * This handler must fulfill the returned promise.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @param timeout
-   *          - number of milliseconds before failure handler is triggered
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled, long timeout) {
-    return this.then(fulfilled, null, timeout);
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop. The
-   * handler must return a new promise that can then be subsequently handled.
-   * This handler must fulfill the returned promise.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @param rejected
-   *          - the handler that is called when the Promise is rejected
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled, FailureHandler<O> rejected) {
-    return this.then(fulfilled, rejected, -1);
-  }
-
-  /**
-   * Chains a promise handler and returns a new Promise that is fulfilled by
-   * that handler. This handler will be executed on the next event loop. The
-   * handler must return a new promise that can then be subsequently handled.
-   * This handler must fulfill the returned promise.
-   * 
-   * @param fulfilled
-   *          - the handler that is called when the Promise is fulfilled
-   * @param rejected
-   *          - the handler that is called when the Promise is rejected
-   * @param timeout
-   *          - number of milliseconds before failure handler is triggered
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> then(RepromiseHandler<T, O> fulfilled, FailureHandler<O> rejected, long timeout) {
-    this.fulfilled = fulfilled;
-    this.rejected = rejected;
-
-    Promise<O> deferred = Promise.defer();
-    this.deferred = deferred;
-    this.deferred.timerTimeout = timeout;
-
-    return deferred;
-  }
-
-  /**
-   * This chains a handler and returns a new Promise. However, calling this
-   * method on a chain of promises indicates that there are no further work to
-   * be done. This is analogous to a "finally" clause in Java. You should only
-   * use this to perform cleanup operations.
-   * 
-   * The handler will be invoked regardless of the success/failure of the
-   * previous handler, but will only be invoked upon success or failure
-   * (otherwise, it will simply time out)
-   * 
-   * @param handler
-   *          - the handler that is called when the promise is resolved.
-   * @return the new deferred Promise.
-   */
-  public <O> Promise<O> fin(PromiseHandler<Void, O> handler) {
-    this.finaled = handler;
-
-    Promise<O> deferred = Promise.defer();
-    this.deferred = deferred;
-
-    return deferred;
-  }
-
-  /**
-   * This chains a handler and returns a new Promise. This is shorthand for
-   * "then()", but with null as the fulfilment handler. Useful if you're only
-   * expecting an exception and not worried about the return value.
-   * 
-   * @param rejected
-   *          - the handler that is called when the promise is rejected.
-   * @return the new deferred Promise.
-   * @see #then(PromiseHandler, FailureHandler)
-   */
-  public <O> Promise<O> fail(FailureHandler<O> rejected) {
-    this.rejected = rejected;
-
-    Promise<O> deferred = Promise.defer();
-    this.deferred = deferred;
-
-    return deferred;
-  }
-
-  /**
-   * For internal use only. Turns this Promise into the passed in Promise. All
-   * handlers on the passed in Promise are nulled.
-   * 
-   * @param other
-   *          - the Promise to become.
-   */
-  void become(Promise<T> other) {
-    this.deferred = other.deferred;
-    other.deferred = null;
-
-    this.fulfilled = other.fulfilled;
-    other.fulfilled = null;
-
-    this.finaled = other.finaled;
-    other.finaled = null;
-  }
-
-  /**
-   * Fulfills the promise with the value given.
-   * 
-   * @param result
-   *          - the value to fulfill the promise with.
-   */
-  public void fulfill(final T result) {
-    if (this.state != State.PENDING) {
-      return;
-    }
-
-    this.result = result;
-    this.state = State.FULFILLED;
-
-    // Begin any timeout handlers for the deferred promise
-    if (this.deferred != null) {
-      this.deferred.beginTimeout();
-    }
-
-    Promise.enqueue(new Runnable() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public void run() {
-        try {
-          Object resolved = null;
-
-          if (that.fulfilled != null) {
-            resolved = that.fulfilled.handle(result);
-          }
-
-          if (that.finaled != null) {
-            Promise.enqueue(new Runnable() {
-              @Override
-              public void run() {
-                that.finaled.handle(null);
-              }
-            });
-          } else if (that.deferred != null) {
-            /*
-             * Hopefully, an occurance of a ClassCastException should never
-             * occur, due to the type safety on the client side code
-             */
-            if (resolved instanceof Promise) {
-              final Promise<T> p = ((Promise<T>) resolved);
-              p.become(that.deferred);
-            } else {
-              that.deferred.fulfill(resolved);
-            }
-          }
-        } catch (Throwable e) {
-          /*
-           * Catch and pass any exceptions that occur in the handler to the
-           * failure handler for the promise (if any)
-           */
-          if (that.finaled != null) {
-            Promise.enqueue(new Runnable() {
-              @Override
-              public void run() {
-                that.finaled.handle(null);
-              }
-            });
-          } else if (that.deferred != null) {
-            that.deferred.reject(e);
-          }
-        }
-      }
-    });
-
-  }
-
-  /**
-   * Rejects the promise, specifying the Throwable that caused the rejection.
-   * 
-   * @param e
-   *          - the exception that caused the rejection.
-   */
-  public void reject(final Throwable e) {
-    if (this.state != State.PENDING) {
-      return;
-    }
-
-    this.result = null;
-    this.state = State.REJECTED;
-
-    // Begin any timeout handlers for the deferred promise
-    if (this.deferred != null) {
-      this.deferred.beginTimeout();
-    }
-
-    Promise.enqueue(new Runnable() {
-      @SuppressWarnings("unchecked")
-      @Override
-      public void run() {
-
-        if (that.finaled != null) {
-          Promise.enqueue(new Runnable() {
-            @Override
-            public void run() {
-              that.finaled.handle(null);
-            }
-          });
-        } else if (that.rejected != null) {
-          Object resolved = that.rejected.handle(e);
-
-          if (that.deferred != null) {
-            if (resolved instanceof Promise) {
-              final Promise<T> p = ((Promise<T>) resolved);
-              p.become(that.deferred);
-            } else {
-              that.deferred.fulfill(resolved);
-            }
-          }
-        } else {
-          VertxLocator.container.getLogger().error("No error handler defined for this promise");
-          e.printStackTrace();
-        }
-      }
-    });
-  }
-
-  /**
-   * Rejects the promise, specifying the reason that caused the rejection.
-   * 
-   * @param reason
-   *          - the reason for the rejection. This is then wrapped as an
-   *          Exception.
-   */
-  public void reject(String reason) {
-    this.reject(new Exception(reason));
-  }
-
-  public boolean isFulfilled() {
-    return this.state == State.FULFILLED;
-  }
-
-  public boolean isRejected() {
-    return this.state == State.REJECTED;
-  }
-
-  public boolean isPending() {
-    return this.state == State.PENDING;
-  }
-
-  private void beginTimeout() {
-    this.timerId = this.setTimeout(this.timerTimeout);
-  }
-
-  private long setTimeout(long timeout) {
-    if (timeout < 0) {
-      return -1;
-    }
-
-    return VertxLocator.vertx.setTimer(timeout, new Handler<Long>() {
-      @Override
-      public void handle(Long timerid) {
-        Promise<?> that = Promise.this;
-        System.out.println(that.state);
-        if (that.state == State.PENDING) {
-          that.reject("Promise Timed Out");
-        }
-      }
-    });
-  }
+  private Map<Subscription, Observer<T>> observers;
 
   public static <T> Promise<T> defer() {
-    return Promise.defer(null, -1);
-  }
+    final ConcurrentHashMap<Subscription, Observer<T>> observers = new ConcurrentHashMap<Subscription, Observer<T>>();
+    final Promise<T> promise = new Promise<>(
+        new Func1<Observer<T>, Subscription>() {
+          @Override
+          public Subscription call(Observer<T> observer) {
+            final AtomicObservableSubscription subscription = new AtomicObservableSubscription();
 
-  public static <T> Promise<T> defer(long timeout) {
-    return Promise.defer(null, timeout);
-  }
+            subscription.wrap(new Subscription() {
+              @Override
+              public void unsubscribe() {
+                // on unsubscribe remove it from the map of outbound observers
+                // to
+                // notify
+                observers.remove(subscription);
+              }
+            });
 
-  public static <T> Promise<T> defer(final Handler<Promise<T>> promiser) {
-    return Promise.defer(promiser, -1);
-  }
-
-  public static <T> Promise<T> defer(final Handler<Promise<T>> promiser, long timeout) {
-    final Promise<T> promise = new Promise<>();
-
-    if (promiser != null) {
-      Promise.enqueue(new Runnable() {
-        @Override
-        public void run() {
-          promiser.handle(promise);
-        }
-      });
-    }
-
-    promise.timerTimeout = timeout;
-    promise.beginTimeout();
+            observers.put(subscription, observer);
+            return subscription;
+          }
+        },
+        observers
+        );
 
     return promise;
   }
 
-  private static void enqueue(final Runnable task) {
-    VertxLocator.vertx.runOnLoop(new Handler<Void>() {
+  protected Promise(Func1<Observer<T>, Subscription> onSubscribe, Map<Subscription, Observer<T>> observers) {
+    super(onSubscribe);
+    this.observers = observers;
+  }
+
+  /* Defer Methods */
+  public <O> Promise<O> then(PromiseHandler<T, O> onFulfilled) {
+    return this._then(onFulfilled, null, null);
+  }
+
+  public <O> Promise<O> then(PromiseHandler<T, O> onFulfilled, FailureHandler<?> onRejected) {
+    return this._then(onFulfilled, onRejected, null);
+  }
+
+  public <O> Promise<O> then(RepromiseHandler<T, O> onFulfilled) {
+    return this._then(onFulfilled, null, null);
+  }
+
+  public <O> Promise<O> then(RepromiseHandler<T, O> onFulfilled, FailureHandler<O> onRejected) {
+    return this._then(onFulfilled, onRejected, null);
+  }
+
+  public <O> Promise<O> fail(FailureHandler<O> onRejected) {
+    return this._then(null, onRejected, null);
+  }
+
+  public <O> Promise<O> fin(PromiseHandler<Void, O> onFinally) {
+    return this._then(null, null, onFinally);
+  }
+
+  private <O> Promise<O> _then(
+      final CompletedHandler<T> onFulfilled,
+      final CompletedHandler<Exception> onRejected,
+      final CompletedHandler<Void> onFinally)
+  {
+    final Promise<O> promise = Promise.defer();
+    this.subscribe(new Observer<T>() {
       @Override
-      public void handle(Void event) {
-        task.run();
+      public void onCompleted() {
+        // No op
       }
-    });
-  }
 
-  /**
-   * Returns the fulfilled value of this promise.
-   * 
-   * @throws IllegalStateException
-   *           if it has not been fulfilled.
-   */
-  public T get() throws IllegalStateException {
-    if (this.state != State.FULFILLED) {
-      throw new IllegalStateException("Promise has not been fulfilled yet");
-    }
-    return this.result;
-  }
-
-  public static <R> Observable<R> toObservable(final Promise<R> promise) {
-    return Observable.create(new Func1<Observer<R>, Subscription>() {
       @Override
-      public Subscription call(final Observer<R> obs) {
+      @SuppressWarnings("unchecked")
+      public void onError(Exception reason) {
+        Object result = null;
 
-        if (promise.isFulfilled()) {
-          obs.onNext(promise.get());
-          obs.onCompleted();
+        try {
+          // Perform any finally handlers
+          if (onFinally != null) {
+            result = onFinally.handle(null);
 
-        } else if (promise.isRejected()) {
-          // TODO: Exception handling causing rejection
-          obs.onError(new Exception("Promise Rejected"));
-
-        } else if (promise.isPending()) {
-          promise.then(new PromiseHandler<R, Void>() {
-            @Override
-            public Void handle(R value) {
-              obs.onNext(value);
-              obs.onCompleted();
-              return null;
+            // results from fin() handler is ignored
+            if (!(result instanceof Promise)) {
+              result = null;
             }
-          });
-
+          } else if (onRejected == null) {
+            // We don't have a handler so we'll just forward on
+            // We have to assume that the casting will work...
+            promise.reject(reason);
+            return;
+          } else {
+            // if fin() is called, then onRejected would be null
+            result = onRejected.handle(reason);
+          }
+        } catch (Exception e) {
+          result = e;
         }
 
-        return Observable.noOpSubscription();
+        if (result instanceof Promise) {
+          ((Promise<O>) result).become(promise);
+        } else if (result instanceof Exception) {
+          promise.reject((Exception) result);
+        } else {
+          promise.fulfill((O) result);
+        }
+      }
+
+      @Override
+      @SuppressWarnings("unchecked")
+      public void onNext(T value) {
+        Object result = null;
+
+        try {
+          // Perform any finally handlers
+          if (onFinally != null) {
+            result = onFinally.handle(null);
+
+            // results from fin() handler is ignored
+            if (!(result instanceof Promise)) {
+              result = null;
+            }
+          } else if (onFulfilled == null) {
+            // We don't have a handler so we'll just forward on
+            // We have to assume that the casting will work...
+            promise.fulfill((O) value);
+            return;
+          } else {
+            // if fin() is called, then onFulfilled would be null
+            result = onFulfilled.handle(value);
+          }
+        } catch (Exception e) {
+          result = e;
+        }
+
+        if (result instanceof Promise) {
+          ((Promise<O>) result).become(promise);
+        } else if (result instanceof Exception) {
+          promise.reject((Exception) result);
+        } else {
+          promise.fulfill((O) result);
+        }
       }
     });
+
+    return promise;
+  }
+
+  /* Result Methods */
+  public void fulfill(T value) {
+    for (Observer<T> obs : this.observers.values()) {
+      obs.onNext(value);
+      obs.onCompleted();
+    }
+  }
+
+  public void reject(Exception reason) {
+    for (Observer<T> obs : this.observers.values()) {
+      obs.onError(new Exception(reason));
+    }
+  }
+
+  public void become(Promise<T> other) {
+    this.observers.putAll(other.observers);
   }
 }

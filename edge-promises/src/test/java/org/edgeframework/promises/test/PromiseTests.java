@@ -19,7 +19,6 @@ public class PromiseTests extends TestBase {
   @Test public void testDefer2() { perform(); }
   
   @Test public void testBasic() { perform(); }
-  @Test public void testPrefilled() { perform(); }
   
   @Test public void testChain1() { perform(); }
   @Test public void testChain2() { perform(); }

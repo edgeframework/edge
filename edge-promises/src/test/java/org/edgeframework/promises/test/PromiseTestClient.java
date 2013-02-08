@@ -1,6 +1,7 @@
 package org.edgeframework.promises.test;
 
 import org.edgeframework.promises.FailureHandler;
+import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.promises.RepromiseHandler;
@@ -137,7 +138,7 @@ public class PromiseTestClient extends TestClientBase {
             },
             new FailureHandler<Void>() {
               @Override
-              public Void handle(Throwable value) {
+              public Void handle(Exception value) {
                 tu.testComplete();
                 return null;
               }
@@ -156,7 +157,7 @@ public class PromiseTestClient extends TestClientBase {
         }).fail(
             new FailureHandler<Void>() {
               @Override
-              public Void handle(Throwable value) {
+              public Void handle(Exception value) {
                 tu.testComplete();
                 return null;
               }
@@ -176,7 +177,7 @@ public class PromiseTestClient extends TestClientBase {
             },
             new FailureHandler<Character>() {
               @Override
-              public Character handle(Throwable e) {
+              public Character handle(Exception e) {
                 tu.azzert(false, "This rejection handler should not be called!");
                 return null;
               }
@@ -184,7 +185,7 @@ public class PromiseTestClient extends TestClientBase {
         ).fail(
             new FailureHandler<Void>() {
               @Override
-              public Void handle(Throwable value) {
+              public Void handle(Exception value) {
                 tu.testComplete();
                 return null;
               }
@@ -211,7 +212,7 @@ public class PromiseTestClient extends TestClientBase {
             },
             new FailureHandler<String>() {
               @Override
-              public String handle(Throwable value) {
+              public String handle(Exception value) {
                 return null;
               }
             }
@@ -282,11 +283,7 @@ public class PromiseTestClient extends TestClientBase {
           @Override
           public Character handle(String result) {
             char c = ' ';
-            try {
-              c = result.charAt(20); // Exception
-            } finally {
-              tu.testComplete();
-            }
+            c = result.charAt(20); // Exception
 
             return c;
           }
@@ -300,25 +297,8 @@ public class PromiseTestClient extends TestClientBase {
         });
   }
 
-  public void testPrefilled() throws Exception {
-    Promise<String> p = Promise.defer();
-
-    p.fulfill("Hello World");
-
-    p.then(new PromiseHandler<String, Void>() {
-      @Override
-      public Void handle(String value) {
-        tu.azzert(value.equals("Hello World"));
-        tu.testComplete();
-        return null;
-      }
-    });
-  }
-
   public void testRxBasic() {
-    Promise
-        .toObservable(makePromise("Hello World"))
-
+    makePromise("Hello World")
         .subscribe(new Action1<String>() {
           @Override
           public void call(String value) {

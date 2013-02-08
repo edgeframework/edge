@@ -1,5 +1,5 @@
 package org.edgeframework.promises;
 
-public interface FailureHandler<O> extends CompletedHandler<Throwable> {
-  public O handle(Throwable e);
+public interface FailureHandler<O> extends CompletedHandler<Exception> {
+  public O handle(Exception e);
 }

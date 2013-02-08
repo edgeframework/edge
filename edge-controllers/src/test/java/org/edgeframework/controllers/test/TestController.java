@@ -6,6 +6,7 @@ import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.deploy.impl.VertxLocator;
 
 public class TestController extends Controller {
 
@@ -22,9 +23,10 @@ public class TestController extends Controller {
   }
 
   public static Result testAsyncResult() {
-    Promise<Result> promise = Promise.defer(new Handler<Promise<String>>() {
+    final Promise<String> promise = Promise.defer();
+    VertxLocator.vertx.runOnLoop(new Handler<Void>() {
       @Override
-      public void handle(Promise<String> promise) {
+      public void handle(Void arg) {
         try {
           Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -33,7 +35,9 @@ public class TestController extends Controller {
 
         promise.fulfill("Hello World");
       }
-    }).then(
+    });
+
+    Promise<Result> result = promise.then(
         new PromiseHandler<String, Result>() {
           @Override
           public Result handle(String value) {
@@ -43,7 +47,7 @@ public class TestController extends Controller {
 
         );
 
-    return async(promise);
+    return async(result);
   }
 
   public static Result testRouteParams(String echoString) {

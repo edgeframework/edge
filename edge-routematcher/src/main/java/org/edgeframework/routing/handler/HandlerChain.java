@@ -42,7 +42,7 @@ public class HandlerChain extends SimpleHandler {
           }
         }, new FailureHandler<Void>() {
           @Override
-          public Void handle(Throwable e) {
+          public Void handle(Exception e) {
             exception(e);
             return null;
           }
