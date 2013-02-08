@@ -9,7 +9,6 @@ import rx.Observer;
 import rx.Subscription;
 import rx.util.AtomicObservableSubscription;
 import rx.util.functions.Func1;
-import sun.security.util.PendingException;
 
 /**
  * A Promise represents a request that will be fulfilled sometime in the future,

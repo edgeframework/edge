@@ -3,17 +3,12 @@ package org.edgeframework.promises.test;
 import java.util.concurrent.CountDownLatch;
 
 import org.edgeframework.promises.FailureHandler;
-import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.promises.RepromiseHandler;
-import org.vertx.groovy.core.Vertx;
-import org.vertx.java.core.Handler;
 import org.vertx.java.core.SimpleHandler;
-import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.java.testframework.TestClientBase;
 
-import rx.Observable;
 import rx.util.functions.Action1;
 
 public class PromiseTestClient extends TestClientBase {
