@@ -22,6 +22,7 @@ public class PromiseTests extends TestBase {
   
   @Test public void testChain1() { perform(); }
   @Test public void testChain2() { perform(); }
+  @Test public void testChain3() { perform(); }
   
   @Test public void testMultiple1() { perform(); }
   
@@ -31,6 +32,7 @@ public class PromiseTests extends TestBase {
   @Test public void testException4() { perform(); }
   @Test public void testException5() { exceptionTest(IllegalStateException.class); }
   @Test public void testException6() { exceptionTest(IllegalStateException.class); }
+  @Test public void testException7() { perform(); }
   
   @Test public void testFinally1() { perform(); }
   @Test public void testFinally2() { perform(); }

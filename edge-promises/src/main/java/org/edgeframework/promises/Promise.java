@@ -126,13 +126,14 @@ public class Promise<T> extends Observable<T> {
             if (!(result instanceof Promise)) {
               result = null;
             }
-          } else if (onRejected == null) {
+          }
+
+          if (onRejected == null) {
             // We don't have a handler so we'll just forward on
             // We have to assume that the casting will work...
             promise.reject(reason);
             return;
           } else {
-            // if fin() is called, then onRejected would be null
             result = onRejected.handle(reason);
           }
         } catch (Exception e) {
@@ -162,7 +163,9 @@ public class Promise<T> extends Observable<T> {
             if (!(result instanceof Promise)) {
               result = null;
             }
-          } else if (onFulfilled == null) {
+          }
+
+          if (onFulfilled == null) {
             // We don't have a handler so we'll just forward on
             // We have to assume that the casting will work...
             promise.fulfill((O) value);

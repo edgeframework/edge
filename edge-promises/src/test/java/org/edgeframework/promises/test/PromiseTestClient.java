@@ -121,6 +121,31 @@ public class PromiseTestClient extends TestClientBase {
         });
   }
 
+  /* Chain of handlers - forwarding on */
+  public void testChain3() throws Exception {
+    makePromise("Hello World")
+        .then(new RepromiseHandler<String, String>() {
+          @Override
+          public Promise<String> handle(final String result) {
+            return makePromise("Foo Bar");
+          }
+        })
+        .fail(new FailureHandler<String>() {
+          @Override
+          public String handle(Exception e) {
+            return "fail";
+          }
+        })
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String result) {
+            tu.azzert(result.equals("Foo Bar"), "Promise failed to pass re-promise through in chain.");
+            tu.testComplete();
+            return null;
+          }
+        });
+  }
+
   public void testMultiple1() throws Exception {
     Promise<String> mainPromise = makePromise("Hello World");
     final CountDownLatch latch = new CountDownLatch(2);
@@ -281,6 +306,31 @@ public class PromiseTestClient extends TestClientBase {
         });
   }
 
+  /* Test exception passing to further promises */
+  public void testException7() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20); // Exception
+          }
+        })
+        .then(new PromiseHandler<Character, Void>() {
+          @Override
+          public Void handle(Character value) {
+            tu.azzert(false, "Promise should not execute this due to exception");
+            return null;
+          }
+        })
+        .fail(new FailureHandler<Void>() {
+          @Override
+          public Void handle(Exception e) {
+            tu.testComplete();
+            return null;
+          }
+        });
+  }
+
   /* Fin with basic */
   public void testFinally1() throws Exception {
     makePromise("Hello World")
@@ -329,7 +379,7 @@ public class PromiseTestClient extends TestClientBase {
         .fin(new PromiseHandler<Void, Void>() {
           @Override
           public Void handle(Void value) {
-            tu.testComplete();
+            tu.azzert(true, "Finally was not invoked!");
             return null;
           }
         })
