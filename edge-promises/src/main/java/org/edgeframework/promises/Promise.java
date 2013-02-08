@@ -96,7 +96,7 @@ public class Promise<T> extends Observable<T> {
     return this._then(null, onRejected, null);
   }
 
-  public <O> Promise<O> fin(PromiseHandler<Void, O> onFinally) {
+  public Promise<T> fin(PromiseHandler<Void, ?> onFinally) {
     return this._then(null, null, onFinally);
   }
 

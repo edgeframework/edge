@@ -1,5 +1,7 @@
 package org.edgeframework.promises.test;
 
+import java.util.concurrent.CountDownLatch;
+
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;
@@ -117,6 +119,28 @@ public class PromiseTestClient extends TestClientBase {
             return null;
           }
         });
+  }
+
+  public void testMultiple1() throws Exception {
+    Promise<String> mainPromise = makePromise("Hello World");
+    final CountDownLatch latch = new CountDownLatch(2);
+
+    mainPromise.then(new PromiseHandler<String, Void>() {
+      @Override
+      public Void handle(String result) {
+        tu.azzert(latch.getCount() == 2);
+        latch.countDown();
+        return null;
+      }
+    });
+    mainPromise.then(new PromiseHandler<String, Void>() {
+      @Override
+      public Void handle(String result) {
+        tu.azzert(latch.getCount() == 1);
+        tu.testComplete();
+        return null;
+      }
+    });
   }
 
   /* Exception with then() handler */
@@ -260,18 +284,17 @@ public class PromiseTestClient extends TestClientBase {
   /* Fin with basic */
   public void testFinally1() throws Exception {
     makePromise("Hello World")
-        .then(new PromiseHandler<String, Void>() {
+        .then(new PromiseHandler<String, Character>() {
           @Override
-          public Void handle(String result) {
-            return null;
+          public Character handle(String result) {
+            return result.charAt(0);
           }
         })
-        .fin(new PromiseHandler<Void, String>() {
-
+        .fin(new PromiseHandler<Void, Void>() {
           @Override
-          public String handle(Void value) {
+          public Void handle(Void value) {
             tu.testComplete();
-            return "Finally!";
+            return null;
           }
         });
   }
@@ -282,10 +305,51 @@ public class PromiseTestClient extends TestClientBase {
         .then(new PromiseHandler<String, Character>() {
           @Override
           public Character handle(String result) {
-            char c = ' ';
-            c = result.charAt(20); // Exception
+            return result.charAt(20);
+          }
+        })
+        .fin(new PromiseHandler<Void, Void>() {
+          @Override
+          public Void handle(Void value) {
+            tu.testComplete();
+            return null;
+          }
+        });
+  }
 
-            return c;
+  /* then() handler after fin() */
+  public void testFinally3() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(0);
+          }
+        })
+        .fin(new PromiseHandler<Void, Void>() {
+          @Override
+          public Void handle(Void value) {
+            tu.testComplete();
+            return null;
+          }
+        })
+        .then(new PromiseHandler<Character, Void>() {
+          @Override
+          public Void handle(Character value) {
+            tu.azzert(value == 'H');
+            tu.testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* then() rejection after fin() */
+  public void testFinally4() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20);
           }
         })
         .fin(new PromiseHandler<Void, String>() {
@@ -293,6 +357,14 @@ public class PromiseTestClient extends TestClientBase {
           public String handle(Void value) {
             tu.testComplete();
             return "Finally!";
+          }
+        })
+        .fail(new FailureHandler<Void>() {
+          @Override
+          public Void handle(Exception reason) {
+            tu.azzert(reason instanceof StringIndexOutOfBoundsException);
+            tu.testComplete();
+            return null;
           }
         });
   }

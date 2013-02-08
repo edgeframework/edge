@@ -23,6 +23,8 @@ public class PromiseTests extends TestBase {
   @Test public void testChain1() { perform(); }
   @Test public void testChain2() { perform(); }
   
+  @Test public void testMultiple1() { perform(); }
+  
   @Test public void testException1() { perform(); }
   @Test public void testException2() { perform(); }
   @Test public void testException3() { perform(); }
@@ -32,6 +34,8 @@ public class PromiseTests extends TestBase {
   
   @Test public void testFinally1() { perform(); }
   @Test public void testFinally2() { perform(); }
+  @Test public void testFinally3() { perform(); }
+  @Test public void testFinally4() { perform(); }
   
   @Test public void testPrefilled() { perform(); }
   
