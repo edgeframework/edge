@@ -1,14 +1,15 @@
-package org.edgeframework.core.test;
+package org.edgeframework.routing.test;
+
 
 import org.junit.Test;
 import org.vertx.java.testframework.TestBase;
 
-public class ApplicationTests extends TestBase {
+public class RoutingTests extends TestBase {
 
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    startApp(ApplicationTestClient.class.getName());
+    startApp(RoutingTestClient.class.getName());
   }
 
   @Override

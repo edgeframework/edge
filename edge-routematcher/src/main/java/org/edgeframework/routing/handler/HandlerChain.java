@@ -7,8 +7,8 @@ import java.util.List;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
-import org.edgeframework.routing.RouteMatcher;
-import org.edgeframework.routing.RouteMatcherResult;
+import org.edgeframework.routing.Matcher;
+import org.edgeframework.routing.MatcherResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.SimpleHandler;
 import org.vertx.java.core.buffer.Buffer;
@@ -21,12 +21,12 @@ public class HandlerChain extends SimpleHandler {
   private final List<EdgeHandler> currentHandlers = new LinkedList<>();
   private final List<EdgeHandler> middleware;
 
-  private final RouteMatcher routeMatcher;
+  private final Matcher routeMatcher;
 
   private final EdgeRequest request;
   private final EdgeResponse response;
 
-  public HandlerChain(final HttpServerRequest request, final RouteMatcher routeMatcher, final List<EdgeHandler> middleware) {
+  public HandlerChain(final HttpServerRequest request, final Matcher routeMatcher, final List<EdgeHandler> middleware) {
     this.routeMatcher = routeMatcher;
     this.middleware = middleware;
 
@@ -72,7 +72,7 @@ public class HandlerChain extends SimpleHandler {
   }
 
   private void main() {
-    final RouteMatcherResult routeResult = routeMatcher.getNextMatch();
+    final MatcherResult routeResult = routeMatcher.getNextMatch();
 
     if (routeResult == null) {
       return;

@@ -9,7 +9,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.edgeframework.routing.Routing;
+import org.edgeframework.routing.RouteMatcher;
 import org.edgeframework.routing.handler.EdgeHandler;
 import org.edgeframework.routing.handler.EdgeRequest;
 import org.edgeframework.routing.handler.EdgeResponse;
@@ -20,7 +20,7 @@ public class Controllers {
   private static final String COMMENT_PREFIX = "#";
   private static final Pattern ROUTE_REGEX = Pattern.compile("^(?<method>\\S+)\\s+(?<route>\\S+)\\s+(?<controller>.+)$");
 
-  private Routing routeMatcher = new Routing();
+  private RouteMatcher routeMatcher = new RouteMatcher();
 
   public Controllers(String file, HttpServer server) throws Exception {
     System.out.println(Files.exists(Paths.get(file), LinkOption.NOFOLLOW_LINKS));

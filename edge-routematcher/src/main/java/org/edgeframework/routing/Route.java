@@ -28,7 +28,7 @@ public class Route {
     compilePattern(stringPattern);
   }
 
-  public RouteMatcherResult matches(String method, String url) {
+  public MatcherResult matches(String method, String url) {
     if (!this.method.equals(method)) {
       return null;
     }
@@ -43,7 +43,7 @@ public class Route {
       String value = matcher.group(identifier);
       params.put(identifier, value);
     }
-    return new RouteMatcherResult(this, params);
+    return new MatcherResult(this, params);
   }
 
   public void addHandler(EdgeHandler handler) {

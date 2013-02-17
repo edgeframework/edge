@@ -1,15 +1,18 @@
-package org.edgeframework.core.test;
+package org.edgeframework.routing.test;
 
-import org.edgeframework.core.EdgeApplication;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.PromiseHandler;
+import org.edgeframework.routing.RouteMatcher;
 import org.edgeframework.routing.handler.EdgeHandler;
 import org.edgeframework.routing.handler.EdgeRequest;
 import org.edgeframework.routing.handler.EdgeResponse;
+import org.edgeframework.routing.middleware.Assets;
+import org.edgeframework.routing.middleware.BodyParser;
+import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.testframework.TestClientBase;
 
-public class ApplicationTestClient extends TestClientBase {
+public class RoutingTestClient extends TestClientBase {
 
   private TestHttpClient client;
 
@@ -34,9 +37,9 @@ public class ApplicationTestClient extends TestClientBase {
   }
 
   private void createApplication() {
-    EdgeApplication edge = new EdgeApplication();
+    RouteMatcher routematcher = new RouteMatcher();
 
-    edge
+    routematcher
         /* Index */
         .get("/basic-test", new EdgeHandler() {
           @Override
@@ -91,10 +94,12 @@ public class ApplicationTestClient extends TestClientBase {
 
         })
 
-        .use(EdgeApplication.assets("public"))
-        .use(EdgeApplication.bodyParser())
+        .addMiddleware(new Assets("public"))
+        .addMiddleware(new BodyParser());
 
-        .listen(PORT, HOSTNAME);
+    HttpServer server = vertx.createHttpServer();
+    server.requestHandler(routematcher);
+    server.listen(PORT, HOSTNAME);
   }
 
   public void testBasicRoute1() throws Exception {
