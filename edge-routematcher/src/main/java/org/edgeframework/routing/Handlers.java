@@ -3,19 +3,24 @@ package org.edgeframework.routing;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Handlers {
 
   private final String method;
   private final String url;
 
-  private final Iterator<RouteDefinition> iterator;
+  private final Iterator<RouteDefinitionMatchResult> iterator;
 
-  public Handlers(String method, String url, Collection<RouteDefinition> routes) {
+  public Handlers(String method, String url, List<RouteDefinition> routes) {
     this.method = method;
     this.url = url;
 
-    this.iterator = new LinkedList<RouteDefinition>(routes).iterator();
+    this.iterator = getMatches(method, url, routes).iterator();
+  }
+
+  public boolean hasNextMatch() {
+    return this.iterator.hasNext();
   }
 
   /**
@@ -23,12 +28,22 @@ public class Handlers {
    * 
    * @return the route handler
    */
-  public MatcherResult getNextMatch() {
-    MatcherResult result = null;
-    while (iterator.hasNext() && result == null) {
-      result = iterator.next().matches(this.method, this.url);
+  public RouteDefinitionMatchResult getNextMatch() {
+    return this.hasNextMatch() ?
+        this.iterator.next() :
+        null;
+  }
+
+  private List<RouteDefinitionMatchResult> getMatches(String method, String url, List<RouteDefinition> routes) {
+    List<RouteDefinitionMatchResult> matches = new LinkedList<>();
+
+    for (RouteDefinition route : routes) {
+      RouteDefinitionMatchResult match = route.matches(method, url);
+      if (match != null) {
+        matches.add(match);
+      }
     }
 
-    return result;
+    return matches;
   }
 }

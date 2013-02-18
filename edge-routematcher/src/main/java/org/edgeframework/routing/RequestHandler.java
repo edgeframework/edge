@@ -4,7 +4,7 @@ import org.vertx.java.deploy.impl.VertxLocator;
 
 public abstract class RequestHandler {
 
-  private HandlerContext container;
+  private HandlerContext context;
 
   public RequestHandler() {
   }
@@ -14,24 +14,24 @@ public abstract class RequestHandler {
    * is discarded, and the next route handler (if any) will handle the request.
    */
   protected void next() {
-    if (this.container == null) {
+    if (this.context == null) {
       VertxLocator.container.getLogger().warn("Container for EdgeRequest not set... did you call handleRequest by mistake?");
       return;
     }
 
-    this.container.next();
+    this.context.next();
   }
 
-  void _handle(HandlerContext container, HttpServerRequest request, HttpServerResponse response) {
-    this.container = container;
+  void _handle(HandlerContext context, HttpServerRequest request, HttpServerResponse response) {
+    this.context = context;
 
     try {
       this.handle(request, response);
     } catch (Throwable e) {
       VertxLocator.container.getLogger().error("Error", e);
-      container.exception(e);
+      context.exception(e);
     }
-    this.container = null;
+    this.context = null;
   }
 
   /**

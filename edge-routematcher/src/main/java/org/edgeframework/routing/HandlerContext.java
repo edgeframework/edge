@@ -18,6 +18,14 @@ import org.vertx.java.deploy.impl.VertxLocator;
  * @author dteo
  */
 class HandlerContext {
+  private enum STATE {
+    SETUP,
+    MIDDLEWARE,
+    HANDLERS,
+    COMPLETE,
+    ERROR
+  }
+
   private final HandlerContext that = this;
 
   private final List<RequestHandler> currentHandlers = new LinkedList<>();
@@ -28,20 +36,7 @@ class HandlerContext {
   private final HttpServerRequest request;
   private final HttpServerResponse response;
 
-  // The Loop Handler
-  SimpleHandler loopHandler = new SimpleHandler() {
-    @Override
-    protected void handle() {
-      /* No other handlers to process */
-      if (that.currentHandlers.isEmpty()) {
-        return;
-      }
-
-      /* Process the handler */
-      RequestHandler handler = that.currentHandlers.remove(0);
-      handler._handle(that, request, response);
-    }
-  };
+  private STATE state = STATE.SETUP;
 
   public HandlerContext(final org.vertx.java.core.http.HttpServerRequest request, final List<RouteDefinition> routes, final List<RequestHandler> middleware) {
     this.handlers = new Handlers(request.method, request.path, routes);
@@ -68,7 +63,9 @@ class HandlerContext {
   }
 
   public void next() {
-    VertxLocator.vertx.runOnLoop(loopHandler);
+    if (this.state != STATE.HANDLERS) {
+      return;
+    }
   }
 
   public void exception() {
@@ -89,18 +86,26 @@ class HandlerContext {
   }
 
   private void main() {
-    final MatcherResult routeResult = handlers.getNextMatch();
-
-    if (routeResult == null) {
+    // No Match, don't bother with middleware
+    if (!handlers.hasNextMatch()) {
       return;
     }
 
-    /* Add chain of Middleware to the beginning of the request chain */
-    this.currentHandlers.addAll(this.middleware);
+    this.state = STATE.MIDDLEWARE;
+    while (!this.middleware.isEmpty()) {
+      this.middleware.remove(0)._handle(this, this.request, this.response);
+    }
+
+    this.state = STATE.HANDLERS;
+
+    RouteDefinitionMatchResult routeResult = handlers.getNextMatch();
+
     this.currentHandlers.addAll(Arrays.asList(routeResult.route.getHandlers()));
     this.request.setParams(routeResult.params);
 
-    this.next();
+    while (!this.currentHandlers.isEmpty()) {
+      this.currentHandlers.remove(0)._handle(this, this.request, this.response);
+    }
   }
 
   /* TODO: Why is this here? Shouldn't this be in the middleware? */

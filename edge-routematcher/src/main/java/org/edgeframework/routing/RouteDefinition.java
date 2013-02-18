@@ -27,7 +27,7 @@ class RouteDefinition {
     compilePattern(stringPattern);
   }
 
-  public MatcherResult matches(String method, String url) {
+  public RouteDefinitionMatchResult matches(String method, String url) {
     if (!this.method.equals(method)) {
       return null;
     }
@@ -42,7 +42,7 @@ class RouteDefinition {
       String value = matcher.group(identifier);
       params.put(identifier, value);
     }
-    return new MatcherResult(this, params);
+    return new RouteDefinitionMatchResult(this, params);
   }
 
   public void addHandler(RequestHandler handler) {
