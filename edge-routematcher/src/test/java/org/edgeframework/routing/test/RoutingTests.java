@@ -20,9 +20,15 @@ public class RoutingTests extends TestBase {
   @Test public void testBasicRoute1() { startTest(getMethodName()); }
   @Test public void testBasicRoute2() { startTest(getMethodName()); }
 
-  @Test
-  public void testMultipleHandlers() {
-    startTest(getMethodName());
+  @Test public void testMultipleHandlers1() { startTest(getMethodName()); }
+  @Test(expected=IllegalStateException.class)
+  public void testMultipleHandlers2() { 
+    try { 
+      startTest(getMethodName());
+    } catch (IllegalStateException e) {
+    } catch (Exception e){
+      throw e;
+    }
   }
 
   @Test
@@ -32,6 +38,7 @@ public class RoutingTests extends TestBase {
   
   @Test public void test404_1() { startTest(getMethodName()); }
   @Test public void test404_2() { startTest(getMethodName()); }
+  @Test public void test404_3() { startTest(getMethodName()); }
   
   @Test public void testRouteParams1() { startTest(getMethodName()); }
 }

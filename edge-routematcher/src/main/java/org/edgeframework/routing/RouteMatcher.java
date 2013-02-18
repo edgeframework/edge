@@ -1,6 +1,7 @@
 package org.edgeframework.routing;
 
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
@@ -55,7 +56,7 @@ public class RouteMatcher implements Handler<HttpServerRequest> {
 
   @Override
   public void handle(HttpServerRequest request) {
-    this.routes.getHandlerContext(request);
+     this.routes.getHandlerContext(request);
   }
 
 }

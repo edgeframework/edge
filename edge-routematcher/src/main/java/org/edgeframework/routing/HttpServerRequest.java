@@ -1,8 +1,12 @@
 package org.edgeframework.routing;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.edgeframework.promises.Promise;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.SimpleHandler;
 import org.vertx.java.core.buffer.Buffer;
 
 public class HttpServerRequest {
@@ -11,33 +15,21 @@ public class HttpServerRequest {
   private Map<String, Object> params;
   private Map<String, Object> query;
   private Map<String, Object> body;
-  private Map<String, byte[]> files;
   private Map<String, Object> data;
 
+  private Map<String, String> files;
+
   private Buffer bodyBuffer;
-  private byte[] bodyBytes;
 
   public HttpServerRequest(org.vertx.java.core.http.HttpServerRequest request) {
     this.request = request;
 
     this.params = new HashMap<>();
-    this.data = new HashMap<>();
     this.body = new HashMap<>();
-    this.files = new HashMap<>();
-
+    this.data = new HashMap<>();
     this.query = QueryParser.parse(request.query);
-  }
 
-  public byte[] getPostBody() {
-    if (this.bodyBytes == null) {
-      this.bodyBytes = this.bodyBuffer.getBytes();
-    }
-
-    return this.bodyBytes;
-  }
-
-  public void setPostBody(Buffer buffer) {
-    this.bodyBuffer = buffer;
+    this.files = new HashMap<>();
   }
 
   public org.vertx.java.core.http.HttpServerRequest getUnderlyingRequest() {
@@ -111,40 +103,46 @@ public class HttpServerRequest {
     return this.params;
   }
 
-  public void setParams(Map<String, Object> params) {
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> getBody() {
+    return this.data.containsKey("body") ? (Map<String, Object>) this.data.get("body") : null;
+  }
+
+  public Map<String, Object> getData() {
+    return this.data;
+  }
+
+  void setParams(Map<String, Object> params) {
     this.params = new HashMap<>(params);
   }
 
-  /**
-   * Retrieves a map of request body attribute data and their associated values.
-   * 
-   * @param name
-   * @return
-   */
-  public Map<String, Object> getBody() {
-    return this.body;
+  void setBody(Map<String, Object> body) {
+    this.body = new HashMap<>(body);
   }
 
-  /**
-   * Retrieves a map of uploaded files contents (as byte[]), mapped by their
-   * form names.
-   * 
-   * @param name
-   * @return
-   */
-  public Map<String, byte[]> getFiles() {
-    return this.files;
-  }
+  public Promise<byte[]> getRawBody() {
+    // Return a promise which is fulfilled by the handlers
+    final Promise<byte[]> promise = Promise.defer();
 
-  /**
-   * Retrieves a map of data parameters and their associated values. These are
-   * preserved between a handler chain for a route.
-   * 
-   * @param name
-   * @return
-   */
-  public Map<String, Object> getData() {
-    return this.data;
+    // check if the body has already been loaded
+    if (this.bodyBuffer != null) {
+      promise.fulfill(this.bodyBuffer.getBytes());
+      return promise;
+    }
+
+    // Implementation Note:
+    // Do NOT call endHandler after bodyHandler as that
+    // overrides the handler.
+    // bodyHandler returns you to entire body
+    this.request.bodyHandler(new Handler<Buffer>() {
+      @Override
+      public void handle(Buffer data) {
+        HttpServerRequest.this.bodyBuffer = data;
+        promise.fulfill(data.getBytes());
+      }
+    });
+
+    return promise;
   }
 
   public boolean isPost() {

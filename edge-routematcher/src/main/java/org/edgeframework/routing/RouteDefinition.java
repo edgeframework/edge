@@ -42,6 +42,7 @@ class RouteDefinition {
       String value = matcher.group(identifier);
       params.put(identifier, value);
     }
+
     return new RouteDefinitionMatchResult(this, params);
   }
 

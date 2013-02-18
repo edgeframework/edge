@@ -9,13 +9,9 @@ public abstract class RequestHandler {
   public RequestHandler() {
   }
 
-  /**
-   * Abandons the current hierarchy of requests. All parameters and request data
-   * is discarded, and the next route handler (if any) will handle the request.
-   */
   protected void next() {
     if (this.context == null) {
-      VertxLocator.container.getLogger().warn("Container for EdgeRequest not set... did you call handleRequest by mistake?");
+      VertxLocator.container.getLogger().warn("Context for Request not set... did you call handle by mistake?");
       return;
     }
 
@@ -26,12 +22,12 @@ public abstract class RequestHandler {
     this.context = context;
 
     try {
+      // There is a possiblity that this might be asynchronous.
       this.handle(request, response);
-    } catch (Throwable e) {
+    } catch (Exception e) {
       VertxLocator.container.getLogger().error("Error", e);
-      context.exception(e);
+      this.context.exception(e);
     }
-    this.context = null;
   }
 
   /**

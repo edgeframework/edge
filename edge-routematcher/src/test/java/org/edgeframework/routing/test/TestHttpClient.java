@@ -1,6 +1,5 @@
 package org.edgeframework.routing.test;
 
-
 import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.SimpleHandler;
@@ -54,6 +53,7 @@ public class TestHttpClient {
   }
 
   private void post(String url, String data, Handler<HttpClientResponse> handler) {
+    System.out.println(url);
     HttpClientRequest request = this.client.post(url, handler);
 
     request.headers().put("content-type", "application/x-www-form-urlencoded");
@@ -74,24 +74,13 @@ public class TestHttpClient {
     @Override
     public void handle(HttpClientResponse response) {
 
-      final Buffer data = new Buffer();
-
-      response.dataHandler(new Handler<Buffer>() {
+      response.bodyHandler(new Handler<Buffer>(){
 
         @Override
         public void handle(Buffer buffer) {
-          data.appendBuffer(buffer);
+          promise.fulfill(buffer.toString());
         }
-
-      });
-
-      response.endHandler(new SimpleHandler() {
-
-        @Override
-        protected void handle() {
-          promise.fulfill(data.toString());
-        }
-
+        
       });
     }
 
