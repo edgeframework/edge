@@ -1,4 +1,4 @@
-package org.edgeframework.routing.handler;
+package org.edgeframework.routing;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -7,31 +7,48 @@ import java.util.List;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
-import org.edgeframework.routing.Matcher;
-import org.edgeframework.routing.MatcherResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.SimpleHandler;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
-public class HandlerChain extends SimpleHandler {
-  private final HandlerChain that = this;
+/**
+ * Handles the chaining of request handlers
+ * 
+ * @author dteo
+ */
+class HandlerContext {
+  private final HandlerContext that = this;
 
-  private final List<EdgeHandler> currentHandlers = new LinkedList<>();
-  private final List<EdgeHandler> middleware;
+  private final List<RequestHandler> currentHandlers = new LinkedList<>();
+  private final List<RequestHandler> middleware;
 
-  private final Matcher routeMatcher;
+  private final Handlers handlers;
 
-  private final EdgeRequest request;
-  private final EdgeResponse response;
+  private final HttpServerRequest request;
+  private final HttpServerResponse response;
 
-  public HandlerChain(final HttpServerRequest request, final Matcher routeMatcher, final List<EdgeHandler> middleware) {
-    this.routeMatcher = routeMatcher;
+  // The Loop Handler
+  SimpleHandler loopHandler = new SimpleHandler() {
+    @Override
+    protected void handle() {
+      /* No other handlers to process */
+      if (that.currentHandlers.isEmpty()) {
+        return;
+      }
+
+      /* Process the handler */
+      RequestHandler handler = that.currentHandlers.remove(0);
+      handler._handle(that, request, response);
+    }
+  };
+
+  public HandlerContext(final org.vertx.java.core.http.HttpServerRequest request, final List<RouteDefinition> routes, final List<RequestHandler> middleware) {
+    this.handlers = new Handlers(request.method, request.path, routes);
     this.middleware = middleware;
 
-    this.request = new EdgeRequest(request);
-    this.response = new EdgeResponse(request.response);
+    this.request = new HttpServerRequest(request);
+    this.response = new HttpServerResponse(request.response);
 
     processPostBody(this.request)
         .then(new PromiseHandler<Void, Void>() {
@@ -50,8 +67,8 @@ public class HandlerChain extends SimpleHandler {
 
   }
 
-  void next() {
-    VertxLocator.vertx.runOnLoop(this);
+  public void next() {
+    VertxLocator.vertx.runOnLoop(loopHandler);
   }
 
   public void exception() {
@@ -72,7 +89,7 @@ public class HandlerChain extends SimpleHandler {
   }
 
   private void main() {
-    final MatcherResult routeResult = routeMatcher.getNextMatch();
+    final MatcherResult routeResult = handlers.getNextMatch();
 
     if (routeResult == null) {
       return;
@@ -86,21 +103,8 @@ public class HandlerChain extends SimpleHandler {
     this.next();
   }
 
-  @Override
-  // The Loop Handler
-  protected void handle() {
-    /* No other handlers to process */
-    if (this.currentHandlers.isEmpty()) {
-      return;
-    }
-
-    /* Process the handler */
-    EdgeHandler handler = currentHandlers.remove(0);
-    handler.handle(that, request, response);
-  }
-
   /* TODO: Why is this here? Shouldn't this be in the middleware? */
-  private Promise<Void> processPostBody(final EdgeRequest request) {
+  private Promise<Void> processPostBody(final HttpServerRequest request) {
     final Promise<Void> promise = Promise.defer();
 
     if (request.isPost()) {

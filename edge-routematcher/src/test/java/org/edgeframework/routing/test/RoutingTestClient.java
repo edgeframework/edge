@@ -2,10 +2,10 @@ package org.edgeframework.routing.test;
 
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.PromiseHandler;
+import org.edgeframework.routing.RequestHandler;
+import org.edgeframework.routing.HttpServerRequest;
+import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteMatcher;
-import org.edgeframework.routing.handler.EdgeHandler;
-import org.edgeframework.routing.handler.EdgeRequest;
-import org.edgeframework.routing.handler.EdgeResponse;
 import org.edgeframework.routing.middleware.Assets;
 import org.edgeframework.routing.middleware.BodyParser;
 import org.vertx.java.core.http.HttpServer;
@@ -41,22 +41,22 @@ public class RoutingTestClient extends TestClientBase {
 
     routematcher
         /* Index */
-        .get("/basic-test", new EdgeHandler() {
+        .get("/basic-test", new RequestHandler() {
           @Override
-          public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+          public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
             response.render("basic", new JsonObject("{\"echo\":\"Hello World\"}"));
           }
         })
 
-        .get("/multiple-handlers-test", new EdgeHandler() {
+        .get("/multiple-handlers-test", new RequestHandler() {
           @Override
-          public void handleRequest(EdgeRequest request, EdgeResponse response) {
+          public void handle(HttpServerRequest request, HttpServerResponse response) {
             request.getData().put("echo", "Hello World");
             next();
           }
-        }, new EdgeHandler() {
+        }, new RequestHandler() {
           @Override
-          public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+          public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
             JsonObject context = new JsonObject()
                 .putString("echo", (String) request.getData().get("echo"));
 
@@ -64,9 +64,9 @@ public class RoutingTestClient extends TestClientBase {
           }
         })
 
-        .get("/params/:echo", new EdgeHandler() {
+        .get("/params/:echo", new RequestHandler() {
           @Override
-          public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+          public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
             JsonObject context = new JsonObject()
                 .putString("echo", (String) request.getParams().get("echo"));
 
@@ -74,9 +74,9 @@ public class RoutingTestClient extends TestClientBase {
           }
         })
 
-        .post("/post-test", new EdgeHandler() {
+        .post("/post-test", new RequestHandler() {
           @Override
-          public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+          public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
             JsonObject context = new JsonObject()
                 .putString("echo", (String) request.getBody().get("data"));
 
@@ -84,18 +84,18 @@ public class RoutingTestClient extends TestClientBase {
           }
         })
 
-        .all("*", new EdgeHandler() {
+        .all("*", new RequestHandler() {
 
           @Override
-          public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+          public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
             response.status(404);
             response.send("");
           }
 
         })
 
-        .addMiddleware(new Assets("public"))
-        .addMiddleware(new BodyParser());
+        .use(new Assets("public"))
+        .use(new BodyParser());
 
     HttpServer server = vertx.createHttpServer();
     server.requestHandler(routematcher);

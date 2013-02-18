@@ -1,13 +1,12 @@
-package org.edgeframework.routing.handler;
+package org.edgeframework.routing;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
 
-public class EdgeRequest {
-  private final HttpServerRequest request;
+public class HttpServerRequest {
+  private final org.vertx.java.core.http.HttpServerRequest request;
 
   private Map<String, Object> params;
   private Map<String, Object> query;
@@ -18,7 +17,7 @@ public class EdgeRequest {
   private Buffer bodyBuffer;
   private byte[] bodyBytes;
 
-  public EdgeRequest(HttpServerRequest request) {
+  public HttpServerRequest(org.vertx.java.core.http.HttpServerRequest request) {
     this.request = request;
 
     this.params = new HashMap<>();
@@ -41,7 +40,7 @@ public class EdgeRequest {
     this.bodyBuffer = buffer;
   }
 
-  public HttpServerRequest getUnderlyingRequest() {
+  public org.vertx.java.core.http.HttpServerRequest getUnderlyingRequest() {
     return this.request;
   }
 
@@ -112,7 +111,7 @@ public class EdgeRequest {
     return this.params;
   }
 
-  void setParams(Map<String, Object> params) {
+  public void setParams(Map<String, Object> params) {
     this.params = new HashMap<>(params);
   }
 

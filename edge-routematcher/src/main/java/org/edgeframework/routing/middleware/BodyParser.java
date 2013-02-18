@@ -4,9 +4,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.edgeframework.routing.handler.EdgeHandler;
-import org.edgeframework.routing.handler.EdgeRequest;
-import org.edgeframework.routing.handler.EdgeResponse;
+import org.edgeframework.routing.HttpServerRequest;
+import org.edgeframework.routing.HttpServerResponse;
+import org.edgeframework.routing.RequestHandler;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -22,10 +22,9 @@ import org.jboss.netty.handler.codec.http.multipart.HttpDataFactory;
 import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData;
 import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
-import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.deploy.impl.VertxLocator;
 
-public class BodyParser extends EdgeHandler {
+public class BodyParser extends RequestHandler {
 
   static {
     DiskFileUpload.baseDirectory = null;
@@ -38,7 +37,7 @@ public class BodyParser extends EdgeHandler {
   private static final HttpDataFactory factory = new DefaultHttpDataFactory(false);
 
   @Override
-  public void handleRequest(final EdgeRequest request, final EdgeResponse response) {
+  public void handle(final HttpServerRequest request, final HttpServerResponse response) {
 
     try {
       /* Ignore methods without request body */
@@ -64,7 +63,7 @@ public class BodyParser extends EdgeHandler {
       /* Attempt to Parse */
       try {
         /* Create a dummy Netty Request with the body */
-        final HttpServerRequest vertxReq = request.getUnderlyingRequest();
+        final org.vertx.java.core.http.HttpServerRequest vertxReq = request.getUnderlyingRequest();
         final HttpRequest nettyReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1, new HttpMethod(vertxReq.method), vertxReq.uri);
 
         nettyReq.setChunked(false);

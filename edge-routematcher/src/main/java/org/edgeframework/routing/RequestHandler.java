@@ -1,12 +1,12 @@
-package org.edgeframework.routing.handler;
+package org.edgeframework.routing;
 
 import org.vertx.java.deploy.impl.VertxLocator;
 
-public abstract class EdgeHandler {
+public abstract class RequestHandler {
 
-  private HandlerChain container;
+  private HandlerContext container;
 
-  public EdgeHandler() {
+  public RequestHandler() {
   }
 
   /**
@@ -22,11 +22,11 @@ public abstract class EdgeHandler {
     this.container.next();
   }
 
-  void handle(HandlerChain container, EdgeRequest request, EdgeResponse response) {
+  void _handle(HandlerContext container, HttpServerRequest request, HttpServerResponse response) {
     this.container = container;
 
     try {
-      this.handleRequest(request, response);
+      this.handle(request, response);
     } catch (Throwable e) {
       VertxLocator.container.getLogger().error("Error", e);
       container.exception(e);
@@ -42,5 +42,5 @@ public abstract class EdgeHandler {
    * @param response
    *          - the response
    */
-  public abstract void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception;
+  public abstract void handle(HttpServerRequest request, HttpServerResponse response) throws Exception;
 }

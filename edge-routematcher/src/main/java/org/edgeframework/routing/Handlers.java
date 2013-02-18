@@ -4,18 +4,18 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class Matcher {
+public class Handlers {
 
   private final String method;
   private final String url;
 
-  private final Iterator<Route> iterator;
+  private final Iterator<RouteDefinition> iterator;
 
-  public Matcher(String method, String url, Collection<Route> routes) {
+  public Handlers(String method, String url, Collection<RouteDefinition> routes) {
     this.method = method;
     this.url = url;
 
-    this.iterator = new LinkedList<Route>(routes).iterator();
+    this.iterator = new LinkedList<RouteDefinition>(routes).iterator();
   }
 
   /**

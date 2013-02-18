@@ -9,10 +9,10 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.edgeframework.routing.RequestHandler;
+import org.edgeframework.routing.HttpServerRequest;
+import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteMatcher;
-import org.edgeframework.routing.handler.EdgeHandler;
-import org.edgeframework.routing.handler.EdgeRequest;
-import org.edgeframework.routing.handler.EdgeResponse;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.deploy.impl.VertxLocator;
 
@@ -63,10 +63,10 @@ public class Controllers {
     final RouteControllerDefinition definition = new RouteControllerDefinition(method, route, controller);
     this.definitions.add(definition);
 
-    this.routeMatcher.addRoute(method, route, new EdgeHandler() {
+    this.routeMatcher.route(method, route, new RequestHandler() {
 
       @Override
-      public void handleRequest(EdgeRequest request, EdgeResponse response) throws Exception {
+      public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
         Result result = definition.invoke(request.getParams());
 
         result.performResult(response);

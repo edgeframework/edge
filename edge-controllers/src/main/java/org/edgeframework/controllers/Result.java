@@ -1,6 +1,6 @@
 package org.edgeframework.controllers;
 
-import org.edgeframework.routing.handler.EdgeResponse;
+import org.edgeframework.routing.HttpServerResponse;
 
 public abstract class Result {
 
@@ -11,12 +11,12 @@ public abstract class Result {
     return this;
   }
 
-  void performResult(EdgeResponse response) throws Exception {
+  void performResult(HttpServerResponse response) throws Exception {
     this.perform(response);
     if (this.contentType != null) {
       response.setContentType(this.contentType);
     }
   }
 
-  protected abstract void perform(EdgeResponse response) throws Exception;
+  protected abstract void perform(HttpServerResponse response) throws Exception;
 }

@@ -1,4 +1,4 @@
-package org.edgeframework.routing.handler;
+package org.edgeframework.routing;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class QueryParser {
+public class QueryParser {
 
   private static class Parameter {
     private static final Pattern PARAM_KEY_PATTERN = Pattern.compile("^(?<key>[A-Za-z0-9]+)(?<array>\\[(?<property>.*)\\])?(=(?<value>.*))?$");

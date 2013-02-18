@@ -1,4 +1,4 @@
-package org.edgeframework.routing.handler;
+package org.edgeframework.routing;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,17 +6,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.json.JsonObject;
 
 import com.github.jknack.handlebars.Handlebars;
 
-public class EdgeResponse {
-  private EdgeResponse that = this;
+public class HttpServerResponse {
+  private HttpServerResponse that = this;
 
-  private final HttpServerResponse response;
+  private final org.vertx.java.core.http.HttpServerResponse response;
 
-  public EdgeResponse(HttpServerResponse response) {
+  public HttpServerResponse(org.vertx.java.core.http.HttpServerResponse response) {
     this.response = response;
   }
 
@@ -26,7 +25,7 @@ public class EdgeResponse {
    * @param value
    * @return
    */
-  public EdgeResponse status(int value) {
+  public HttpServerResponse status(int value) {
     this.response.statusCode = value;
     return this;
   }
@@ -38,12 +37,12 @@ public class EdgeResponse {
    * @param value
    * @return
    */
-  public EdgeResponse header(String header, Object value) {
+  public HttpServerResponse header(String header, Object value) {
     this.response.headers().put(header, value);
     return this;
   }
 
-  public EdgeResponse setContentType(String contentType) {
+  public HttpServerResponse setContentType(String contentType) {
     this.header("Content-Type", contentType);
     return this;
   }
@@ -51,7 +50,7 @@ public class EdgeResponse {
   /**
    * Renders a String to the response
    */
-  public EdgeResponse send(String content) {
+  public HttpServerResponse send(String content) {
     if (!this.response.headers().containsKey("Content-Type")) {
       this.response.putHeader("Content-Type", "text/plain; charset=utf-8");
     }
@@ -61,11 +60,11 @@ public class EdgeResponse {
     return this;
   }
 
-  public EdgeResponse sendFile(Path path) {
+  public HttpServerResponse sendFile(Path path) {
     return this.sendFile(path.toString());
   }
 
-  public EdgeResponse sendFile(String path) {
+  public HttpServerResponse sendFile(String path) {
     that.response.sendFile(path);
     return this;
   }
@@ -73,14 +72,14 @@ public class EdgeResponse {
   /**
    * Renders a Template to the response
    */
-  public EdgeResponse render(String templateName) throws IOException {
+  public HttpServerResponse render(String templateName) throws IOException {
     return this.render(templateName, (Map<String, Object>) null);
   }
 
   /**
    * Renders a Template to the response
    */
-  public EdgeResponse render(String templateName, Map<String, Object> data) throws IOException {
+  public HttpServerResponse render(String templateName, Map<String, Object> data) throws IOException {
     this.response.putHeader("Content-Type", "text/html");
 
     Handlebars hb = new Handlebars();
@@ -94,7 +93,7 @@ public class EdgeResponse {
     return this;
   }
 
-  public EdgeResponse render(String templateName, JsonObject data) throws IOException {
+  public HttpServerResponse render(String templateName, JsonObject data) throws IOException {
     return render(templateName, data.toMap());
   }
 }
