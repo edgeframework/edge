@@ -41,4 +41,5 @@ public class RoutingTests extends TestBase {
   @Test public void test404_3() { startTest(getMethodName()); }
   
   @Test public void testRouteParams1() { startTest(getMethodName()); }
+  @Test public void testRouteParams2() { startTest(getMethodName()); }
 }

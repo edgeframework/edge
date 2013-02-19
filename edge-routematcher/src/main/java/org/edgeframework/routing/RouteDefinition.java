@@ -8,9 +8,10 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.edgeframework.routing.handler.RequestHandler;
 import org.vertx.java.deploy.impl.VertxLocator;
 
-class RouteDefinition {
+public class RouteDefinition {
 
   private static final Pattern validParamPattern = Pattern.compile("^:(?<paramname>[A-Za-z0-9]+)$");
 
@@ -50,8 +51,8 @@ class RouteDefinition {
     this.handlers.add(handler);
   }
 
-  public RequestHandler[] getHandlers() {
-    return this.handlers.toArray(new RequestHandler[0]);
+  public List<RequestHandler> getHandlers() {
+    return new LinkedList<>(this.handlers);
   }
 
   private void compilePattern(String stringPattern) throws Exception {

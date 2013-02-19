@@ -1,5 +1,9 @@
 package org.edgeframework.routing;
 
+import java.util.Map;
+
+import org.edgeframework.routing.handler.ParamHandler;
+import org.edgeframework.routing.handler.RequestHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
@@ -54,9 +58,14 @@ public class RouteMatcher implements Handler<HttpServerRequest> {
     return this;
   }
 
+  public <T> RouteMatcher param(final String name, final ParamHandler<T> handler) {
+    this.routes.addParamHandler(name, handler);
+    return this;
+  }
+
   @Override
   public void handle(HttpServerRequest request) {
-     this.routes.getHandlerContext(request);
+    this.routes.getHandlerContext(request);
   }
 
 }

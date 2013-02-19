@@ -9,10 +9,10 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.edgeframework.routing.RequestHandler;
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteMatcher;
+import org.edgeframework.routing.handler.RequestHandler;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.deploy.impl.VertxLocator;
 

@@ -112,12 +112,8 @@ public class HttpServerRequest {
     return this.data;
   }
 
-  void setParams(Map<String, Object> params) {
-    this.params = new HashMap<>(params);
-  }
-
-  void setBody(Map<String, Object> body) {
-    this.body = new HashMap<>(body);
+  public void setParams(Map<String, Object> params) {
+    this.params = Collections.unmodifiableMap(params);
   }
 
   public Promise<byte[]> getRawBody() {

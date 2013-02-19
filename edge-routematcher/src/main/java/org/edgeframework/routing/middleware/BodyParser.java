@@ -11,7 +11,7 @@ import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
-import org.edgeframework.routing.RequestHandler;
+import org.edgeframework.routing.handler.RequestHandler;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.handler.codec.http.DefaultHttpRequest;
 import org.jboss.netty.handler.codec.http.HttpHeaders;
@@ -106,6 +106,8 @@ public class BodyParser extends RequestHandler {
             }
 
             DecoderParser decoder = new DecoderParser(new HttpPostRequestDecoder(BodyParser.factory, nettyReq));
+
+            // putting it in data map
             request.getData().put("body", decoder.body);
 
             return null;

@@ -2,10 +2,11 @@ package org.edgeframework.routing.test;
 
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.PromiseHandler;
-import org.edgeframework.routing.RequestHandler;
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteMatcher;
+import org.edgeframework.routing.handler.ParamHandler;
+import org.edgeframework.routing.handler.RequestHandler;
 import org.edgeframework.routing.middleware.Assets;
 import org.edgeframework.routing.middleware.BodyParser;
 import org.vertx.java.core.Handler;
@@ -79,7 +80,7 @@ public class RoutingTestClient extends TestClientBase {
           }
         })
 
-        .get("/params/:echo", new RequestHandler() {
+        .get("/param-test1/:echo", new RequestHandler() {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
 
@@ -95,17 +96,34 @@ public class RoutingTestClient extends TestClientBase {
 
               response.render("basic", context);
             }
+
+          }
+        })
+
+        // Param test
+        .get("/param-test2/:param", new RequestHandler() {
+          @Override
+          public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
+            JsonObject context = new JsonObject()
+                .putString("echo", (String) request.getData().get("data"));
+
+            response.render("basic", context);
+          }
+        })
+        .param("param", new ParamHandler<String>() {
+          @Override
+          public void handle(HttpServerRequest request, HttpServerResponse response, String value) {
+            request.getData().put("data", value.toUpperCase());
+            next();
           }
         })
 
         .post("/post-test", new RequestHandler() {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
-            System.out.println("Hello");
             JsonObject context = new JsonObject()
                 .putString("echo", (String) request.getBody().get("data"));
 
-            System.out.println(context.encode());
             response.render("basic", context);
           }
         })
@@ -188,7 +206,6 @@ public class RoutingTestClient extends TestClientBase {
 
               @Override
               public Void handle(String value) {
-                System.out.println(value);
                 tu.azzert(value.equals("Hello World"), "Did not manage to POST data.");
 
                 tu.testComplete();
@@ -258,12 +275,29 @@ public class RoutingTestClient extends TestClientBase {
 
   public void testRouteParams1() throws Exception {
     this.client
-        .getPage("/params/HelloWorld")
+        .getPage("/param-test1/HelloWorld")
         .then(new PromiseHandler<String, Void>() {
 
           @Override
           public Void handle(String value) {
             tu.azzert(value.equals("HelloWorld"), "Did not manage to pass through the route parameter");
+
+            tu.testComplete();
+            return null;
+          }
+
+        });
+  }
+
+  // test with param middleware
+  public void testRouteParams2() throws Exception {
+    this.client
+        .getPage("/param-test2/HelloWorld")
+        .then(new PromiseHandler<String, Void>() {
+
+          @Override
+          public Void handle(String value) {
+            tu.azzert(value.equals("HELLOWORLD"), "Did not manage to modify the param");
 
             tu.testComplete();
             return null;

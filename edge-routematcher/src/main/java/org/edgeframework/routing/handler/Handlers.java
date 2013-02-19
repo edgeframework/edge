@@ -1,8 +1,11 @@
-package org.edgeframework.routing;
+package org.edgeframework.routing.handler;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.edgeframework.routing.RouteDefinition;
+import org.edgeframework.routing.RouteDefinitionMatchResult;
 
 public class Handlers {
 

@@ -4,9 +4,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.edgeframework.routing.RequestHandler;
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
+import org.edgeframework.routing.handler.RequestHandler;
 import org.vertx.java.deploy.impl.VertxLocator;
 
 
