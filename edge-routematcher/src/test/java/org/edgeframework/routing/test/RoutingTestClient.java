@@ -26,7 +26,7 @@ public class RoutingTestClient extends TestClientBase {
   public void start() {
     super.start();
 
-    this.client = new TestHttpClient(HOSTNAME, PORT);
+    this.client = new TestHttpClient(vertx, HOSTNAME, PORT);
     createApplication();
 
     tu.appReady();

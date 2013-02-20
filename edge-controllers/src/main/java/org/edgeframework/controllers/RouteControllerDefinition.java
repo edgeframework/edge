@@ -82,7 +82,7 @@ public class RouteControllerDefinition {
 
     String controllerName = definition.substring(0, delimiterIndex);
     String actionMethod = definition.substring(delimiterIndex + 1);
-    System.out.println(actionMethod);
+
     Matcher matcher = SIGNATURE_REGEX.matcher(actionMethod);
     if (!matcher.matches()) {
       throw new Exception("Could not parse controller action: " + definition);

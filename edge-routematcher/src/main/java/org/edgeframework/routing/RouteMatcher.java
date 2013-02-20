@@ -1,13 +1,9 @@
 package org.edgeframework.routing;
 
-import java.util.Map;
-
 import org.edgeframework.routing.handler.ParamHandler;
 import org.edgeframework.routing.handler.RequestHandler;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 public class RouteMatcher implements Handler<HttpServerRequest> {
   public static class HTTP_METHOD {
@@ -47,7 +43,7 @@ public class RouteMatcher implements Handler<HttpServerRequest> {
       RouteDefinition route = new RouteDefinition(method, stringPattern, handlers);
       this.routes.addRouteDefinition(route);
     } catch (Exception e) {
-      VertxLocator.container.getLogger().error("Could not create route", e);
+      // TODO: container.getLogger().error("Could not create route", e);
     }
 
     return this;

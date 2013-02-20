@@ -9,7 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.edgeframework.routing.handler.RequestHandler;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 public class RouteDefinition {
 
@@ -105,7 +104,8 @@ public class RouteDefinition {
 
     completed.append("$");
 
-    VertxLocator.container.getLogger().debug(String.format("String %s Compiled %s", stringPattern, completed));
+    // TODO: container.getLogger().debug(String.format("String %s Compiled %s",
+    // stringPattern, completed));
 
     this.pattern = Pattern.compile(completed.toString());
     this.paramIdentifiers = identifiers.toArray(new String[0]);

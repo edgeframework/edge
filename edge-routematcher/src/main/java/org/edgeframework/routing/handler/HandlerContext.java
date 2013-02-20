@@ -7,7 +7,6 @@ import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteDefinitionMatchResult;
 import org.edgeframework.routing.Routes;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 /**
  * Handles the chaining of request handlers
@@ -142,7 +141,7 @@ public class HandlerContext {
     this.response.status(500);
     /* TODO: trigger exception handlers */
 
-    VertxLocator.container.getLogger().error(message);
+    // TODO: .container.getLogger().error(message);
 
     this.response.send("<p>Server Error (500): " + message + "</p>");
   }

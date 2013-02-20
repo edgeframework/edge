@@ -5,8 +5,8 @@ import org.edgeframework.controllers.Result;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 public class TestController extends Controller {
 
@@ -22,9 +22,9 @@ public class TestController extends Controller {
     return json(new JsonObject().putString("echo", "Hello World"));
   }
 
-  public static Result testAsyncResult() {
+  public static Result testAsyncResult(Vertx vertx) {
     final Promise<String> promise = Promise.defer();
-    VertxLocator.vertx.runOnLoop(new Handler<Void>() {
+    vertx.runOnLoop(new Handler<Void>() {
       @Override
       public void handle(Void arg) {
         try {

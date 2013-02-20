@@ -6,7 +6,6 @@ import org.edgeframework.controllers.test.TestHttpClient;
 import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.java.testframework.TestClientBase;
 
 public class ControllersTestClient extends TestClientBase {
@@ -23,10 +22,10 @@ public class ControllersTestClient extends TestClientBase {
     super.start();
 
     try {
-      HttpServer server = VertxLocator.vertx.createHttpServer();
+      HttpServer server = vertx.createHttpServer();
 
       this.controllers = new Controllers("routes.config", server);
-      this.client = new TestHttpClient(HOSTNAME, PORT);
+      this.client = new TestHttpClient(vertx, HOSTNAME, PORT);
       server.listen(PORT, HOSTNAME);
 
       displayInfo();

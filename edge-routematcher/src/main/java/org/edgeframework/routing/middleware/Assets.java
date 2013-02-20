@@ -7,8 +7,6 @@ import java.nio.file.Paths;
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.handler.RequestHandler;
-import org.vertx.java.deploy.impl.VertxLocator;
-
 
 public class Assets extends RequestHandler {
 
@@ -28,7 +26,7 @@ public class Assets extends RequestHandler {
     if (!file.isFile() || !file.exists()) {
       next();
     } else {
-      VertxLocator.container.getLogger().debug("Delivering Asset: " + file.getAbsolutePath());      
+      // TODO: getLogger().debug("Delivering Asset: " + file.getAbsolutePath());      
       response.sendFile(test);
     }
   }

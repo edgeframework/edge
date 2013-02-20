@@ -2,19 +2,18 @@ package org.edgeframework.routing.test;
 
 import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.SimpleHandler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 public class TestHttpClient {
 
   private HttpClient client;
 
-  public TestHttpClient(String hostname, int port) {
-    this.client = VertxLocator.vertx.createHttpClient()
+  public TestHttpClient(Vertx vertx, String hostname, int port) {
+    this.client = vertx.createHttpClient()
         .setHost(hostname)
         .setPort(port);
   }

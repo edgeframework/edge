@@ -12,19 +12,19 @@ import java.util.List;
 
 import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 public final class EventBus {
 
   private static final String MESSAGE_RESULT_KEY = "result";
   private static final MethodHandles.Lookup lookup = MethodHandles.lookup();
 
-  private static final org.vertx.java.core.eventbus.EventBus eb = VertxLocator.vertx.eventBus();
-
   @SuppressWarnings("unchecked")
-  public static <T> T registerSender(final String namespace, final Class<T> clazz) {
+  public static <T> T registerSender(final Vertx vertx, final String namespace, final Class<T> clazz) {
+    final org.vertx.java.core.eventbus.EventBus eb = vertx.eventBus();
+
     T t = (T) Proxy.newProxyInstance(
         clazz.getClassLoader(),
         new Class[] { clazz },
@@ -49,7 +49,6 @@ public final class EventBus {
                     fulfillHandle.invokeWithArguments(promise, reply.body.getString(MESSAGE_RESULT_KEY));
                   } catch (Throwable e) {
                     e.printStackTrace();
-                    VertxLocator.container.getLogger().error(e);
                   }
                 }
               };
@@ -75,8 +74,6 @@ public final class EventBus {
               }
             }
 
-            VertxLocator.container.getLogger().debug(jsonMessage.toString());
-
             String address = namespace.isEmpty() ? methodName : String.format("%s.%s", namespace, methodName);
 
             eb.send(address, jsonMessage, replyHandler);
@@ -87,7 +84,9 @@ public final class EventBus {
     return t;
   }
 
-  public static <T> void registerReceiver(String namespace, final T receiver, Class<T> clazz) {
+  public static <T> void registerReceiver(final Vertx vertx, String namespace, final T receiver, Class<T> clazz) {
+    final org.vertx.java.core.eventbus.EventBus eb = vertx.eventBus();
+
     for (Method method : clazz.getMethods()) {
       // Ignore Object methods
       if (method.getDeclaringClass().equals(Object.class)) {
@@ -118,14 +117,12 @@ public final class EventBus {
               }
             } catch (Throwable e) {
               e.printStackTrace();
-              VertxLocator.container.getLogger().error(e);
             }
           }
         });
 
       } catch (IllegalAccessException e) {
         e.printStackTrace();
-        VertxLocator.container.getLogger().error(e);
       }
     }
   }

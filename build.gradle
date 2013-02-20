@@ -5,29 +5,10 @@ allprojects {
   apply plugin: 'eclipse'
 
   // Vertx Jars
-  FileCollection coreJars = fileTree(dir: "$System.env.VERTX_HOME/lib", include: '*.jar')
-
-  configurations {
-    // Exclude vertx jars
-    // Ensure you run tests to make sure dependencies do not conflict
-    // for (File jar : coreJars){
-    //  String moduleName = jar.getName();
-    //  moduleName = moduleName.substring(0, moduleName.lastIndexOf('-'))
-
-    //  compile.exclude module: moduleName
-    // }
-
-    core
-    provided
-  }
-
   dependencies {
-    testCompile "junit:junit:$junitVersion"
+    testCompile "org.vert-x:vertx-testframework:$vertxVersion"
 
-    runtime files("$System.env.VERTX_HOME/conf")
-
-    core  coreJars    // this is just for collectDeps
-    compile coreJars  // this is for compiling
+    compile "org.vert-x:vertx-core:$vertxVersion"
   }
 
   repositories {
@@ -38,25 +19,6 @@ allprojects {
   test {
     // Some vert.x properties
     systemProperties['vertx.test.timeout'] = 5
-  }
-
-  // Pulls all dependencies into local project directory for IDEs
-  task collectDeps(type: Copy) {
-    description = 'conveniently collect dependencies for other IDEs'
-    destinationDir = file("$rootDir/build/deps")
-    into("core") {
-      from configurations.core
-    }
-    into("compile") {
-      from configurations.compile
-      exclude {
-        it.file in coreJars
-      }
-    }
-
-    into("test") {
-      from configurations.testCompile
-    }
   }
 }
 
@@ -113,7 +75,3 @@ task dist(type: Zip, dependsOn:jar) {
 task wrapper(type: Wrapper) {
   gradleVersion = "$gradleVersion"
 }
-
-// IDE Configuration
-tasks.eclipse.dependsOn collectDeps
-tasks.idea.dependsOn collectDeps

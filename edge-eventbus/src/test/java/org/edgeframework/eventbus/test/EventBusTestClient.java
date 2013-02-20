@@ -5,7 +5,6 @@ import org.edgeframework.promises.PromiseHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.deploy.impl.VertxLocator;
 import org.vertx.java.testframework.TestClientBase;
 
 public class EventBusTestClient extends TestClientBase {
@@ -25,7 +24,7 @@ public class EventBusTestClient extends TestClientBase {
 
   public void testSend() {
 
-    VertxLocator.vertx.eventBus().registerHandler(REMOTE_NAMESPACE + ".testString", new Handler<Message<JsonObject>>() {
+    vertx.eventBus().registerHandler(REMOTE_NAMESPACE + ".testString", new Handler<Message<JsonObject>>() {
       @Override
       public void handle(Message<JsonObject> message) {
         tu.azzert(message.body.getString("message").equals("Hello World"), "Message sent on event bus is not correct");
@@ -33,13 +32,13 @@ public class EventBusTestClient extends TestClientBase {
       }
     });
 
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
     server.testString("Hello World");
   }
 
   public void testReceive() {
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public void testString(String message) {
         tu.azzert(message.equals("Hello World"));
@@ -47,13 +46,13 @@ public class EventBusTestClient extends TestClientBase {
       }
     }, EventBusTestsReceiver.class);
 
-    VertxLocator.vertx.eventBus().send(REMOTE_NAMESPACE + ".testString", new JsonObject().putString("message", "Hello World"));
+    vertx.eventBus().send(REMOTE_NAMESPACE + ".testString", new JsonObject().putString("message", "Hello World"));
   }
 
   public void testBothEnds() {
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public void testString(String message) {
         tu.azzert(message.equals("Hello World"));
@@ -65,9 +64,9 @@ public class EventBusTestClient extends TestClientBase {
   }
 
   public void testReply() {
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public String testReply(String message) {
         return message.toUpperCase();
@@ -90,9 +89,9 @@ public class EventBusTestClient extends TestClientBase {
   }
 
   public void testMultipleParameters() {
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public String testMultipleParameters(String message, Number value) {
         String result = "";
@@ -121,9 +120,9 @@ public class EventBusTestClient extends TestClientBase {
   }
 
   public void testParameterTypes1() {
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public void testParameterTypes1(byte n1, short n2, int n3, long n4) {
         tu.azzert(n1 == 1);
@@ -138,9 +137,9 @@ public class EventBusTestClient extends TestClientBase {
   }
 
   public void testParameterTypes2() {
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public void testParameterTypes2(Byte n1, Short n2, Integer n3, Long n4) {
         tu.azzert(n1 == 1);
@@ -155,9 +154,9 @@ public class EventBusTestClient extends TestClientBase {
   }
 
   public void testParameterTypes3() {
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public void testParameterTypes3(float f1, double f2) {
         tu.azzert(f1 == 1.5f);
@@ -170,9 +169,9 @@ public class EventBusTestClient extends TestClientBase {
   }
 
   public void testParameterTypes4() {
-    EventBusTestsSender server = EventBus.registerSender(REMOTE_NAMESPACE, EventBusTestsSender.class);
+    EventBusTestsSender server = EventBus.registerSender(vertx, REMOTE_NAMESPACE, EventBusTestsSender.class);
 
-    EventBus.registerReceiver(REMOTE_NAMESPACE, new Receiver() {
+    EventBus.registerReceiver(vertx, REMOTE_NAMESPACE, new Receiver() {
       @Override
       public void testParameterTypes4(Float f1, Double f2) {
         tu.azzert(f1 == 1.5f);

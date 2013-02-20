@@ -14,7 +14,6 @@ import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteMatcher;
 import org.edgeframework.routing.handler.RequestHandler;
 import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.deploy.impl.VertxLocator;
 
 public class Controllers {
   private static final String COMMENT_PREFIX = "#";
@@ -39,7 +38,7 @@ public class Controllers {
 
         Matcher matcher = ROUTE_REGEX.matcher(line);
         if (!matcher.matches()) {
-          VertxLocator.container.getLogger().warn("Controller Route File contains invalid line: " + line);
+          // TODO: Logging
           continue;
         }
 
