@@ -2,6 +2,7 @@
 allprojects {
   // Java Configuration
   apply plugin: 'java'
+  apply plugin: 'eclipse'
 
   // Vertx Jars
   FileCollection coreJars = fileTree(dir: "$System.env.VERTX_HOME/lib", include: '*.jar')

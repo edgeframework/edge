@@ -2,6 +2,7 @@
 .gradle
 .idea
 .project
+.metadata
 .settings
 module.iml
 bin
