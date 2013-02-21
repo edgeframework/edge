@@ -10,21 +10,21 @@ import org.vertx.java.core.json.JsonObject;
 
 public class TestController extends Controller {
 
-  public static Result testOkResult() {
+  public Result testOkResult() {
     return ok("Hello World");
   }
 
-  public static Result testRenderResult() {
+  public Result testRenderResult() {
     return render("basic", new JsonObject().putString("echo", "Hello World"));
   }
 
-  public static Result testJsonResult() {
+  public Result testJsonResult() {
     return json(new JsonObject().putString("echo", "Hello World"));
   }
 
-  public static Result testAsyncResult(Vertx vertx) {
+  public Result testAsyncResult() {
     final Promise<String> promise = Promise.defer();
-    vertx.runOnLoop(new Handler<Void>() {
+    vertx().runOnLoop(new Handler<Void>() {
       @Override
       public void handle(Void arg) {
         try {
@@ -50,7 +50,8 @@ public class TestController extends Controller {
     return async(result);
   }
 
-  public static Result testRouteParams(String echoString) {
+  public Result testRouteParams(String echoString) {
     return ok(echoString);
   }
+
 }

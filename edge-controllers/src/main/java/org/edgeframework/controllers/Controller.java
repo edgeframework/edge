@@ -5,9 +5,20 @@ import java.util.Map;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.HttpServerResponse;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 
 public abstract class Controller {
+
+  private Vertx vertx;
+
+  protected Vertx vertx() {
+    return this.vertx;
+  }
+
+  void setVertx(Vertx vertx) {
+    this.vertx = vertx;
+  }
 
   public static Result ok(final String content) {
     return new Result() {

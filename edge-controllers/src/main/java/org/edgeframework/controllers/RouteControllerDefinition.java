@@ -10,6 +10,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.edgeframework.controllers.test.TestController;
+import org.vertx.java.core.Vertx;
+
 public class RouteControllerDefinition {
 
   private static final Map<String, Class<?>> CLASS_MAPPINGS = new HashMap<>();
@@ -26,8 +29,10 @@ public class RouteControllerDefinition {
 
   private String method;
   private String route;
-
   private String controller;
+
+  private Class<?> controllerClass;
+
   private MethodHandle handle;
 
   // Holds a list of parameters by name, and in the order in which the
@@ -39,7 +44,6 @@ public class RouteControllerDefinition {
     this.method = method.toUpperCase();
     this.route = route;
 
-    this.controller = controller;
     parseController(controller);
   }
 
@@ -55,31 +59,37 @@ public class RouteControllerDefinition {
     return this.controller;
   }
 
-  public Result invoke(Map<String, Object> arguments) throws Exception {
-    try {
-      if (arguments == null) {
-        // TODO: Why can't I use invokeExact here? The return type?
-        return (Result) this.handle.invokeWithArguments();
-      }
+  public Result invoke(Vertx vertx, Map<String, Object> arguments) throws Exception {
+    return this.invoke(vertx, (Controller) this.controllerClass.newInstance(), arguments);
+  }
 
-      Object[] args = new Object[namedParameters.length];
-      for (int i = 0; i < namedParameters.length; i++) {
-        args[i] = arguments.get(this.namedParameters[i]);
+  public Result invoke(Vertx vertx) throws Exception {
+    return this.invoke(vertx, null);
+  }
+
+  private Result invoke(Vertx vertx, Controller receiver, Map<String, Object> arguments) throws Exception {
+    try {
+      receiver.setVertx(vertx);
+
+      // + 1 to hold receiving target
+      Object[] args = new Object[this.namedParameters.length + 1];
+
+      args[0] = receiver;
+      for (int i = 0; i < this.namedParameters.length; i++) {
+        args[i + 1] = arguments.get(this.namedParameters[i]);
       }
 
       return (Result) this.handle.invokeWithArguments(args);
     } catch (Throwable e) {
+      e.printStackTrace();
       throw new Exception("Could not invoke controller action", e);
     }
-  }
-
-  public Result invoke() throws Exception {
-    return this.invoke(null);
   }
 
   private void parseController(String definition) throws Exception {
     int delimiterIndex = definition.lastIndexOf('.');
 
+    // Get both segments of the definition
     String controllerName = definition.substring(0, delimiterIndex);
     String actionMethod = definition.substring(delimiterIndex + 1);
 
@@ -91,8 +101,9 @@ public class RouteControllerDefinition {
     String actionName = matcher.group("name");
     String actionParams[] = matcher.group("params").split("\\s*,\\s*");
 
-    MethodHandles.Lookup lookup = MethodHandles.lookup();
-    Class<?> clazz = Class.forName(controllerName);
+    this.controllerClass = Class.forName(controllerName);
+
+    // TODO: check hierarchy of Controller
 
     MethodType mt = MethodType.methodType(Result.class);
     List<String> namedParams = new ArrayList<>(actionParams.length);
@@ -114,7 +125,7 @@ public class RouteControllerDefinition {
     }
 
     this.namedParameters = namedParams.toArray(new String[namedParams.size()]);
-    this.handle = lookup.findStatic(clazz, actionName, mt);
+    this.handle = MethodHandles.lookup().findVirtual(this.controllerClass, actionName, mt);
   }
 
 }

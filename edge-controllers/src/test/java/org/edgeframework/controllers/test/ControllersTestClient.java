@@ -2,9 +2,7 @@ package org.edgeframework.controllers.test;
 
 import org.edgeframework.controllers.Controllers;
 import org.edgeframework.controllers.RouteControllerDefinition;
-import org.edgeframework.controllers.test.TestHttpClient;
 import org.edgeframework.promises.PromiseHandler;
-import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.testframework.TestClientBase;
 
@@ -22,11 +20,8 @@ public class ControllersTestClient extends TestClientBase {
     super.start();
 
     try {
-      HttpServer server = vertx.createHttpServer();
-
-      this.controllers = new Controllers("routes.config", server);
+      this.controllers = new Controllers(vertx, HOSTNAME, PORT);
       this.client = new TestHttpClient(vertx, HOSTNAME, PORT);
-      server.listen(PORT, HOSTNAME);
 
       displayInfo();
     } catch (Exception e) {

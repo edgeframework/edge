@@ -1,7 +1,6 @@
 package org.edgeframework.controllers;
 
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Paths;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,18 +12,28 @@ import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteMatcher;
 import org.edgeframework.routing.handler.RequestHandler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 
 public class Controllers {
   private static final String COMMENT_PREFIX = "#";
   private static final Pattern ROUTE_REGEX = Pattern.compile("^(?<method>\\S+)\\s+(?<route>\\S+)\\s+(?<controller>.+)$");
 
+  private final Vertx vertx;
+
+  private final HttpServer server;
+
   private RouteMatcher routeMatcher = new RouteMatcher();
 
-  public Controllers(String file, HttpServer server) throws Exception {
-    System.out.println(Files.exists(Paths.get(file), LinkOption.NOFOLLOW_LINKS));
+  public Controllers(Vertx vertx, String host, int port) throws Exception {
+    this(vertx, "routes.config", host, port);
+  }
+
+  public Controllers(Vertx vertx, String file, String host, int port) throws Exception {
+    this.vertx = vertx;
 
     try (
+        // This is only done once on init, so don't really care about async
         Scanner s = new Scanner(
             new String(Files.readAllBytes(Paths.get(file)))
             )) {
@@ -53,7 +62,9 @@ public class Controllers {
       throw new Exception("Could not load the route configuration file", e);
     }
 
-    server.requestHandler(routeMatcher);
+    this.server = vertx.createHttpServer();
+    this.server.requestHandler(routeMatcher);
+    this.server.listen(port, host);
   }
 
   private final List<RouteControllerDefinition> definitions = new LinkedList<>();
@@ -66,7 +77,7 @@ public class Controllers {
 
       @Override
       public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
-        Result result = definition.invoke(request.getParams());
+        Result result = definition.invoke(vertx, request.getParams());
 
         result.performResult(response);
       }
