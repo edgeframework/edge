@@ -1,15 +1,19 @@
 package org.edgeframework.controllers.test;
 
+import static org.vertx.testtools.VertxAssert.assertEquals;
+import static org.vertx.testtools.VertxAssert.testComplete;
+
 import org.edgeframework.controllers.Controllers;
 import org.edgeframework.controllers.RouteControllerDefinition;
 import org.edgeframework.core.util.org.edgeframework.routing.test.TestHttpClient;
 import org.edgeframework.promises.PromiseHandler;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.testframework.TestClientBase;
+import org.vertx.testtools.TestVerticle;
 
-public class ControllersTestClient extends TestClientBase {
+public class ControllersTestClient extends TestVerticle {
 
   private static Logger logger = LoggerFactory.getLogger(ControllersTestClient.class);
 
@@ -22,8 +26,6 @@ public class ControllersTestClient extends TestClientBase {
 
   @Override
   public void start() {
-    super.start();
-
     try {
       this.controllers = new Controllers(vertx, HOSTNAME, PORT);
       this.client = new TestHttpClient(vertx, HOSTNAME, PORT);
@@ -33,13 +35,12 @@ public class ControllersTestClient extends TestClientBase {
       e.printStackTrace();
     }
 
-    tu.appReady();
+    super.start();
   }
 
   @Override
-  public void stop() {
+  public void stop() throws Exception {
     this.client.close();
-    tu.appStopped();
 
     super.stop();
   }
@@ -52,14 +53,15 @@ public class ControllersTestClient extends TestClientBase {
     }
   }
 
+  @Test
   public void testOkResult() throws Exception {
     this.client
         .getPage("/testOkResult")
         .then(new PromiseHandler<String, Void>() {
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("Hello World"));
-            tu.testComplete();
+            assertEquals("Page did not successfully load", value, "Hello World");
+            testComplete();
 
             return null;
           }
@@ -72,8 +74,8 @@ public class ControllersTestClient extends TestClientBase {
         .then(new PromiseHandler<String, Void>() {
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("Hello World"));
-            tu.testComplete();
+            assertEquals("Page was not rendered correctly", value, "Hello World");
+            testComplete();
 
             return null;
           }
@@ -87,8 +89,9 @@ public class ControllersTestClient extends TestClientBase {
           @Override
           public Void handle(String value) {
             JsonObject json = new JsonObject(value);
-            tu.azzert(json.getString("echo").equals("Hello World"));
-            tu.testComplete();
+
+            assertEquals("Json Data not rendered properly", json.getString("echo"), "Hello World");
+            testComplete();
 
             return null;
           }
@@ -101,8 +104,8 @@ public class ControllersTestClient extends TestClientBase {
         .then(new PromiseHandler<String, Void>() {
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("Hello World"));
-            tu.testComplete();
+            assertEquals("Asynchronus result not rendered properly", value, "Hello World");
+            testComplete();
 
             return null;
           }
@@ -116,9 +119,9 @@ public class ControllersTestClient extends TestClientBase {
 
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("HelloWorld"), "Did not manage to pass through the route parameter");
+            assertEquals("Did not manage to pass through the route parameter", value, "HelloWorld");
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
@@ -132,9 +135,9 @@ public class ControllersTestClient extends TestClientBase {
 
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("HelloWorld"), "Did not manage to pass through the route parameter");
+            assertEquals("Did not manage to pass through the query parameter", value, "HelloWorld");
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
@@ -148,9 +151,9 @@ public class ControllersTestClient extends TestClientBase {
 
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("HelloWorld"), "Did not manage to pass through the route parameter");
+            assertEquals("Did not manage to pass through the body data", value, "HelloWorld");
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 

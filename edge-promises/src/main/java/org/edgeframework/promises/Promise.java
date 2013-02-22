@@ -221,7 +221,7 @@ public class Promise<T> extends Observable<T> {
     this.reason = reason;
 
     for (Observer<T> obs : this.observers.values()) {
-      obs.onError(new Exception(reason));
+      obs.onError(reason);
     }
   }
 

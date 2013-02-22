@@ -8,5 +8,6 @@ module.iml
 bin
 build
 out
+mods
 
 public

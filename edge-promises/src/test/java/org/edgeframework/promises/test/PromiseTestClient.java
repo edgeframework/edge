@@ -1,30 +1,450 @@
 package org.edgeframework.promises.test;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.promises.RepromiseHandler;
+
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.SimpleHandler;
-import org.vertx.java.testframework.TestClientBase;
+import org.vertx.testtools.TestVerticle;
+
+import org.junit.ComparisonFailure;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.vertx.testtools.VertxAssert.*;
 
 import rx.util.functions.Action1;
 
-public class PromiseTestClient extends TestClientBase {
+public class PromiseTestClient extends TestVerticle {
 
-  @Override
-  public void start() {
-    super.start();
-    tu.appReady();
+  @Test
+  public void testDefer() throws Exception {
+    Promise<String> promise = Promise.defer();
+
+    assertNotNull(promise);
+    assertTrue(promise instanceof Promise);
+    testComplete();
   }
 
-  @Override
-  public void stop() {
-    super.stop();
+  @Test
+  public void testDefer2() throws Exception {
+    Promise<String> promise = makePromise("Hello World");
+
+    assertNotNull(promise != null);
+    assertNotNull(promise instanceof Promise);
+    testComplete();
   }
 
-  public Promise<String> makePromise(final String message) {
+  /* Basic handler */
+  @Test
+  public void testBasic() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String result) {
+            assertEquals(result, "Hello World", result);
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* Test of Handlers - return Value */
+  @Test
+  public void testChain1() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, String>() {
+          @Override
+          public String handle(String result) {
+            return result.toUpperCase();
+          }
+        })
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String result) {
+            assertEquals(result, "HELLO WORLD", result);
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* Chain of handlers - return Promise */
+  @Test
+  public void testChain2() throws Exception {
+    makePromise("Hello World")
+        .then(new RepromiseHandler<String, String>() {
+          @Override
+          public Promise<String> handle(final String result) {
+            return makePromise("Foo Bar");
+          }
+        })
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String result) {
+            assertEquals(result, "Foo Bar", result);
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* Chain of handlers - forwarding on */
+  @Test
+  public void testChain3() throws Exception {
+    makePromise("Hello World")
+        .then(new RepromiseHandler<String, String>() {
+          @Override
+          public Promise<String> handle(final String result) {
+            return makePromise("Foo Bar");
+          }
+        })
+        .fail(new FailureHandler<String>() {
+          @Override
+          public String handle(Exception e) {
+            return "fail";
+          }
+        })
+        .then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String result) {
+            assertEquals(result, "Foo Bar", result);
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  @Test
+  public void testMultiple1() throws Exception {
+    Promise<String> mainPromise = makePromise("Hello World");
+    final CountDownLatch latch = new CountDownLatch(2);
+
+    mainPromise.then(new PromiseHandler<String, Void>() {
+      @Override
+      public Void handle(String result) {
+        System.out.println("Before");
+        assertEquals(latch.getCount(), 2);
+        latch.countDown();
+        return null;
+      }
+    });
+    mainPromise.then(new PromiseHandler<String, Void>() {
+      @Override
+      public Void handle(String result) {
+        System.out.println("After");
+        assertEquals(latch.getCount(), 1);
+        testComplete();
+        return null;
+      }
+    });
+  }
+
+  /* Exception with then() handler */
+  @Test
+  public void testException1() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20); // Exception
+          }
+        }).then(
+            new PromiseHandler<Character, Void>() {
+              @Override
+              public Void handle(Character value) {
+                fail("Promise not correctly calling failure handler when exception or rejection occurs");
+                testComplete();
+                return null;
+              }
+            },
+            new FailureHandler<Void>() {
+              @Override
+              public Void handle(Exception e) {
+                System.out.println(e);
+                assertTrue("Exception is not StringIndexOutOfBoundsException", e instanceof StringIndexOutOfBoundsException);
+                testComplete();
+                return null;
+              }
+            }
+        );
+  }
+
+  /* Exception with fail() handler */
+  @Test
+  public void testException2() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20); // Exception
+          }
+        }).fail(
+            new FailureHandler<Void>() {
+              @Override
+              public Void handle(Exception e) {
+                assertTrue(e instanceof StringIndexOutOfBoundsException);
+                testComplete();
+                return null;
+              }
+            }
+        );
+  }
+
+  /* Exception with fail() handler */
+  @Test
+  public void testException3() throws Exception {
+    makePromise("Hello World")
+        .then(
+            new PromiseHandler<String, Character>() {
+              @Override
+              public Character handle(String result) {
+                return result.charAt(20); // Exception
+              }
+            },
+            new FailureHandler<Character>() {
+              @Override
+              public Character handle(Exception e) {
+                fail("This rejection handler should not be called!");
+                testComplete();
+                return null;
+              }
+            }
+        ).fail(
+            new FailureHandler<Void>() {
+              @Override
+              public Void handle(Exception e) {
+                assertTrue(e instanceof StringIndexOutOfBoundsException);
+                testComplete();
+                return null;
+              }
+            }
+        );
+  }
+
+  /* Exception with handler */
+  @Test
+  public void testException4() throws Exception {
+    final AtomicBoolean flag = new AtomicBoolean(false);
+
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20); // Exception
+          }
+        }).then(
+            new PromiseHandler<Character, String>() {
+              @Override
+              public String handle(Character value) {
+                fail("Promise not correctly calling failure handler when exception or rejection occurs");
+                testComplete();
+                return "The Char is : " + value;
+              }
+            },
+            new FailureHandler<String>() {
+              @Override
+              public String handle(Exception value) {
+                flag.set(true);
+                return null;
+              }
+            }
+        ).then(new PromiseHandler<String, Void>() {
+          @Override
+          public Void handle(String value) {
+            assertNull(value);
+            assertTrue("FailureHandler was not called", flag.get());
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  @Test
+  public void testException5() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20); // Exception
+          }
+        })
+        .then(new PromiseHandler<Character, Void>() {
+          @Override
+          public Void handle(Character value) {
+            fail("Promise should not execute this due to exception");
+            testComplete();
+            return null;
+          }
+        });
+
+    endLater();
+  }
+
+  /* Test exception passing to further promises */
+  @Test
+  public void testException7() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20); // Exception
+          }
+        })
+        .then(new PromiseHandler<Character, Void>() {
+          @Override
+          public Void handle(Character value) {
+            fail("Promise should not execute this due to exception");
+            testComplete();
+            return null;
+          }
+        })
+        .fail(new FailureHandler<Void>() {
+          @Override
+          public Void handle(Exception e) {
+            assertTrue(e instanceof StringIndexOutOfBoundsException);
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* Fin with basic */
+  @Test
+  public void testFinally1() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(0);
+          }
+        })
+        .fin(new PromiseHandler<Void, Void>() {
+          @Override
+          public Void handle(Void value) {
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* Fin with Exception */
+  @Test
+  public void testFinally2() throws Exception {
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20);
+          }
+        })
+        .fin(new PromiseHandler<Void, Void>() {
+          @Override
+          public Void handle(Void value) {
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* then() handler after fin() */
+  @Test
+  public void testFinally3() throws Exception {
+    final AtomicBoolean flag = new AtomicBoolean(false);
+
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(0);
+          }
+        })
+        .fin(new PromiseHandler<Void, String>() {
+          @Override
+          public String handle(Void value) {
+            flag.set(true);
+            return "HelloWorld";
+          }
+        })
+        .then(new PromiseHandler<Character, Void>() {
+          @Override
+          public Void handle(Character value) {
+            // value from promise must pass through
+            // finally handler must fire
+            // finally return value must be ignored
+            assertEquals(value, new Character('H'));
+            assertTrue(flag.get());
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  /* then() rejection after fin() */
+  @Test
+  public void testFinally4() throws Exception {
+    final AtomicBoolean flag = new AtomicBoolean(false);
+
+    makePromise("Hello World")
+        .then(new PromiseHandler<String, Character>() {
+          @Override
+          public Character handle(String result) {
+            return result.charAt(20);
+          }
+        })
+        .fin(new PromiseHandler<Void, String>() {
+          @Override
+          public String handle(Void value) {
+            flag.set(true);
+            return "Finally!";
+          }
+        })
+        .fail(new FailureHandler<Void>() {
+          @Override
+          public Void handle(Exception reason) {
+            assertTrue(reason instanceof StringIndexOutOfBoundsException);
+            assertTrue(flag.get());
+            testComplete();
+            return null;
+          }
+        });
+  }
+
+  @Test
+  public void testPrefilled() throws Exception {
+    Promise<String> p = Promise.defer();
+
+    p.fulfill("Hello World");
+
+    p.then(new PromiseHandler<String, Void>() {
+      @Override
+      public Void handle(String value) {
+        assertEquals(value, "Hello World");
+        testComplete();
+        return null;
+      }
+    });
+  }
+
+  @Test
+  public void testRxBasic() {
+    makePromise("Hello World")
+        .subscribe(new Action1<String>() {
+          @Override
+          public void call(String value) {
+            assertEquals(value, "Hello World");
+            testComplete();
+          }
+        });
+
+  }
+
+  private Promise<String> makePromise(final String message) {
     final Promise<String> promise = Promise.defer();
 
     vertx.runOnLoop(new SimpleHandler() {
@@ -49,395 +469,12 @@ public class PromiseTestClient extends TestClientBase {
     return promise;
   }
 
-  public void testDefer() throws Exception {
-    Promise<String> promise = Promise.defer();
-
-    tu.azzert(promise != null);
-    tu.azzert(promise instanceof Promise);
-    tu.testComplete();
-  }
-
-  public void testDefer2() throws Exception {
-    Promise<String> promise = makePromise("Hello World");
-
-    tu.azzert(promise != null);
-    tu.azzert(promise instanceof Promise);
-    tu.testComplete();
-  }
-
-  /* Basic handler */
-  public void testBasic() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Void>() {
-          @Override
-          public Void handle(String result) {
-            tu.azzert(result.equals("Hello World"), "Promise failed to pass through return value to handler");
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /* Test of Handlers - return Value */
-  public void testChain1() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, String>() {
-          @Override
-          public String handle(String result) {
-            return result.toUpperCase();
-          }
-        })
-        .then(new PromiseHandler<String, Void>() {
-          @Override
-          public Void handle(String result) {
-            tu.azzert(result.equals("HELLO WORLD"), "Promise failed to pass through return value to handler in a chain");
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /* Chain of handlers - return Promise */
-  public void testChain2() throws Exception {
-    makePromise("Hello World")
-        .then(new RepromiseHandler<String, String>() {
-          @Override
-          public Promise<String> handle(final String result) {
-            return makePromise("Foo Bar");
-          }
-        })
-        .then(new PromiseHandler<String, Void>() {
-          @Override
-          public Void handle(String result) {
-            tu.azzert(result.equals("Foo Bar"), "Promise failed to pass re-promise through in chain.");
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /* Chain of handlers - forwarding on */
-  public void testChain3() throws Exception {
-    makePromise("Hello World")
-        .then(new RepromiseHandler<String, String>() {
-          @Override
-          public Promise<String> handle(final String result) {
-            return makePromise("Foo Bar");
-          }
-        })
-        .fail(new FailureHandler<String>() {
-          @Override
-          public String handle(Exception e) {
-            return "fail";
-          }
-        })
-        .then(new PromiseHandler<String, Void>() {
-          @Override
-          public Void handle(String result) {
-            tu.azzert(result.equals("Foo Bar"), "Promise failed to pass re-promise through in chain.");
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  public void testMultiple1() throws Exception {
-    Promise<String> mainPromise = makePromise("Hello World");
-    final CountDownLatch latch = new CountDownLatch(2);
-
-    mainPromise.then(new PromiseHandler<String, Void>() {
+  private void endLater() {
+    vertx.setTimer(2l, new Handler<Long>() {
       @Override
-      public Void handle(String result) {
-        tu.azzert(latch.getCount() == 2);
-        latch.countDown();
-        return null;
+      public void handle(Long event) {
+        testComplete();
       }
     });
-    mainPromise.then(new PromiseHandler<String, Void>() {
-      @Override
-      public Void handle(String result) {
-        tu.azzert(latch.getCount() == 1);
-        tu.testComplete();
-        return null;
-      }
-    });
-  }
-
-  /* Exception with then() handler */
-  public void testException1() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20); // Exception
-          }
-        }).then(
-            new PromiseHandler<Character, Void>() {
-              @Override
-              public Void handle(Character value) {
-                tu.azzert(false, "Promise not correctly calling failure handler when exception or rejection occurs");
-                tu.testComplete();
-                return null;
-              }
-            },
-            new FailureHandler<Void>() {
-              @Override
-              public Void handle(Exception value) {
-                tu.testComplete();
-                return null;
-              }
-            }
-        );
-  }
-
-  /* Exception with fail() handler */
-  public void testException2() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20); // Exception
-          }
-        }).fail(
-            new FailureHandler<Void>() {
-              @Override
-              public Void handle(Exception value) {
-                tu.testComplete();
-                return null;
-              }
-            }
-        );
-  }
-
-  /* Exception with fail() handler */
-  public void testException3() throws Exception {
-    makePromise("Hello World")
-        .then(
-            new PromiseHandler<String, Character>() {
-              @Override
-              public Character handle(String result) {
-                return result.charAt(20); // Exception
-              }
-            },
-            new FailureHandler<Character>() {
-              @Override
-              public Character handle(Exception e) {
-                tu.azzert(false, "This rejection handler should not be called!");
-                return null;
-              }
-            }
-        ).fail(
-            new FailureHandler<Void>() {
-              @Override
-              public Void handle(Exception value) {
-                tu.testComplete();
-                return null;
-              }
-            }
-        );
-  }
-
-  /* Exception with handler */
-  public void testException4() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20); // Exception
-          }
-        }).then(
-            new PromiseHandler<Character, String>() {
-              @Override
-              public String handle(Character value) {
-                tu.azzert(false, "Promise not correctly calling failure handler when exception or rejection occurs");
-                tu.testComplete();
-                return "The Char is : " + value;
-              }
-            },
-            new FailureHandler<String>() {
-              @Override
-              public String handle(Exception value) {
-                return null;
-              }
-            }
-        ).then(new PromiseHandler<String, Void>() {
-          @Override
-          public Void handle(String value) {
-            tu.azzert(value == null);
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /*
-   * Exception with handler - there is no way for JUnit to pick up the
-   * exception: verify visually through stacktrace
-   */
-  public void testException5() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20); // Exception
-          }
-        });
-  }
-
-  public void testException6() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20); // Exception
-          }
-        })
-        .then(new PromiseHandler<Character, Void>() {
-          @Override
-          public Void handle(Character value) {
-            tu.azzert(false, "Promise should not execute this due to exception");
-            return null;
-          }
-        });
-  }
-
-  /* Test exception passing to further promises */
-  public void testException7() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20); // Exception
-          }
-        })
-        .then(new PromiseHandler<Character, Void>() {
-          @Override
-          public Void handle(Character value) {
-            tu.azzert(false, "Promise should not execute this due to exception");
-            return null;
-          }
-        })
-        .fail(new FailureHandler<Void>() {
-          @Override
-          public Void handle(Exception e) {
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /* Fin with basic */
-  public void testFinally1() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(0);
-          }
-        })
-        .fin(new PromiseHandler<Void, Void>() {
-          @Override
-          public Void handle(Void value) {
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /* Fin with Exception */
-  public void testFinally2() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20);
-          }
-        })
-        .fin(new PromiseHandler<Void, Void>() {
-          @Override
-          public Void handle(Void value) {
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /* then() handler after fin() */
-  public void testFinally3() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(0);
-          }
-        })
-        .fin(new PromiseHandler<Void, Void>() {
-          @Override
-          public Void handle(Void value) {
-            tu.azzert(true, "Finally was not invoked!");
-            return null;
-          }
-        })
-        .then(new PromiseHandler<Character, Void>() {
-          @Override
-          public Void handle(Character value) {
-            tu.azzert(value == 'H');
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  /* then() rejection after fin() */
-  public void testFinally4() throws Exception {
-    makePromise("Hello World")
-        .then(new PromiseHandler<String, Character>() {
-          @Override
-          public Character handle(String result) {
-            return result.charAt(20);
-          }
-        })
-        .fin(new PromiseHandler<Void, String>() {
-          @Override
-          public String handle(Void value) {
-            tu.testComplete();
-            return "Finally!";
-          }
-        })
-        .fail(new FailureHandler<Void>() {
-          @Override
-          public Void handle(Exception reason) {
-            tu.azzert(reason instanceof StringIndexOutOfBoundsException);
-            tu.testComplete();
-            return null;
-          }
-        });
-  }
-
-  public void testPrefilled() throws Exception {
-    Promise<String> p = Promise.defer();
-
-    p.fulfill("Hello World");
-
-    p.then(new PromiseHandler<String, Void>() {
-      @Override
-      public Void handle(String value) {
-        tu.azzert(value.equals("Hello World"));
-        tu.testComplete();
-        return null;
-      }
-    });
-  }
-
-  public void testRxBasic() {
-    makePromise("Hello World")
-        .subscribe(new Action1<String>() {
-          @Override
-          public void call(String value) {
-            tu.azzert(value.equals("Hello World"));
-            tu.testComplete();
-          }
-        });
-
   }
 }

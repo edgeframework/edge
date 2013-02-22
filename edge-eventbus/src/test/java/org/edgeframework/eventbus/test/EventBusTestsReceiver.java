@@ -10,7 +10,7 @@ public interface EventBusTestsReceiver {
   public String testReply(String message);
 
   @EventBusParams({ "message", "integer" })
-  public String testMultipleParameters(String message, Number integer);
+  public String testMultipleParameters(String message, Integer integer);
 
   @EventBusParams({ "n1", "n2", "n3", "n4" })
   public void testParameterTypes1(byte n1, short n2, int n3, long n4);

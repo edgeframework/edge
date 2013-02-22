@@ -1,5 +1,9 @@
 package org.edgeframework.routing.test;
 
+import static org.vertx.testtools.VertxAssert.assertEquals;
+import static org.vertx.testtools.VertxAssert.fail;
+import static org.vertx.testtools.VertxAssert.testComplete;
+
 import org.edgeframework.core.util.org.edgeframework.routing.test.TestHttpClient;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.PromiseHandler;
@@ -10,11 +14,12 @@ import org.edgeframework.routing.handler.ParamHandler;
 import org.edgeframework.routing.handler.RequestHandler;
 import org.edgeframework.routing.middleware.Assets;
 import org.edgeframework.routing.middleware.BodyParser;
+import org.junit.Test;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.testframework.TestClientBase;
+import org.vertx.testtools.TestVerticle;
 
-public class RoutingTestClient extends TestClientBase {
+public class RoutingTestClient extends TestVerticle {
 
   private TestHttpClient client;
 
@@ -23,16 +28,14 @@ public class RoutingTestClient extends TestClientBase {
 
   @Override
   public void start() {
-    super.start();
-
     this.client = new TestHttpClient(vertx, HOSTNAME, PORT);
     createApplication();
 
-    tu.appReady();
+    super.start();
   }
 
   @Override
-  public void stop() {
+  public void stop() throws Exception {
     this.client.close();
 
     super.stop();
@@ -70,12 +73,14 @@ public class RoutingTestClient extends TestClientBase {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) {
             // NOOP
+            response.send("done");
+            testComplete();
           }
         }, new RequestHandler() {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
-            tu.azzert(false, "Should not be calling this handler!");
-            tu.testComplete();
+            fail("Should not be calling this handler!");
+            testComplete();
           }
         })
 
@@ -145,6 +150,7 @@ public class RoutingTestClient extends TestClientBase {
     server.listen(PORT, HOSTNAME);
   }
 
+  @Test
   public void testBasicRoute1() throws Exception {
     this.client
         .getPageStatus("/basic-test")
@@ -152,15 +158,16 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(Integer value) {
-            tu.azzert(value.equals(200), "Failed to get correct HTTP Status");
+            assertEquals("Value not retrieved", value.intValue(), 200);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
         });
   }
 
+  @Test
   public void testBasicRoute2() throws Exception {
     this.client
         .getPage("/basic-test")
@@ -168,15 +175,16 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("Hello World"), "Did not manage to load the correct handlebars template");
+            assertEquals("Value not retrieved", "Hello World", value);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
         });
   }
 
+  @Test
   public void testMultipleHandlers1() throws Exception {
     this.client
         .getPage("/multiple-handlers-test")
@@ -184,19 +192,21 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("Hello World"), "Did not manage to load the correct handlebars template");
+            assertEquals("Did not successfully call multiple handlers", "Hello World", value);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
         });
   }
 
+  @Test
   public void testMultipleHandlers2() throws Exception {
     this.client.getPage("/multiple-handlers-test2");
   }
 
+  @Test
   public void testPost() throws Exception {
     this.client
         .postPage("/post-test", "data=Hello%20World")
@@ -205,9 +215,9 @@ public class RoutingTestClient extends TestClientBase {
 
               @Override
               public Void handle(String value) {
-                tu.azzert(value.equals("Hello World"), "Did not manage to POST data.");
+                assertEquals("Post data not passed", "Hello World", value);
 
-                tu.testComplete();
+                testComplete();
                 return null;
               }
 
@@ -217,13 +227,15 @@ public class RoutingTestClient extends TestClientBase {
               @Override
               public Void handle(Exception e) {
                 e.printStackTrace();
-                tu.azzert(false, "Exception");
+                fail(e.getMessage());
+                testComplete();
                 return null;
               }
             }
         );
   }
 
+  @Test
   public void test404_1() throws Exception {
     this.client
         .getPageStatus("/does-not-exist")
@@ -231,15 +243,16 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(Integer value) {
-            tu.azzert(value.equals(404), "Failed to get correct HTTP Status");
+            assertEquals("404 error not given", value.intValue(), 404);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
         });
   }
 
+  @Test
   public void test404_2() throws Exception {
     this.client
         .postPageStatus("/does-not-exist", "Hello World")
@@ -247,15 +260,16 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(Integer value) {
-            tu.azzert(value.equals(404), "Failed to get correct HTTP Status");
+            assertEquals("404 error not given", value.intValue(), 404);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
         });
   }
 
+  @Test
   public void test404_3() throws Exception {
     this.client
         .getPageStatus("echo/does-not-exist")
@@ -263,15 +277,16 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(Integer value) {
-            tu.azzert(value.equals(404), "Failed to get correct HTTP Status");
+            assertEquals("404 error not given", value.intValue(), 404);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
         });
   }
 
+  @Test
   public void testRouteParams1() throws Exception {
     this.client
         .getPage("/param-test1/HelloWorld")
@@ -279,16 +294,16 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("HelloWorld"), "Did not manage to pass through the route parameter");
+            assertEquals("Route Param not filled", "HelloWorld", value);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
         });
   }
 
-  // test with param middleware
+  @Test
   public void testRouteParams2() throws Exception {
     this.client
         .getPage("/param-test2/HelloWorld")
@@ -296,9 +311,9 @@ public class RoutingTestClient extends TestClientBase {
 
           @Override
           public Void handle(String value) {
-            tu.azzert(value.equals("HELLOWORLD"), "Did not manage to modify the param");
+            assertEquals(value, "HELLOWORLD", value);
 
-            tu.testComplete();
+            testComplete();
             return null;
           }
 
