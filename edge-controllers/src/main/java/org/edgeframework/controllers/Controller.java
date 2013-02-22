@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
+import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
@@ -11,15 +12,50 @@ import org.vertx.java.core.json.JsonObject;
 public abstract class Controller {
 
   private Vertx vertx;
+  private HttpServerRequest request;
 
-  protected Vertx vertx() {
-    return this.vertx;
-  }
-
+  // Setters
   void setVertx(Vertx vertx) {
     this.vertx = vertx;
   }
 
+  void setRequest(HttpServerRequest request) {
+    this.request = request;
+  }
+
+  // Request Getters
+  public Vertx vertx() {
+    return this.vertx;
+  }
+
+  public Map<String, Object> query() {
+    return this.request.getQuery();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T query(String name) {
+    return (T) query().get(name);
+  }
+
+  public Map<String, Object> data() {
+    return this.request.getData();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T data(String name) {
+    return (T) data().get(name);
+  }
+
+  public Map<String, Object> body() {
+    return this.request.getBody();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T body(String name) {
+    return (T) body().get("name");
+  }
+
+  /* Result Factory Methods */
   public static Result ok(final String content) {
     return new Result() {
       @Override

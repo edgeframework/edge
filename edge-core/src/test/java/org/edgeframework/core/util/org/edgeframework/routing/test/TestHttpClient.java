@@ -1,6 +1,8 @@
-package org.edgeframework.routing.test;
+package org.edgeframework.core.util.org.edgeframework.routing.test;
 
 import org.edgeframework.promises.Promise;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
@@ -10,6 +12,7 @@ import org.vertx.java.core.http.HttpClientResponse;
 
 public class TestHttpClient {
 
+  private static final Logger logger = LoggerFactory.getLogger(TestHttpClient.class);
   private HttpClient client;
 
   public TestHttpClient(Vertx vertx, String hostname, int port) {
@@ -52,7 +55,6 @@ public class TestHttpClient {
   }
 
   private void post(String url, String data, Handler<HttpClientResponse> handler) {
-    System.out.println(url);
     HttpClientRequest request = this.client.post(url, handler);
 
     request.headers().put("content-type", "application/x-www-form-urlencoded");
@@ -73,13 +75,14 @@ public class TestHttpClient {
     @Override
     public void handle(HttpClientResponse response) {
 
-      response.bodyHandler(new Handler<Buffer>(){
+      response.bodyHandler(new Handler<Buffer>() {
 
         @Override
         public void handle(Buffer buffer) {
+          logger.debug(buffer.toString());
           promise.fulfill(buffer.toString());
         }
-        
+
       });
     }
 

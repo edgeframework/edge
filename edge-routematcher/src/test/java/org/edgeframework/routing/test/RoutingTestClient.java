@@ -1,5 +1,6 @@
 package org.edgeframework.routing.test;
 
+import org.edgeframework.core.util.org.edgeframework.routing.test.TestHttpClient;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.HttpServerRequest;
@@ -9,8 +10,6 @@ import org.edgeframework.routing.handler.ParamHandler;
 import org.edgeframework.routing.handler.RequestHandler;
 import org.edgeframework.routing.middleware.Assets;
 import org.edgeframework.routing.middleware.BodyParser;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.testframework.TestClientBase;

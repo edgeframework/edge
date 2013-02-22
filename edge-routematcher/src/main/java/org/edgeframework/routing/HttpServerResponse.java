@@ -51,6 +51,8 @@ public class HttpServerResponse {
    * Renders a String to the response
    */
   public HttpServerResponse send(String content) {
+    content = content != null ? content : "";
+
     if (!this.response.headers().containsKey("Content-Type")) {
       this.response.putHeader("Content-Type", "text/plain; charset=utf-8");
     }

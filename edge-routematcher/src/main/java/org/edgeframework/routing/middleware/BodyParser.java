@@ -28,6 +28,8 @@ import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
 import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder.NotEnoughDataDecoderException;
 import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData;
 import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.buffer.Buffer;
 
 public class BodyParser extends RequestHandler {
@@ -38,6 +40,8 @@ public class BodyParser extends RequestHandler {
     DiskAttribute.baseDirectory = null;
     DiskAttribute.deleteOnExitTemporaryFile = true;
   }
+
+  private static final Logger logger = LoggerFactory.getLogger(BodyParser.class);
 
   // Disk if size exceed MINSIZE
   private static final HttpDataFactory factory = new DefaultHttpDataFactory(false);
@@ -94,6 +98,8 @@ public class BodyParser extends RequestHandler {
         .then(new PromiseHandler<byte[], Void>() {
           @Override
           public Void handle(byte[] data) throws Exception {
+            logger.debug("Post Body: " + new String(data));
+
             /* Create a dummy Netty Request with the body */
             final org.vertx.java.core.http.HttpServerRequest vertxReq = request.getUnderlyingRequest();
             final HttpRequest nettyReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1, new HttpMethod(vertxReq.method), vertxReq.uri);
@@ -142,6 +148,7 @@ public class BodyParser extends RequestHandler {
     }
 
     private void parseAttribute(Attribute attr) throws IOException {
+      logger.debug(String.format("Attribute Found: %s = %s", attr.getName(), attr.getValue()));
       addField(attr.getName(), attr.getValue(), this.body);
     }
 

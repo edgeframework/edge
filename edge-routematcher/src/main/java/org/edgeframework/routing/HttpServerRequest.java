@@ -14,7 +14,6 @@ public class HttpServerRequest {
 
   private Map<String, Object> params;
   private Map<String, Object> query;
-  private Map<String, Object> body;
   private Map<String, Object> data;
 
   private Map<String, String> files;
@@ -25,7 +24,6 @@ public class HttpServerRequest {
     this.request = request;
 
     this.params = new HashMap<>();
-    this.body = new HashMap<>();
     this.data = new HashMap<>();
     this.query = QueryParser.parse(request.query);
 
@@ -105,7 +103,7 @@ public class HttpServerRequest {
 
   @SuppressWarnings("unchecked")
   public Map<String, Object> getBody() {
-    return this.data.containsKey("body") ? (Map<String, Object>) this.data.get("body") : null;
+    return this.data.containsKey("body") ? (Map<String, Object>) this.data.get("body") : Collections.unmodifiableMap(new HashMap<String, Object>());
   }
 
   public Map<String, Object> getData() {

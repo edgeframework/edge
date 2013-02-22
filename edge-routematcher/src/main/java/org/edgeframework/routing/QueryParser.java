@@ -75,11 +75,6 @@ public class QueryParser {
     });
 
     for (Parameter parameter : parameters) {
-      System.out.println("Key: " + parameter.key);
-      System.out.println("Value: " + parameter.value);
-      System.out.println("IsArray: " + parameter.isArray);
-      System.out.println("IsMap: " + parameter.isMap);
-
       boolean entered = query.containsKey(parameter.key);
 
       if (parameter.isArray) {

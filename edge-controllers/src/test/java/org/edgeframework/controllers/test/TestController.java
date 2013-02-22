@@ -4,11 +4,14 @@ import org.edgeframework.controllers.Controller;
 import org.edgeframework.controllers.Result;
 import org.edgeframework.promises.Promise;
 import org.edgeframework.promises.PromiseHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 
 public class TestController extends Controller {
+
+  public static Logger logger = LoggerFactory.getLogger(TestController.class);
 
   public Result testOkResult() {
     return ok("Hello World");
@@ -50,8 +53,16 @@ public class TestController extends Controller {
     return async(result);
   }
 
-  public Result testRouteParams(String echoString) {
-    return ok(echoString);
+  public Result testRouteParams(String echo) {
+    return ok(echo);
   }
 
+  public Result testQueryString(String echo) {
+    return ok(echo);
+  }
+
+  public Result testBodyString(String echo) {
+    logger.debug("Body Echo: " + echo);
+    return ok(echo);
+  }
 }

@@ -1,4 +1,5 @@
-include	'edge-routematcher',
+include	'edge-core',
+  'edge-routematcher',
 	'edge-promises',
 	'edge-controllers',
 	'edge-eventbus'

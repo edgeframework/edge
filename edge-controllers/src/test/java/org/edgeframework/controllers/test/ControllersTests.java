@@ -22,4 +22,6 @@ public class ControllersTests extends TestBase {
   @Test public void testAsyncResult() { startTest(getMethodName()); }
   
   @Test public void testRouteParams1() { startTest(getMethodName()); }
+  @Test public void testQueryString1() { startTest(getMethodName()); }
+  @Test public void testBodyString1() { startTest(getMethodName()); }
 }

@@ -4,6 +4,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,9 +12,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.edgeframework.controllers.test.TestController;
+import org.edgeframework.routing.HttpServerRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Vertx;
 
 public class RouteControllerDefinition {
+
+  private static Logger logger = LoggerFactory.getLogger(RouteControllerDefinition.class);
 
   private static final Map<String, Class<?>> CLASS_MAPPINGS = new HashMap<>();
   {
@@ -59,24 +65,45 @@ public class RouteControllerDefinition {
     return this.controller;
   }
 
-  public Result invoke(Vertx vertx, Map<String, Object> arguments) throws Exception {
-    return this.invoke(vertx, (Controller) this.controllerClass.newInstance(), arguments);
+  public Result invoke(Vertx vertx, HttpServerRequest request) throws Exception {
+    return this.invoke(vertx, (Controller) this.controllerClass.newInstance(), request);
   }
 
-  public Result invoke(Vertx vertx) throws Exception {
-    return this.invoke(vertx, null);
-  }
-
-  private Result invoke(Vertx vertx, Controller receiver, Map<String, Object> arguments) throws Exception {
+  private Result invoke(Vertx vertx, Controller receiver, HttpServerRequest request) throws Exception {
     try {
       receiver.setVertx(vertx);
 
       // + 1 to hold receiving target
       Object[] args = new Object[this.namedParameters.length + 1];
 
+      Map<String, Object> params = request.getParams();
+      Map<String, Object> query = request.getQuery();
+      Map<String, Object> body = request.getBody();
+      body = (Map<String, Object>) (body != null ? body : Collections.emptyMap());
+
       args[0] = receiver;
       for (int i = 0; i < this.namedParameters.length; i++) {
-        args[i + 1] = arguments.get(this.namedParameters[i]);
+        String name = this.namedParameters[i];
+
+        // Route Parameters take top priority
+        // Followed by Post Data
+        // Then Query String data
+        // Thus, go through in ascending order of priority
+        // And thus overwrite lower priority values
+
+        if (body.containsKey(name)) {
+          args[i + 1] = body.get(name);
+        }
+
+        if (query.containsKey(name)) {
+          args[i + 1] = query.get(name);
+        }
+
+        if (params.containsKey(name)) {
+          args[i + 1] = params.get(name);
+        }
+
+        logger.info("Parameter: " + name + " = " + args[i + 1]);
       }
 
       return (Result) this.handle.invokeWithArguments(args);

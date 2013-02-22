@@ -174,7 +174,7 @@ public final class EventBus {
         params.add(message.getNumber(name));
       } else {
         System.out.println(type);
-        System.out.println("FAIL!");
+        System.out.println("Event Bus Type Conversion FAIL!");
       }
 
       // TODO: Support for Objects/Arrays and Complex Types

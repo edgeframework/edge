@@ -5,12 +5,6 @@ allprojects {
   apply plugin: 'eclipse'
 
   // Vertx Jars
-  dependencies {
-    testCompile "org.vert-x:vertx-testframework:$vertxVersion"
-
-    compile "org.vert-x:vertx-core:$vertxVersion"
-  }
-
   repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
@@ -22,9 +16,19 @@ allprojects {
   }
 }
 
+project (':edge-core') {
+  dependencies {
+    testCompile "org.vert-x:vertx-testframework:$vertxVersion"
+    testCompile project(':edge-promises')
+
+    compile "org.vert-x:vertx-core:$vertxVersion"
+    compile "org.slf4j:slf4j-simple:1.7.2"
+  }
+}
+
 project(':edge-routematcher'){
   dependencies {
-    compile project(':edge-promises')
+    compile project(':edge-core')
     compile "com.github.jknack:handlebars:$handlebarsVersion"
   }
 
@@ -35,7 +39,7 @@ project(':edge-routematcher'){
 
 project(':edge-controllers'){
   dependencies {
-    compile project(':edge-promises')
+    compile project(':edge-core')
     compile project(':edge-routematcher')
   }
 
@@ -46,15 +50,17 @@ project(':edge-controllers'){
 
 project(':edge-eventbus'){
   dependencies {
-    compile project(':edge-promises')
+    compile project(':edge-core')
   }
 }
 
 project(':edge-promises'){
   dependencies {
+    compile project(':edge-core')
     compile "com.netflix.rxjava:rxjava-core:0.5.0"
   }
 }
+
 
 
 // Root Project Configuration
