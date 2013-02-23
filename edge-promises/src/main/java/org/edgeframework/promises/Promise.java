@@ -1,8 +1,9 @@
 package org.edgeframework.promises;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-
-import org.jboss.netty.util.internal.ConcurrentHashMap;
 
 import rx.Observable;
 import rx.Observer;
@@ -42,7 +43,9 @@ public class Promise<T> extends Observable<T> {
   private Map<Subscription, Observer<T>> observers;
 
   public static <T> Promise<T> defer() {
-    final ConcurrentHashMap<Subscription, Observer<T>> observers = new ConcurrentHashMap<Subscription, Observer<T>>();
+    // LinkedHashMap used to preserve key insertion order
+    final Map<Subscription, Observer<T>> observers = new LinkedHashMap<Subscription, Observer<T>>();
+
     final Promise<T> promise = new Promise<>(
         new Func1<Observer<T>, Subscription>() {
           @Override
@@ -206,8 +209,11 @@ public class Promise<T> extends Observable<T> {
     this.state = STATE.FULFILLED;
     this.value = value;
 
-    for (Observer<T> obs : this.observers.values()) {
-      obs.onNext(value);
+    // A copy of the observers is taken first, in case more observers are added
+    // after.
+    List<Observer<T>> observerList = new ArrayList<>(this.observers.values());
+    for (Observer<T> obs : observerList) {
+      obs.onNext(this.value);
       obs.onCompleted();
     }
   }
@@ -220,8 +226,9 @@ public class Promise<T> extends Observable<T> {
     this.state = STATE.REJECTED;
     this.reason = reason;
 
-    for (Observer<T> obs : this.observers.values()) {
-      obs.onError(reason);
+    List<Observer<T>> observerList = new ArrayList<>(this.observers.values());
+    for (Observer<T> obs : observerList) {
+      obs.onError(this.reason);
     }
   }
 
