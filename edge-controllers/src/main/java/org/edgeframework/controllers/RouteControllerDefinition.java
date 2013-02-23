@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.edgeframework.controllers.test.TestController;
 import org.edgeframework.routing.HttpServerRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +31,8 @@ public class RouteControllerDefinition {
   }
 
   private static final Pattern SIGNATURE_REGEX = Pattern.compile("^(?<name>\\S+)\\((?<params>.*)\\)$");
+
+  private static final Map<String, Object> emptybody = Collections.emptyMap();
 
   private String method;
   private String route;
@@ -79,7 +80,7 @@ public class RouteControllerDefinition {
       Map<String, Object> params = request.getParams();
       Map<String, Object> query = request.getQuery();
       Map<String, Object> body = request.getBody();
-      body = (Map<String, Object>) (body != null ? body : Collections.emptyMap());
+      body = body != null ? body : RouteControllerDefinition.emptybody;
 
       args[0] = receiver;
       for (int i = 0; i < this.namedParameters.length; i++) {

@@ -4,7 +4,6 @@ import static org.vertx.testtools.VertxAssert.assertEquals;
 import static org.vertx.testtools.VertxAssert.fail;
 import static org.vertx.testtools.VertxAssert.testComplete;
 
-import org.edgeframework.core.util.org.edgeframework.routing.test.TestHttpClient;
 import org.edgeframework.promises.FailureHandler;
 import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.HttpServerRequest;
@@ -14,6 +13,7 @@ import org.edgeframework.routing.handler.ParamHandler;
 import org.edgeframework.routing.handler.RequestHandler;
 import org.edgeframework.routing.middleware.Assets;
 import org.edgeframework.routing.middleware.BodyParser;
+import org.edgeframework.testutils.TestHttpClient;
 import org.junit.Test;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;

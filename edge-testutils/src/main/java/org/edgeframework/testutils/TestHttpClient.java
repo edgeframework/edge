@@ -1,4 +1,4 @@
-package org.edgeframework.core.util.org.edgeframework.routing.test;
+package org.edgeframework.testutils;
 
 import org.edgeframework.promises.Promise;
 import org.slf4j.Logger;

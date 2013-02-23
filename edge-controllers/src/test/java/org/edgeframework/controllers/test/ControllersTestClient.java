@@ -5,8 +5,8 @@ import static org.vertx.testtools.VertxAssert.testComplete;
 
 import org.edgeframework.controllers.Controllers;
 import org.edgeframework.controllers.RouteControllerDefinition;
-import org.edgeframework.core.util.org.edgeframework.routing.test.TestHttpClient;
 import org.edgeframework.promises.PromiseHandler;
+import org.edgeframework.testutils.TestHttpClient;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

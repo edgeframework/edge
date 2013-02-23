@@ -48,7 +48,7 @@ dependencies {
 
   compile project(':edge-promises')
 
-  testCompile project(':edge-core')
+  testCompile project(':edge-testutils')
 }
 
 test {
