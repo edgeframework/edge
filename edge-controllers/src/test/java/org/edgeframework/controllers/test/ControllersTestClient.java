@@ -68,6 +68,7 @@ public class ControllersTestClient extends TestVerticle {
         });
   }
 
+  @Test
   public void testRenderResult() throws Exception {
     this.client
         .getPage("/testRenderResult")
@@ -82,6 +83,7 @@ public class ControllersTestClient extends TestVerticle {
         });
   }
 
+  @Test
   public void testJsonResult() throws Exception {
     this.client
         .getPage("/testJsonResult")
@@ -98,6 +100,7 @@ public class ControllersTestClient extends TestVerticle {
         });
   }
 
+  @Test
   public void testAsyncResult() throws Exception {
     this.client
         .getPage("/testAsyncResult")
@@ -112,6 +115,7 @@ public class ControllersTestClient extends TestVerticle {
         });
   }
 
+  @Test
   public void testRouteParams1() throws Exception {
     this.client
         .getPage("/testRouteParams/HelloWorld")
@@ -128,6 +132,7 @@ public class ControllersTestClient extends TestVerticle {
         });
   }
 
+  @Test
   public void testQueryString1() throws Exception {
     this.client
         .getPage("/testQueryString?echo=HelloWorld")
@@ -144,6 +149,7 @@ public class ControllersTestClient extends TestVerticle {
         });
   }
 
+  @Test
   public void testBodyString1() throws Exception {
     this.client
         .postPage("/testBodyString", "echo=HelloWorld")
