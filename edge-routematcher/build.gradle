@@ -60,4 +60,5 @@ test {
   exclude 'org/boo/**'
   */
 
+  workingDir = "$buildDir/resources/test"
 }
