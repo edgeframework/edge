@@ -1,5 +1,9 @@
 package org.edgeframework.eventbus.test;
 
+import static org.vertx.testtools.VertxAssert.assertEquals;
+import static org.vertx.testtools.VertxAssert.assertTrue;
+import static org.vertx.testtools.VertxAssert.testComplete;
+
 import org.edgeframework.eventbus.EventBus;
 import org.edgeframework.promises.PromiseHandler;
 import org.junit.Test;
@@ -7,8 +11,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
-
-import static org.vertx.testtools.VertxAssert.*;
 
 public class EventBusTestClient extends TestVerticle {
   private static final String REMOTE_NAMESPACE = "remote.namespace";

@@ -26,7 +26,7 @@ public class Assets extends RequestHandler {
     if (!file.isFile() || !file.exists()) {
       next();
     } else {
-      // TODO: getLogger().debug("Delivering Asset: " + file.getAbsolutePath());      
+      // TODO: getLogger().debug("Delivering Asset: " + file.getAbsolutePath());
       response.sendFile(test);
     }
   }

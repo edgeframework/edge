@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.SimpleHandler;
 import org.vertx.java.core.buffer.Buffer;
 
 public class HttpServerRequest {

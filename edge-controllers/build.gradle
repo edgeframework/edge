@@ -59,3 +59,40 @@ test {
 
   workingDir = "$buildDir/resources/test"
 }
+
+/*
+If you're uploading stuff to Maven, Gradle needs to generate a POM.
+Please edit the details below.
+ */
+def configurePom(def pom) {
+  pom.project {
+    description 'Play! style Controllers for Web Applications'
+    inceptionYear '2013'
+    packaging 'zip'
+    url 'http://edgeframework.org'
+
+    developers {
+      developer {
+        id 'darylteo'
+        name 'Daryl Teo'
+        email 'i.am@darylteo.com'
+      }
+    }
+
+    scm {
+      url 'http://github.com/edgeframework/edge'
+    }
+
+    licenses {
+      license {
+        name 'The Apache Software License, Version 2.0'
+        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        distribution 'repo'
+      }
+    }
+
+    properties {
+      setProperty('project.build.sourceEncoding', 'UTF8')
+    }
+  }
+}
