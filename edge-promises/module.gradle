@@ -28,7 +28,6 @@ def configurePom(def pom) {
   pom.project {
     description 'Play! style Controllers for Web Applications'
     inceptionYear '2013'
-    packaging 'zip'
     url 'http://edgeframework.org'
 
     developers {

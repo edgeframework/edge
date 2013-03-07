@@ -1,0 +1,15 @@
+import org.vertx.gradle.VertxPlugin
+
+buildscript {
+  repositories {
+    mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath "org.vertx:vertx-gradle-plugin:1.0.0-SNAPSHOT"
+  }
+}
+
+apply plugin: VertxPlugin
