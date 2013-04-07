@@ -1,6 +1,6 @@
 package org.edgeframework.testutils;
 
-import org.edgeframework.promises.Promise;
+import com.darylteo.rx.promises.Promise;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
@@ -74,9 +74,7 @@ public class TestHttpClient {
 
     @Override
     public void handle(HttpClientResponse response) {
-
       response.bodyHandler(new Handler<Buffer>() {
-
         @Override
         public void handle(Buffer buffer) {
           logger.debug(buffer.toString());
@@ -89,7 +87,6 @@ public class TestHttpClient {
   }
 
   private class StatusHandler implements Handler<HttpClientResponse> {
-
     public Promise<Integer> promise = Promise.defer();
 
     @Override

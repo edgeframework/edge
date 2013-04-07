@@ -7,8 +7,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.edgeframework.promises.Promise;
-import org.edgeframework.promises.PromiseHandler;
+import javax.management.RuntimeErrorException;
+
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.handler.RequestHandler;
@@ -25,11 +25,16 @@ import org.jboss.netty.handler.codec.http.multipart.DiskFileUpload;
 import org.jboss.netty.handler.codec.http.multipart.FileUpload;
 import org.jboss.netty.handler.codec.http.multipart.HttpDataFactory;
 import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
+import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder.IncompatibleDataDecoderException;
 import org.jboss.netty.handler.codec.http.multipart.HttpPostRequestDecoder.NotEnoughDataDecoderException;
 import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData;
 import org.jboss.netty.handler.codec.http.multipart.InterfaceHttpData.HttpDataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.darylteo.rx.promises.Promise;
+import com.darylteo.rx.promises.PromiseAction;
 
 public class BodyParser extends RequestHandler {
 
@@ -40,13 +45,16 @@ public class BodyParser extends RequestHandler {
     DiskAttribute.deleteOnExitTemporaryFile = true;
   }
 
-  private static final Logger logger = LoggerFactory.getLogger(BodyParser.class);
+  private static final Logger logger = LoggerFactory
+      .getLogger(BodyParser.class);
 
   // Disk if size exceed MINSIZE
-  private static final HttpDataFactory factory = new DefaultHttpDataFactory(false);
+  private static final HttpDataFactory factory = new DefaultHttpDataFactory(
+      false);
 
   @Override
-  public void handle(final HttpServerRequest request, final HttpServerResponse response) {
+  public void handle(final HttpServerRequest request,
+      final HttpServerResponse response) {
     try {
 
       if (!hasPostBody(request)) {
@@ -55,11 +63,10 @@ public class BodyParser extends RequestHandler {
       }
 
       parseBody(request)
-          .then(new PromiseHandler<Void, Void>() {
+          .then(new PromiseAction<Void>() {
             @Override
-            public Void handle(Void value) throws Exception {
+            public void call(Void value) {
               BodyParser.this.next();
-              return null;
             }
           });
 
@@ -84,7 +91,8 @@ public class BodyParser extends RequestHandler {
     }
 
     contentType = contentType.toLowerCase();
-    if (!contentType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED) &&
+    if (!contentType
+        .startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED) &&
         !contentType.startsWith(HttpHeaders.Values.MULTIPART_FORM_DATA)) {
       return false;
     }
@@ -94,28 +102,36 @@ public class BodyParser extends RequestHandler {
 
   private Promise<Void> parseBody(final HttpServerRequest request) {
     return request.getRawBody()
-        .then(new PromiseHandler<byte[], Void>() {
+        .then(new PromiseAction<byte[]>() {
           @Override
-          public Void handle(byte[] data) throws Exception {
+          public void call(byte[] data) {
             logger.debug("Post Body: " + new String(data));
 
             /* Create a dummy Netty Request with the body */
-            final org.vertx.java.core.http.HttpServerRequest vertxReq = request.getUnderlyingRequest();
-            final HttpRequest nettyReq = new DefaultHttpRequest(HttpVersion.HTTP_1_1, new HttpMethod(vertxReq.method), vertxReq.uri);
+            final org.vertx.java.core.http.HttpServerRequest vertxReq = request
+                .getUnderlyingRequest();
+            final HttpRequest nettyReq = new DefaultHttpRequest(
+                HttpVersion.HTTP_1_1, new HttpMethod(vertxReq.method),
+                vertxReq.uri);
 
             nettyReq.setChunked(false);
             nettyReq.setContent(ChannelBuffers.wrappedBuffer(data));
 
-            for (Map.Entry<String, String> header : vertxReq.headers().entrySet()) {
+            for (Map.Entry<String, String> header : vertxReq.headers()
+                .entrySet()) {
               nettyReq.addHeader(header.getKey(), header.getValue());
             }
 
-            DecoderParser decoder = new DecoderParser(new HttpPostRequestDecoder(BodyParser.factory, nettyReq));
+            DecoderParser decoder;
+            try {
+              decoder = new DecoderParser(
+                  new HttpPostRequestDecoder(BodyParser.factory, nettyReq));
+            } catch (Exception e) {
+              throw new RuntimeException(e);
+            }
 
             // putting it in data map
             request.getData().put("body", decoder.body);
-
-            return null;
           }
         });
 
@@ -125,7 +141,8 @@ public class BodyParser extends RequestHandler {
     public Map<String, Object> body = new HashMap<>();
     public Map<String, Object> files = new HashMap<>();
 
-    public DecoderParser(HttpPostRequestDecoder decoder) throws NotEnoughDataDecoderException, IOException {
+    public DecoderParser(HttpPostRequestDecoder decoder)
+        throws NotEnoughDataDecoderException, IOException {
 
       for (InterfaceHttpData data : decoder.getBodyHttpDatas()) {
         HttpDataType type = data.getHttpDataType();
@@ -147,7 +164,8 @@ public class BodyParser extends RequestHandler {
     }
 
     private void parseAttribute(Attribute attr) throws IOException {
-      logger.debug(String.format("Attribute Found: %s = %s", attr.getName(), attr.getValue()));
+      logger.debug(String.format("Attribute Found: %s = %s", attr.getName(),
+          attr.getValue()));
       addField(attr.getName(), attr.getValue(), this.body);
     }
 

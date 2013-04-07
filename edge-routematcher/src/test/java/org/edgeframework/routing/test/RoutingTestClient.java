@@ -4,8 +4,6 @@ import static org.vertx.testtools.VertxAssert.assertEquals;
 import static org.vertx.testtools.VertxAssert.fail;
 import static org.vertx.testtools.VertxAssert.testComplete;
 
-import org.edgeframework.promises.FailureHandler;
-import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.edgeframework.routing.RouteMatcher;
@@ -14,22 +12,28 @@ import org.edgeframework.routing.handler.RequestHandler;
 import org.edgeframework.routing.middleware.Assets;
 import org.edgeframework.routing.middleware.BodyParser;
 import org.edgeframework.testutils.TestHttpClient;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
+import com.darylteo.rx.promises.PromiseAction;
+
 public class RoutingTestClient extends TestVerticle {
 
   private TestHttpClient client;
+  private HttpServer server;
 
   private static final String HOSTNAME = "localhost";
   private static final int PORT = 8080;
 
   @Override
   public void start() {
+    System.out.println("Executing test on " + this);
     this.client = new TestHttpClient(vertx, HOSTNAME, PORT);
-    createApplication();
+    this.server = createApplication();
 
     super.start();
   }
@@ -37,11 +41,14 @@ public class RoutingTestClient extends TestVerticle {
   @Override
   public void stop() throws Exception {
     this.client.close();
+    this.client = null;
+    this.server.close();
+    this.server = null;
 
     super.stop();
   }
 
-  private void createApplication() {
+  private HttpServer createApplication() {
     RouteMatcher routematcher = new RouteMatcher();
 
     routematcher
@@ -62,8 +69,7 @@ public class RoutingTestClient extends TestVerticle {
         }, new RequestHandler() {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
-            JsonObject context = new JsonObject()
-                .putString("echo", (String) request.getData().get("echo"));
+            JsonObject context = new JsonObject().putString("echo", (String) request.getData().get("echo"));
 
             response.render("basic", context);
           }
@@ -87,14 +93,12 @@ public class RoutingTestClient extends TestVerticle {
         .get("/param-test1/:echo", new RequestHandler() {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
-
             String echo = (String) request.getParams().get("echo");
 
             // Does not exist, funnel through
             if (echo.equals("does-not-exist")) {
               next();
             } else {
-
               JsonObject context = new JsonObject()
                   .putString("echo", echo);
 
@@ -108,8 +112,7 @@ public class RoutingTestClient extends TestVerticle {
         .get("/param-test2/:param", new RequestHandler() {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
-            JsonObject context = new JsonObject()
-                .putString("echo", (String) request.getData().get("data"));
+            JsonObject context = new JsonObject().putString("echo", (String) request.getData().get("data"));
 
             response.render("basic", context);
           }
@@ -125,21 +128,17 @@ public class RoutingTestClient extends TestVerticle {
         .post("/post-test", new RequestHandler() {
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
-            JsonObject context = new JsonObject()
-                .putString("echo", (String) request.getBody().get("data"));
+            JsonObject context = new JsonObject().putString("echo", (String) request.getBody().get("data"));
 
             response.render("basic", context);
           }
         })
-
         .all("*", new RequestHandler() {
-
           @Override
           public void handle(HttpServerRequest request, HttpServerResponse response) throws Exception {
             response.status(404);
             response.send("");
           }
-
         })
 
         .use(new Assets("public"))
@@ -148,22 +147,20 @@ public class RoutingTestClient extends TestVerticle {
     HttpServer server = vertx.createHttpServer();
     server.requestHandler(routematcher);
     server.listen(PORT, HOSTNAME);
+
+    return server;
   }
 
   @Test
   public void testBasicRoute1() throws Exception {
     this.client
         .getPageStatus("/basic-test")
-        .then(new PromiseHandler<Integer, Void>() {
-
+        .then(new PromiseAction<Integer>() {
           @Override
-          public Void handle(Integer value) {
+          public void call(Integer value) {
             assertEquals("Value not retrieved", value.intValue(), 200);
-
             testComplete();
-            return null;
           }
-
         });
   }
 
@@ -171,16 +168,12 @@ public class RoutingTestClient extends TestVerticle {
   public void testBasicRoute2() throws Exception {
     this.client
         .getPage("/basic-test")
-        .then(new PromiseHandler<String, Void>() {
-
+        .then(new PromiseAction<String>() {
           @Override
-          public Void handle(String value) {
+          public void call(String value) {
             assertEquals("Value not retrieved", "Hello World", value);
-
             testComplete();
-            return null;
           }
-
         });
   }
 
@@ -188,16 +181,12 @@ public class RoutingTestClient extends TestVerticle {
   public void testMultipleHandlers1() throws Exception {
     this.client
         .getPage("/multiple-handlers-test")
-        .then(new PromiseHandler<String, Void>() {
-
+        .then(new PromiseAction<String>() {
           @Override
-          public Void handle(String value) {
+          public void call(String value) {
             assertEquals("Did not successfully call multiple handlers", "Hello World", value);
-
             testComplete();
-            return null;
           }
-
         });
   }
 
@@ -211,25 +200,20 @@ public class RoutingTestClient extends TestVerticle {
     this.client
         .postPage("/post-test", "data=Hello%20World")
         .then(
-            new PromiseHandler<String, Void>() {
-
+            new PromiseAction<String>() {
               @Override
-              public Void handle(String value) {
+              public void call(String value) {
                 assertEquals("Post data not passed", "Hello World", value);
-
                 testComplete();
-                return null;
               }
 
             },
-            new FailureHandler<Void>() {
-
+            new PromiseAction<Exception>() {
               @Override
-              public Void handle(Exception e) {
+              public void call(Exception e) {
                 e.printStackTrace();
                 fail(e.getMessage());
                 testComplete();
-                return null;
               }
             }
         );
@@ -239,16 +223,12 @@ public class RoutingTestClient extends TestVerticle {
   public void test404_1() throws Exception {
     this.client
         .getPageStatus("/does-not-exist")
-        .then(new PromiseHandler<Integer, Void>() {
-
+        .then(new PromiseAction<Integer>() {
           @Override
-          public Void handle(Integer value) {
+          public void call(Integer value) {
             assertEquals("404 error not given", value.intValue(), 404);
-
             testComplete();
-            return null;
           }
-
         });
   }
 
@@ -256,14 +236,11 @@ public class RoutingTestClient extends TestVerticle {
   public void test404_2() throws Exception {
     this.client
         .postPageStatus("/does-not-exist", "Hello World")
-        .then(new PromiseHandler<Integer, Void>() {
-
+        .then(new PromiseAction<Integer>() {
           @Override
-          public Void handle(Integer value) {
+          public void call(Integer value) {
             assertEquals("404 error not given", value.intValue(), 404);
-
             testComplete();
-            return null;
           }
 
         });
@@ -273,16 +250,12 @@ public class RoutingTestClient extends TestVerticle {
   public void test404_3() throws Exception {
     this.client
         .getPageStatus("echo/does-not-exist")
-        .then(new PromiseHandler<Integer, Void>() {
-
+        .then(new PromiseAction<Integer>() {
           @Override
-          public Void handle(Integer value) {
+          public void call(Integer value) {
             assertEquals("404 error not given", value.intValue(), 404);
-
             testComplete();
-            return null;
           }
-
         });
   }
 
@@ -290,16 +263,12 @@ public class RoutingTestClient extends TestVerticle {
   public void testRouteParams1() throws Exception {
     this.client
         .getPage("/param-test1/HelloWorld")
-        .then(new PromiseHandler<String, Void>() {
-
+        .then(new PromiseAction<String>() {
           @Override
-          public Void handle(String value) {
+          public void call(String value) {
             assertEquals("Route Param not filled", "HelloWorld", value);
-
             testComplete();
-            return null;
           }
-
         });
   }
 
@@ -307,16 +276,12 @@ public class RoutingTestClient extends TestVerticle {
   public void testRouteParams2() throws Exception {
     this.client
         .getPage("/param-test2/HelloWorld")
-        .then(new PromiseHandler<String, Void>() {
-
+        .then(new PromiseAction<String>() {
           @Override
-          public Void handle(String value) {
+          public void call(String value) {
             assertEquals(value, "HELLOWORLD", value);
-
             testComplete();
-            return null;
           }
-
         });
   }
 }

@@ -6,8 +6,7 @@ dependencies {
   testCompile "com.foo:foo-lib:1.0.1" - for test time deps
   provided "com.foo:foo-lib:1.0.1" - if you DON'T want it to be packaged in the module zip
    */
-
-  compile "com.netflix.rxjava:rxjava-core:0.5.0"
+  compile 'com.darylteo:rxjava-promises:1.0.0-ALPHA1-SNAPSHOT'
 }
 
 test {

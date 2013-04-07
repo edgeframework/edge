@@ -4,9 +4,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.edgeframework.promises.Promise;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
+
+import com.darylteo.rx.promises.Promise;
 
 public class HttpServerRequest {
   private final org.vertx.java.core.http.HttpServerRequest request;

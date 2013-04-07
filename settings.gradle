@@ -1,5 +1,3 @@
 include	'edge-routematcher',
-	'edge-promises',
 	'edge-controllers',
-	'edge-eventbus',
   'edge-testutils'

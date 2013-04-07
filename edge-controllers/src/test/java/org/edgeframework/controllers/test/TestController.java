@@ -2,12 +2,13 @@ package org.edgeframework.controllers.test;
 
 import org.edgeframework.controllers.Controller;
 import org.edgeframework.controllers.Result;
-import org.edgeframework.promises.Promise;
-import org.edgeframework.promises.PromiseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
+
+import com.darylteo.rx.promises.Promise;
+import com.darylteo.rx.promises.PromiseFunction;
 
 public class TestController extends Controller {
 
@@ -41,9 +42,9 @@ public class TestController extends Controller {
     });
 
     Promise<Result> result = promise.then(
-        new PromiseHandler<String, Result>() {
+        new PromiseFunction<String, Result>() {
           @Override
-          public Result handle(String value) {
+          public Result call(String value) {
             return ok(value);
           }
         }

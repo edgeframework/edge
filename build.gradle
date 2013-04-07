@@ -1,14 +1,14 @@
-import org.vertx.gradle.VertxPlugin
+import com.darylteo.gradle.vertx.VertxPlugin
 
 buildscript {
   repositories {
     mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
-    mavenLocal()
+    maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } // for vertx core
   }
 
   dependencies {
-    classpath "org.vertx:vertx-gradle-plugin:1.0.0-SNAPSHOT"
+    classpath "com.darylteo:vertx-gradle-plugin:1.0.0-ALPHA2"
   }
 }
 

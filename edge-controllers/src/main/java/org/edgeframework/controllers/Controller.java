@@ -2,12 +2,13 @@ package org.edgeframework.controllers;
 
 import java.util.Map;
 
-import org.edgeframework.promises.Promise;
-import org.edgeframework.promises.PromiseHandler;
 import org.edgeframework.routing.HttpServerRequest;
 import org.edgeframework.routing.HttpServerResponse;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
+
+import com.darylteo.rx.promises.Promise;
+import com.darylteo.rx.promises.PromiseAction;
 
 public abstract class Controller {
 
@@ -98,16 +99,16 @@ public abstract class Controller {
   public static Result async(final Promise<Result> promise) {
     return new Result() {
       @Override
-      protected void perform(final HttpServerResponse response) throws Exception {
-        promise.then(new PromiseHandler<Result, Void>() {
+      protected void perform(final HttpServerResponse response)
+          throws Exception {
+        promise.then(new PromiseAction<Result>() {
           @Override
-          public Void handle(Result result) {
+          public void call(Result result) {
             try {
               result.perform(response);
             } catch (Exception e) {
               // TODO: Exception
             }
-            return null;
           }
         });
       }

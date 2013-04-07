@@ -10,7 +10,7 @@ dependencies {
   compile 'io.netty:netty:3.6.2.Final'
   compile 'com.github.jknack:handlebars:0.8.0'
 
-  compile project(':edge-promises')
+  modules vertxModule('com.darylteo~vertx-promises~1.0.0-ALPHA1-SNAPSHOT')
 
   testCompile project(':edge-testutils')
 }
@@ -35,7 +35,6 @@ def configurePom(def pom) {
   pom.project {
     description 'Play! style Controllers for Web Applications'
     inceptionYear '2013'
-    packaging 'zip'
     url 'http://edgeframework.org'
 
     developers {
