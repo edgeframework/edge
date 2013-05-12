@@ -2,14 +2,19 @@ import com.darylteo.gradle.vertx.VertxPlugin
 
 buildscript {
   repositories {
+    mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } // for vertx core
   }
 
   dependencies {
-    classpath "com.darylteo:vertx-gradle-plugin:1.0.0-ALPHA2"
+    classpath "com.darylteo:vertx-gradle-plugin:1.0.0-ALPHA4-SNAPSHOT"
   }
 }
 
 apply plugin: VertxPlugin
+
+dependencies {
+  modules vertxModule('com.darylteo~vertx-deployer~1.0.0-ALPHA1-SNAPSHOT')
+}
