@@ -16,5 +16,11 @@ buildscript {
 apply plugin: VertxPlugin
 
 dependencies {
-  modules vertxModule('com.darylteo~vertx-deployer~1.0.0-ALPHA1-SNAPSHOT')
+  modules vertxModule('com.darylteo~vertx-promises~1.0.0-ALPHA1-SNAPSHOT')
+}
+
+subprojects {
+  dependencies {
+		compile rootProject
+  }
 }
