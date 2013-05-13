@@ -13,7 +13,9 @@ import com.darylteo.rx.promises.PromiseAction;
 
 public abstract class StaticFace extends Face {
 
-  private Path basePath;
+  private Path basePath = Paths.get("");
+  private String host = "localhost";
+  private int port = 8080;
 
   public StaticFace(String name) {
     super(name);
@@ -42,7 +44,7 @@ public abstract class StaticFace extends Face {
             .then(new SendFileAction(event.response(), requested));
       }
     })
-        .listen(8080);
+        .listen(this.port, this.host);
   }
 
   @Override
@@ -94,6 +96,22 @@ public abstract class StaticFace extends Face {
 
   public Path getBasePath() {
     return this.basePath;
+  }
+
+  public int getPort() {
+    return port;
+  }
+
+  public void setPort(int port) {
+    this.port = port;
+  }
+
+  public String getHost() {
+    return host;
+  }
+
+  public void setHost(String host) {
+    this.host = host;
   }
 
 }
