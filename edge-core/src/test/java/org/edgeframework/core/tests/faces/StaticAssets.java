@@ -1,4 +1,4 @@
-package org.edgeframework.core.tests;
+package org.edgeframework.core.tests.faces;
 
 import org.edgeframework.core.faces.StaticFace;
 
@@ -8,5 +8,4 @@ public class StaticAssets extends StaticFace {
 
     this.setBasePath("assets");
   }
-
 }

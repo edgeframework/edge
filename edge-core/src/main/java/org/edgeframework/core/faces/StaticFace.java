@@ -29,14 +29,14 @@ public abstract class StaticFace extends Face {
       @Override
       public void handle(HttpServerRequest event) {
         String requested = event.path();
-        requested = requested.substring(1);
-
         if (requested.contains("..")) {
-          // 500
+          event.response().setStatusCode(500);
+          event.response().setStatusMessage("Invalid path");
+          event.response().end();
           return;
         }
 
-        System.out.println(basePath);
+        requested = requested.substring(1);
         requested = basePath.resolve(requested).toString();
         System.out.println("Requested a file: " + requested);
 
