@@ -1,6 +1,7 @@
 package org.edgeframework.core.faces;
 
 import org.vertx.java.core.Handler;
+
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
@@ -23,6 +24,7 @@ public abstract class ControllerFace extends AbstractFace {
         result.render(event.response());
       }
     });
+    
   }
 
   public Result ok(final String content) {

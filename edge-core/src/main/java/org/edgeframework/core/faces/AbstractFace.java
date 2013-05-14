@@ -3,6 +3,8 @@ package org.edgeframework.core.faces;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.platform.Verticle;
 
+import com.jetdrone.vertx.yoke.Yoke;
+
 public abstract class AbstractFace extends Verticle {
   private String name;
 
@@ -23,6 +25,8 @@ public abstract class AbstractFace extends Verticle {
     container.logger().info("Server Configuration");
     configureServer(server);
     server.listen(port, host);
+
+    Yoke yoke = new Yoke(vertx);
   }
 
   abstract void configureServer(HttpServer server);

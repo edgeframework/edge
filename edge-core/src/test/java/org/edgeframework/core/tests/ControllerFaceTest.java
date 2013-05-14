@@ -3,10 +3,6 @@ package org.edgeframework.core.tests;
 import org.edgeframework.core.tests.faces.AdminController;
 import org.edgeframework.core.tests.util.AbstractFaceTest;
 import org.junit.Test;
-import org.vertx.testtools.VertxAssert;
-
-import com.darylteo.rx.promises.FinallyAction;
-import com.darylteo.rx.promises.PromiseAction;
 
 public class ControllerFaceTest extends AbstractFaceTest {
   @Test
