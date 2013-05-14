@@ -36,7 +36,6 @@ public class AbstractFaceTest extends TestVerticle {
     return new RepromiseFunction<String, Void>() {
       @Override
       public Promise<Void> call(String deployID) {
-        System.out.println(expected);
         return getUrl(host, port, path)
           .then(new RepromiseFunction<HttpClientResponse, String>() {
             @Override

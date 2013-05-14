@@ -12,12 +12,4 @@ public class StaticFaceTest extends AbstractFaceTest {
       .fail(onFailure())
       .fin(onComplete());
   }
-
-  @Test
-  public void testValidPath() {
-    deployVerticle(StaticAssets.class.getCanonicalName())
-      .then(testStatus("localhost", 8080, "/../test.html", 500))
-      .fail(onFailure())
-      .fin(onComplete());
-  }
 }

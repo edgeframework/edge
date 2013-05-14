@@ -20,16 +20,13 @@ public abstract class AbstractFace extends Verticle {
 
   @Override
   public void start() {
-    /* Create web server */
-    server = vertx.createHttpServer();
-    container.logger().info("Server Configuration");
-    configureServer(server);
-    server.listen(port, host);
-
+    /* Create YOKE */
     Yoke yoke = new Yoke(vertx);
+    configure(yoke);
+    yoke.listen(port, host);
   }
 
-  abstract void configureServer(HttpServer server);
+  abstract void configure(Yoke yoke);
 
   /* Accessors */
   public String getName() {

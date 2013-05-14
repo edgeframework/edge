@@ -1,10 +1,11 @@
 package org.edgeframework.core.faces;
 
 import org.vertx.java.core.Handler;
-
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+
+import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.middleware.Router;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 
 public abstract class ControllerFace extends AbstractFace {
   public ControllerFace(String name, String host, int port) {
@@ -12,19 +13,19 @@ public abstract class ControllerFace extends AbstractFace {
   }
 
   @Override
-  void configureServer(HttpServer server) {
-    server.requestHandler(new Handler<HttpServerRequest>() {
+  void configure(Yoke yoke) {
+    Router router = new Router();
+    router.get("/index", new Handler<YokeRequest>() {
       @Override
-      public void handle(HttpServerRequest event) {
+      public void handle(YokeRequest request) {
+        String query = request.getParams().get("query");
 
-        String path = event.path();
-        event.query();
-
-        Result result = ok("index");
-        result.render(event.response());
+        query = query == null ? "index" : query;
+        request.response().end(query);
       }
     });
-    
+
+    yoke.use(router);
   }
 
   public Result ok(final String content) {
