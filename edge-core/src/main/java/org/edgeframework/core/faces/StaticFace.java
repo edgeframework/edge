@@ -5,27 +5,23 @@ import java.nio.file.Paths;
 
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 
 import com.darylteo.rx.promises.Promise;
 import com.darylteo.rx.promises.PromiseAction;
 
-public abstract class StaticFace extends Face {
-
+public abstract class StaticFace extends AbstractFace {
   private Path basePath = Paths.get("");
-  private String host = "localhost";
-  private int port = 8080;
 
-  public StaticFace(String name) {
-    super(name);
+  public StaticFace(String name, String host, int port) {
+    super(name, host, port);
   }
 
   @Override
-  public void start() {
-    super.start();
-
-    vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
+  void configureServer(HttpServer server) {
+    server.requestHandler(new Handler<HttpServerRequest>() {
       @Override
       public void handle(HttpServerRequest event) {
         String requested = event.path();
@@ -38,18 +34,12 @@ public abstract class StaticFace extends Face {
 
         requested = requested.substring(1);
         requested = basePath.resolve(requested).toString();
-        System.out.println("Requested a file: " + requested);
+        container.logger().debug("Requested a file: " + requested);
 
         checkFileExists(requested)
-            .then(new SendFileAction(event.response(), requested));
+          .then(new SendFileAction(event.response(), requested));
       }
-    })
-        .listen(this.port, this.host);
-  }
-
-  @Override
-  public void stop() {
-    super.stop();
+    });
   }
 
   private Promise<Boolean> checkFileExists(String path) {
@@ -96,22 +86,6 @@ public abstract class StaticFace extends Face {
 
   public Path getBasePath() {
     return this.basePath;
-  }
-
-  public int getPort() {
-    return port;
-  }
-
-  public void setPort(int port) {
-    this.port = port;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
   }
 
 }

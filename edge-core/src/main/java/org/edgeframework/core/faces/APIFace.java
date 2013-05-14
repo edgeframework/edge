@@ -1,7 +1,7 @@
 package org.edgeframework.core.faces;
 
-public class APIFace extends Face {
-  public APIFace(String name) {
-    super(name);
+public abstract class APIFace extends AbstractFace {
+  public APIFace(String name, String host, int port) {
+    super(name, host, port);
   }
 }
