@@ -9,6 +9,7 @@ import org.vertx.java.core.Handler;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 
 public abstract class ControllerFace extends AbstractFace {
   private String routesPath = "";
@@ -31,6 +32,7 @@ public abstract class ControllerFace extends AbstractFace {
     Handler<YokeRequest> handler = new Handler<YokeRequest>() {
       @Override
       public void handle(YokeRequest request) {
+        YokeResponse response = request.response();
         try {
           Controller receiver = controller.newInstance();
 
@@ -41,9 +43,10 @@ public abstract class ControllerFace extends AbstractFace {
           Controller.Result result = (Controller.Result) handle.invoke(receiver);
 
           /* Render result to response */
-          result.render(request.response());
+          result.render(response);
         } catch (Throwable e) {
-          // TODO Auto-generated catch block
+          response.setStatusCode(500);
+          response.setStatusMessage(e.getMessage());
           e.printStackTrace();
         }
       }
