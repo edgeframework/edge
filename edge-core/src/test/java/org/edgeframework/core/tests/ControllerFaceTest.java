@@ -67,6 +67,25 @@ public class ControllerFaceTest extends AbstractFaceTest {
       .fail(onFailure())
       .fin(onComplete());
 
+    promise
+      .then(testContents("localhost", 8081, "/types/float/3.333333", "3.33"))
+      .fail(onFailure())
+      .fin(onComplete());
+
+    promise
+      .then(testContents("localhost", 8081, "/types/double/3.333333", "3.33"))
+      .fail(onFailure())
+      .fin(onComplete());
+
+    promise
+    .then(testContents("localhost", 8081, "/types/date/2012-01-01", "Sun Jan 01 00:01:00 EST 2012"))
+    .fail(onFailure())
+    .fin(onComplete());
+
+    promise
+      .then(testContents("localhost", 8081, "/types/timestamp/1325376000", "Sun Jan 01 00:01:00 EST 2012"))
+      .fail(onFailure())
+      .fin(onComplete());
   }
 
   private Promise<String> deploy() {

@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,9 +17,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.edgeframework.core.faces.Controller.Result;
+import org.edgeframework.core.faces.Controller.TypeConverter;
 import org.vertx.java.core.Handler;
-
-import rx.util.functions.Func1;
 
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Router;
@@ -47,59 +48,53 @@ public abstract class ControllerFace extends AbstractFace {
   }
 
   private void setupParameters() {
-    paramTypes.put("", String.class);
-    paramTypes.put("string", String.class);
-    paramTypes.put("int", int.class);
-    paramTypes.put("long", long.class);
-    paramTypes.put("byte", byte.class);
-    paramTypes.put("short", short.class);
-    paramTypes.put("double", double.class);
-    paramTypes.put("float", float.class);
-    paramTypes.put("boolean", boolean.class);
+    // default string types
+    addConverter("", String.class, null);
+    addConverter("string", String.class, null);
 
-    paramConversions.put(byte.class, new TypeConverter() {
+    addConverter("byte", byte.class, new TypeConverter() {
       @Override
       public Object call(String value) {
         return Byte.parseByte(value);
       }
     });
 
-    paramConversions.put(short.class, new TypeConverter() {
+    addConverter("short", short.class, new TypeConverter() {
       @Override
       public Object call(String value) {
         return Short.parseShort(value);
       }
     });
 
-    paramConversions.put(int.class, new TypeConverter() {
+    addConverter("int", int.class, new TypeConverter() {
       @Override
       public Object call(String value) {
         return Integer.parseInt(value);
       }
     });
 
-    paramConversions.put(long.class, new TypeConverter() {
+    addConverter("long", long.class, new TypeConverter() {
       @Override
       public Object call(String value) {
         return Long.parseLong(value);
       }
     });
 
-    paramConversions.put(float.class, new TypeConverter() {
+    addConverter("float", float.class, new TypeConverter() {
       @Override
       public Object call(String value) {
         return Float.parseFloat(value);
       }
     });
 
-    paramConversions.put(double.class, new TypeConverter() {
+    addConverter("double", double.class, new TypeConverter() {
       @Override
       public Object call(String value) {
         return Double.parseDouble(value);
       }
     });
 
-    paramConversions.put(Date.class, new TypeConverter() {
+    addConverter("date", Date.class, new TypeConverter() {
       @Override
       public Object call(String value) {
         // attempt to parse long
@@ -155,7 +150,7 @@ public abstract class ControllerFace extends AbstractFace {
 
     final MethodHandle handle = MethodHandles
       .publicLookup()
-      .findVirtual(controller, actionName, MethodType.methodType(Controller.Result.class, new ArrayList<>(captures.values())
+      .findVirtual(controller, actionName, MethodType.methodType(Result.class, new ArrayList<>(captures.values())
         )
       );
 
@@ -186,7 +181,7 @@ public abstract class ControllerFace extends AbstractFace {
           }
 
           /* Invoke Receiver, receive result */
-          Controller.Result result = (Controller.Result) handle.invokeWithArguments(args);
+          Result result = (Result) handle.invokeWithArguments(args);
 
           /* Render result to response */
           result.render(response);
@@ -205,6 +200,8 @@ public abstract class ControllerFace extends AbstractFace {
     return routesPath;
   }
 
-  private interface TypeConverter extends Func1<String, Object> {
+  public void addConverter(String name, Class<?> type, TypeConverter converter) {
+    this.paramTypes.put(name, type);
+    this.paramConversions.put(type, converter);
   }
 }

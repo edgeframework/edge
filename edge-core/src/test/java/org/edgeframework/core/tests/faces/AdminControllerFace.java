@@ -19,5 +19,7 @@ public class AdminControllerFace extends ControllerFace {
     register(AdminController.class, "GET", "/types/long/:value", "datatype(value: long)");
     register(AdminController.class, "GET", "/types/float/:value", "datatype(value: float)");
     register(AdminController.class, "GET", "/types/double/:value", "datatype(value: double)");
+    register(AdminController.class, "GET", "/types/timestamp/:value", "datatype(value: date)");
+    register(AdminController.class, "GET", "/types/date/:value", "datatype(value: date)");
   }
 }

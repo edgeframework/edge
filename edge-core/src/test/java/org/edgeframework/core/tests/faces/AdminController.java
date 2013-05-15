@@ -1,5 +1,7 @@
 package org.edgeframework.core.tests.faces;
 
+import java.util.Date;
+
 import org.edgeframework.core.faces.Controller;
 
 public class AdminController extends Controller {
@@ -44,11 +46,14 @@ public class AdminController extends Controller {
   }
 
   public Result datatype(float value) {
-    return ok("" + value);
+    return ok(String.format("%f.2", value));
   }
 
   public Result datatype(double value) {
-    return ok("" + value);
+    return ok(String.format("%f.2", value));
   }
 
+  public Result datatype(Date value) {
+    return ok(value.toString());
+  }
 }
