@@ -7,10 +7,18 @@ public class AdminController extends Controller {
   }
 
   public Result index() {
-    if (request().params().contains("query")) {
-      return ok(request().params().get("query"));
-    }
-
     return ok("index");
+  }
+
+  public Result index(String query) {
+    return ok(query);
+  }
+
+  public Result index(String query, String subquery) {
+    return ok(query + ":" + subquery);
+  }
+
+  public Result index(String query, String subquery, String test) {
+    return ok(query + ":" + subquery + ":" + test);
   }
 }

@@ -28,6 +28,7 @@ public class RoutedControllerMain {
           if (event.succeeded()) {
             System.out.println("Server Up: " + event.result());
           } else {
+            event.cause().printStackTrace();
             System.out.println("Server down: " + event.cause());
           }
         }
