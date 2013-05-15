@@ -6,7 +6,7 @@ public class AdminController extends Controller {
   public AdminController() {
   }
 
-  public Result index() {
+  public Result echo() {
     String echo = "index";
     if (request().params().contains("get")) {
       echo = request().params().get("get");
@@ -15,15 +15,40 @@ public class AdminController extends Controller {
     return ok(echo);
   }
 
-  public Result index(String query) {
+  public Result mapping(String query) {
     return ok(query);
   }
 
-  public Result index(String query, String subquery) {
+  public Result mapping(String query, String subquery) {
     return ok(query + ":" + subquery);
   }
 
-  public Result index(String query, String subquery, String test) {
+  public Result mapping(String query, String subquery, String test) {
     return ok(query + ":" + subquery + ":" + test);
   }
+
+  public Result datatype(byte value) {
+    return ok("" + value);
+  }
+
+  public Result datatype(short value) {
+    return ok("" + value);
+  }
+
+  public Result datatype(int value) {
+    return ok("" + value);
+  }
+
+  public Result datatype(long value) {
+    return ok("" + value);
+  }
+
+  public Result datatype(float value) {
+    return ok("" + value);
+  }
+
+  public Result datatype(double value) {
+    return ok("" + value);
+  }
+
 }
