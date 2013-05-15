@@ -7,7 +7,12 @@ public class AdminController extends Controller {
   }
 
   public Result index() {
-    return ok("index");
+    String echo = "index";
+    if (request().params().contains("get")) {
+      echo = request().params().get("get");
+    }
+
+    return ok(echo);
   }
 
   public Result index(String query) {
