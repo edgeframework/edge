@@ -1,6 +1,6 @@
 package org.edgeframework.core.tests.faces;
 
-import org.edgeframework.core.faces.ControllerFace;
+import org.edgeframework.core.faces.controller.ControllerFace;
 
 public class AdminControllerFace extends ControllerFace {
   public AdminControllerFace() throws Exception {
@@ -21,5 +21,8 @@ public class AdminControllerFace extends ControllerFace {
     register(AdminController.class, "GET", "/types/double/:value", "datatype(value: double)");
     register(AdminController.class, "GET", "/types/timestamp/:value", "datatype(value: date)");
     register(AdminController.class, "GET", "/types/date/:value", "datatype(value: date)");
+
+    register(AdminController.class, "GET", "/types/fallthrough/:value", "fallthrough(value: int)");
+    register(AdminController.class, "GET", "/types/fallthrough/:value", "fallthrough(value: string)");
   }
 }

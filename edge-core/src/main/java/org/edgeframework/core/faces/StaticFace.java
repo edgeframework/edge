@@ -11,7 +11,7 @@ public abstract class StaticFace extends AbstractFace {
   }
 
   @Override
-  void configure(Yoke yoke) {
+  public void configure(Yoke yoke) {
     yoke.use(new Static(basePath));
   }
 

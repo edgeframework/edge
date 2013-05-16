@@ -26,7 +26,7 @@ public abstract class AbstractFace extends Verticle {
     yoke.listen(port, host);
   }
 
-  abstract void configure(Yoke yoke);
+  public abstract void configure(Yoke yoke);
 
   /* Accessors */
   public String getName() {

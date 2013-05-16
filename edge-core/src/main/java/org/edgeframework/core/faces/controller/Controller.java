@@ -1,6 +1,4 @@
-package org.edgeframework.core.faces;
-
-import rx.util.functions.Func1;
+package org.edgeframework.core.faces.controller;
 
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
@@ -12,11 +10,9 @@ public abstract class Controller {
     this.request = request;
   }
 
+  /* Util Classes */
   protected abstract class Result {
     public abstract void render(YokeResponse response);
-  }
-
-  protected interface TypeConverter extends Func1<String, Object> {
   }
 
   /* Properties */
