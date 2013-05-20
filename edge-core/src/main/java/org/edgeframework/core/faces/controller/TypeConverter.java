@@ -11,7 +11,7 @@ import rx.util.functions.Func1;
 
 public class TypeConverter {
   private Map<String, Class<?>> namesToType = new HashMap<>();
-  private Map<Class<?>, Func1<String, Object>> typeToConverter = new HashMap<>();
+  private Map<Class<?>, Func1<String, ? extends Object>> typeToConverter = new HashMap<>();
 
   public TypeConverter() {
     // default string types
@@ -71,8 +71,7 @@ public class TypeConverter {
       public Object call(String value) {
         // attempt to parse long
         try {
-          Long longResult = Long.parseLong(value);
-          return new Date(longResult);
+          return new Date(Long.parseLong(value));
         } catch (NumberFormatException e) {
         }
 
@@ -87,7 +86,7 @@ public class TypeConverter {
     });
   }
 
-  public void addConverter(String name, Class<?> type, Func1<String, Object> converter) {
+  public void addConverter(String name, Class<?> type, Func1<String, ? extends Object> converter) {
     this.namesToType.put(name, type);
     this.typeToConverter.put(type, converter);
   }
@@ -114,7 +113,7 @@ public class TypeConverter {
     return this.namesToType.get(name);
   }
 
-  public Func1<String, Object> getConverter(Class<?> type) {
+  public Func1<String, ? extends Object> getConverter(Class<?> type) {
     return this.typeToConverter.get(type);
   }
 }

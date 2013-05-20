@@ -11,7 +11,7 @@ import com.jetdrone.vertx.yoke.middleware.YokeRequest;
  * @author dteo
  * 
  */
-public class ActionMiddleware extends Middleware {
+class ActionMiddleware extends Middleware {
   private final RequestAction action;
 
   public ActionMiddleware(RequestAction action) {

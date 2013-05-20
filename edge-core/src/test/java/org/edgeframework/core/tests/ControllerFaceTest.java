@@ -45,45 +45,16 @@ public class ControllerFaceTest extends AbstractFaceTest {
 
   @Test
   public void testGetWithUrlParamDatatypes() {
-    Promise<String> promise = deploy();
-
-    promise
-      .then(testContents("localhost", 8081, "/types/byte/5", "5"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
-      .then(testContents("localhost", 8081, "/types/short/50", "50"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
-      .then(testContents("localhost", 8081, "/types/int/500", "500"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
-      .then(testContents("localhost", 8081, "/types/long/5000", "5000"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
-      .then(testContents("localhost", 8081, "/types/float/3.333333", "3.33"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
-      .then(testContents("localhost", 8081, "/types/double/3.333333", "3.33"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
-      .then(testContents("localhost", 8081, "/types/date/2012-01-01", "Sun Jan 01 00:01:00 EST 2012"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
-      .then(testContents("localhost", 8081, "/types/timestamp/1325376000", "Sun Jan 01 00:01:00 EST 2012"))
+    deploy()
+      .then(testContents("localhost", 8081, "/types/byte/5", "5:byte"))
+      .then(testContents("localhost", 8081, "/types/short/50", "50:short"))
+      .then(testContents("localhost", 8081, "/types/int/500", "500:int"))
+      .then(testContents("localhost", 8081, "/types/long/5000", "5000:long"))
+      .then(testContents("localhost", 8081, "/types/float/3.333333", "3.33:float"))
+      .then(testContents("localhost", 8081, "/types/double/3.333333", "3.33:double"))
+      .then(testContents("localhost", 8081, "/types/date/2012-01-01", "Sun Jan 01 00:01:00 EST 2012:date"))
+      .then(testContents("localhost", 8081, "/types/timestamp/1325336460000", "Sun Jan 01 00:01:00 EST 2012:date"))
+      .then(testContents("localhost", 8081, "/types/uuid/8c063560-c114-11e2-8b8b-0800200c9a66", "8c063560-c114-11e2-8b8b-0800200c9a66:uuid"))
       .fail(onFailure())
       .fin(onComplete());
   }

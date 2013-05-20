@@ -1,6 +1,7 @@
 package org.edgeframework.core.tests.faces;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.edgeframework.core.faces.controller.Controller;
 
@@ -32,31 +33,35 @@ public class AdminController extends Controller {
 
   /* Datattype Tests */
   public Result datatype(byte value) {
-    return ok("" + value);
+    return ok(value + ":byte");
   }
 
   public Result datatype(short value) {
-    return ok("" + value);
+    return ok(value + ":short");
   }
 
   public Result datatype(int value) {
-    return ok("" + value);
+    return ok(value + ":int");
   }
 
   public Result datatype(long value) {
-    return ok("" + value);
+    return ok(value + ":long");
   }
 
   public Result datatype(float value) {
-    return ok(String.format("%.2f", value));
+    return ok(String.format("%.2f:float", value));
   }
 
   public Result datatype(double value) {
-    return ok(String.format("%.2f", value));
+    return ok(String.format("%.2f:double", value));
   }
 
   public Result datatype(Date value) {
-    return ok(value.toString());
+    return ok(value.toString() + ":date");
+  }
+
+  public Result datatype(UUID value) {
+    return ok(value.toString() + ":uuid");
   }
 
   /* Fall through Test */

@@ -34,7 +34,7 @@ class RequestAction {
 
   /* Action Properties */
   private final String name;
-  private final LinkedHashMap<String, Func1<String, Object>> captures = new LinkedHashMap<>();
+  private final LinkedHashMap<String, Func1<String, ?>> captures = new LinkedHashMap<>();
 
   public RequestAction(Class<? extends Controller> controller, String actionString, TypeConverter converter) throws Exception {
     this.controller = controller;
@@ -87,7 +87,7 @@ class RequestAction {
   private List<Object> coerceParams(MultiMap params) {
     List<Object> result = new LinkedList<>();
 
-    for (Map.Entry<String, Func1<String, Object>> entry : this.captures.entrySet()) {
+    for (Map.Entry<String, Func1<String, ?>> entry : this.captures.entrySet()) {
       String value = params.get(entry.getKey());
       result.add(entry.getValue().call(value));
     }

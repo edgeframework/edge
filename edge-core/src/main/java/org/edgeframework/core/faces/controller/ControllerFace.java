@@ -4,6 +4,8 @@ import java.util.regex.Pattern;
 
 import org.edgeframework.core.faces.AbstractFace;
 
+import rx.util.functions.Func1;
+
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Router;
@@ -33,6 +35,10 @@ public abstract class ControllerFace extends AbstractFace {
     Middleware handler = new ActionMiddleware(action);
 
     router.all(pattern, handler);
+  }
+
+  protected void register(final String name, final Class<?> type, Func1<String, ?> converterFunction) {
+    converter.addConverter(name, type, converterFunction);
   }
 
   public String getRoutesPath() {
