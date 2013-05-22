@@ -64,6 +64,23 @@ public class AdminController extends Controller {
     return ok(value.toString() + ":uuid");
   }
 
+  /* Sessions and Cookies */
+  public Result session(String value) {
+    return ok("session:" + value);
+  }
+
+  public Result session() {
+    return ok("session:hello");
+  }
+
+  public Result cookies(String value) {
+    return ok("cookie:" + value);
+  }
+
+  public Result cookies() {
+    return ok("cookie:hello");
+  }
+
   /* Fall through Test */
   public Result fallthrough(int value) {
     return ok(value + ":int");

@@ -25,19 +25,9 @@ public class ControllerFaceTest extends AbstractFaceTest {
 
   @Test
   public void testGetWithUrlParam() {
-    Promise<String> promise = deploy();
-
-    promise
+    deploy()
       .then(testContents("localhost", 8081, "/mapping/part1", "part1"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
       .then(testContents("localhost", 8081, "/mapping/part1/part2", "part1:part2"))
-      .fail(onFailure())
-      .fin(onComplete());
-
-    promise
       .then(testContents("localhost", 8081, "/mapping/part1/part2/part3", "part1:part2:part3"))
       .fail(onFailure())
       .fin(onComplete());
@@ -57,6 +47,25 @@ public class ControllerFaceTest extends AbstractFaceTest {
       .then(testContents("localhost", 8081, "/types/uuid/8c063560-c114-11e2-8b8b-0800200c9a66", "8c063560-c114-11e2-8b8b-0800200c9a66:uuid"))
       .fail(onFailure())
       .fin(onComplete());
+  }
+
+  @Test
+  public void testSession() {
+    deploy()
+      .then(testContents("localhost", 8081, "/session/hello", "session:hello"))
+      .then(testContents("localhost", 8081, "/session/", "session:hello"))
+      .fail(onFailure())
+      .fin(onComplete());
+  }
+
+  @Test
+  public void testCookies() {
+    deploy()
+      .then(testContents("localhost", 8081, "/cookies/hello", "cookie:hello"))
+      .then(testContents("localhost", 8081, "/cookies/", "cookie:hello"))
+      .fail(onFailure())
+      .fin(onComplete());
+
   }
 
   private Promise<String> deploy() {

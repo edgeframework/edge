@@ -34,6 +34,11 @@ public class AdminControllerFace extends ControllerFace {
     register(AdminController.class, "GET", "/types/date/:value", "datatype(value: date)");
     register(AdminController.class, "GET", "/types/uuid/:value", "datatype(value: uuid)");
 
+    register(AdminController.class, "GET", "/session/", "session()");
+    register(AdminController.class, "GET", "/session/:value", "session(value: string)");
+    register(AdminController.class, "GET", "/cookies/", "cookies()");
+    register(AdminController.class, "GET", "/cookies/:value", "cookies(value: string)");
+
     register(AdminController.class, "GET", "/types/fallthrough/:value", "fallthrough(value: int)");
     register(AdminController.class, "GET", "/types/fallthrough/:value", "fallthrough(value: string)");
   }
