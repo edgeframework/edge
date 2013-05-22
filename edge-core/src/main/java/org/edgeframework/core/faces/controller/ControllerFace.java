@@ -1,12 +1,13 @@
 package org.edgeframework.core.faces.controller;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.edgeframework.core.faces.AbstractFace;
 
 import rx.util.functions.Func1;
 
-import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Router;
 
@@ -19,6 +20,9 @@ public abstract class ControllerFace extends AbstractFace {
 
   private TypeConverter converter = new TypeConverter();
 
+  private List<ActionMiddleware> handlers = new LinkedList<>(); // TODO: vertx
+                                                                // hack
+
   public ControllerFace(String name, String host, int port, String routesPath) {
     super(name, host, port);
 
@@ -27,13 +31,18 @@ public abstract class ControllerFace extends AbstractFace {
 
   @Override
   public void configure(Yoke yoke) {
+    for (ActionMiddleware handler : handlers) {
+      handler.setVertx(vertx);
+    }
+
     yoke.use(router);
   }
 
   protected void register(final Class<? extends Controller> controller, final String method, final String pattern, final String actionString) throws Exception {
     final RequestAction action = new RequestAction(controller, actionString, converter);
-    Middleware handler = new ActionMiddleware(action);
+    ActionMiddleware handler = new ActionMiddleware(action);
 
+    handlers.add(handler);
     router.all(pattern, handler);
   }
 

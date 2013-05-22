@@ -17,5 +17,5 @@ apply plugin: VertxPlugin
 
 dependencies {
   modules vertxModule('com.darylteo~vertx-promises~1.0.0-ALPHA1-SNAPSHOT')
-  modules vertxModule('com.jetdrone~yoke~1.0.0-SNAPSHOT')
+	// modules vertxModule('com.jetdrone~yoke~1.0.0-SNAPSHOT')
 }

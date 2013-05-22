@@ -1,13 +1,22 @@
 package org.edgeframework.core.faces.controller;
 
+import java.util.Map;
+
+import org.vertx.java.core.Vertx;
+
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 
 public abstract class Controller {
+  private Vertx vertx;
   private YokeRequest request;
 
   void setRequest(YokeRequest request) {
     this.request = request;
+  }
+
+  void setVertx(Vertx vertx) {
+    this.vertx = vertx;
   }
 
   /* Util Classes */
@@ -18,6 +27,10 @@ public abstract class Controller {
   /* Properties */
   protected YokeRequest request() {
     return this.request;
+  }
+
+  protected Map<String, Object> session() {
+    return vertx.sharedData().getMap("session");
   }
 
   /* Result Methods */

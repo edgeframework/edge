@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.edgeframework.core.faces.controller.Controller.Result;
 import org.vertx.java.core.MultiMap;
+import org.vertx.java.core.Vertx;
 
 import rx.util.functions.Func1;
 
@@ -68,10 +69,11 @@ class RequestAction {
       .findVirtual(controller, this.name, mt);
   }
 
-  public void invoke(YokeRequest request) throws Throwable {
+  public void invoke(Vertx vertx, YokeRequest request) throws Throwable {
     /* Setup Receiver */
     Controller receiver = this.controller.newInstance();
     receiver.setRequest(request);
+    receiver.setVertx(vertx);
 
     /* Get Param Values */
     List<Object> args = coerceParams(request.params());

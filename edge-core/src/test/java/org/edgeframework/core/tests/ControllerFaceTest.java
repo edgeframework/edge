@@ -52,8 +52,8 @@ public class ControllerFaceTest extends AbstractFaceTest {
   @Test
   public void testSession() {
     deploy()
-      .then(testContents("localhost", 8081, "/session/hello", "session:hello"))
-      .then(testContents("localhost", 8081, "/session/", "session:hello"))
+      .then(testContents("localhost", 8081, "/sessions/hello", "sessions:hello"))
+      .then(testContents("localhost", 8081, "/sessions/", "sessions:hello"))
       .fail(onFailure())
       .fin(onComplete());
   }
