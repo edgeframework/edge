@@ -1,4 +1,4 @@
-package org.edgeframework.core.faces;
+package org.edgeframework.core.faces.impl;
 
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Static;
@@ -6,17 +6,14 @@ import com.jetdrone.vertx.yoke.middleware.Static;
 public abstract class StaticFace extends AbstractFace {
   private String basePath = "";
 
-  public StaticFace(String name, String host, int port) {
+  public StaticFace(String name, String host, int port, String basePath) {
     super(name, host, port);
+    this.basePath = basePath;
   }
 
   @Override
-  public void configure(Yoke yoke) {
+  void configure(Yoke yoke) {
     yoke.use(new Static(basePath));
-  }
-
-  public void setBasePath(String basePath) {
-    this.basePath = basePath;
   }
 
   public String getBasePath() {

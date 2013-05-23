@@ -3,7 +3,7 @@ package org.edgeframework.core.tests.faces;
 import java.util.Date;
 import java.util.UUID;
 
-import org.edgeframework.core.faces.controller.Controller;
+import org.edgeframework.core.faces.impl.Controller;
 
 public class AdminController extends Controller {
   public AdminController() {
@@ -64,8 +64,8 @@ public class AdminController extends Controller {
     return ok(value.toString() + ":uuid");
   }
 
-  /* Sessions and Cookies */
-  public Result sessions(String value) {
+  /* Sessions */
+  public Result sessionsPage(String value) {
     beginSession();
     session().put("key", value);
 
@@ -77,7 +77,7 @@ public class AdminController extends Controller {
     return ok("sessions:end");
   }
 
-  public Result sessions() {
+  public Result sessionsPage() {
     if (isActiveSession()) {
       String value = (String) session().get("key");
       return ok("sessions:" + value);
@@ -86,12 +86,15 @@ public class AdminController extends Controller {
     }
   }
 
-  public Result cookies(String value) {
+  /* Cookies */
+  public Result cookiesPage(String value) {
+    cookies("cookie", value);
     return ok("cookie:" + value);
   }
 
-  public Result cookies() {
-    return ok("cookie:hello");
+  public Result cookiesPage() {
+    String value = cookies("cookie");
+    return ok("cookie:" + value);
   }
 
   /* Fall through Test */

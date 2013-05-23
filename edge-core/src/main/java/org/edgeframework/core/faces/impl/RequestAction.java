@@ -1,4 +1,4 @@
-package org.edgeframework.core.faces.controller;
+package org.edgeframework.core.faces.impl;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.edgeframework.core.faces.controller.Controller.Result;
+import org.edgeframework.core.faces.impl.Controller.Result;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 
@@ -69,11 +69,12 @@ class RequestAction {
       .findVirtual(controller, this.name, mt);
   }
 
-  public void invoke(Vertx vertx, YokeRequest request) throws Throwable {
+  public void invoke(Vertx vertx, YokeRequest request, ControllerFace face) throws Throwable {
     /* Setup Receiver */
     Controller receiver = this.controller.newInstance();
     receiver.setRequest(request);
     receiver.setVertx(vertx);
+    receiver.setFace(face);
 
     /* Get Param Values */
     List<Object> args = coerceParams(request.params());

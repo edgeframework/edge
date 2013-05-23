@@ -1,4 +1,4 @@
-package org.edgeframework.core.faces.controller;
+package org.edgeframework.core.faces.impl;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -9,7 +9,7 @@ import java.util.Map;
 
 import rx.util.functions.Func1;
 
-public class TypeConverter {
+class TypeConverter {
   private Map<String, Class<?>> namesToType = new HashMap<>();
   private Map<Class<?>, Func1<String, ? extends Object>> typeToConverter = new HashMap<>();
 

@@ -1,6 +1,6 @@
-package org.edgeframework.core.faces;
+package org.edgeframework.core.faces.impl;
 
-import org.vertx.java.core.http.HttpServer;
+import org.edgeframework.core.exceptions.EdgeException;
 import org.vertx.java.platform.Verticle;
 
 import com.jetdrone.vertx.yoke.Yoke;
@@ -10,7 +10,7 @@ public abstract class AbstractFace extends Verticle {
 
   private String host;
   private int port;
-  private HttpServer server;
+  private Yoke yoke;
 
   public AbstractFace(String name, String host, int port) {
     this.name = name;
@@ -19,14 +19,32 @@ public abstract class AbstractFace extends Verticle {
   }
 
   @Override
-  public void start() {
+  public final void start() {
     /* Create YOKE */
-    Yoke yoke = new Yoke(vertx);
-    configure(yoke);
-    yoke.listen(port, host);
+    yoke = new Yoke(vertx);
+
+    try {
+      configure(yoke);
+      beforeStart();
+      yoke.listen(port, host);
+      onStart();
+    } catch (Exception e) {
+      throw new EdgeException(e);
+    }
   }
 
-  public abstract void configure(Yoke yoke);
+  /* Lifecycle */
+  void configure(Yoke yoke) {
+    // no-op
+  }
+
+  public void beforeStart() {
+    // no-op
+  }
+
+  public void onStart() {
+    // no-op
+  }
 
   /* Accessors */
   public String getName() {
