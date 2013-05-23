@@ -1,8 +1,12 @@
 package org.edgeframework.core.tests.util;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.testtools.TestVerticle;
 import org.vertx.testtools.VertxAssert;
@@ -13,6 +17,8 @@ import com.darylteo.rx.promises.PromiseAction;
 import com.darylteo.rx.promises.RepromiseFunction;
 
 public class AbstractFaceTest extends TestVerticle {
+  private List<String> cookies = Collections.emptyList();
+
   protected Promise<String> deployVerticle(String main) {
     System.out.println("Deploying " + main);
     final Promise<String> promise = Promise.defer();
@@ -40,6 +46,7 @@ public class AbstractFaceTest extends TestVerticle {
           .then(new RepromiseFunction<HttpClientResponse, String>() {
             @Override
             public Promise<String> call(HttpClientResponse response) {
+              cookies = response.cookies();
               return getPageContents(response);
             }
           })
@@ -88,16 +95,21 @@ public class AbstractFaceTest extends TestVerticle {
 
   private Promise<HttpClientResponse> getUrl(String host, int port, String path) {
     final Promise<HttpClientResponse> promise = Promise.defer();
-    vertx.createHttpClient()
+    HttpClientRequest request = vertx.createHttpClient()
       .setHost(host)
       .setPort(port)
-      .getNow(path, new Handler<HttpClientResponse>() {
+      .get(path, new Handler<HttpClientResponse>() {
         @Override
         public void handle(HttpClientResponse event) {
           promise.fulfill(event);
         }
-      });
+      }).putHeader("Cookie", cookies);
 
+    for (String cookie : cookies) {
+      System.out.println(cookie);
+    }
+    
+    request.end();
     return promise;
   }
 

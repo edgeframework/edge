@@ -1,6 +1,8 @@
 package org.edgeframework.core.faces.controller;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import org.vertx.java.core.Vertx;
 
@@ -29,8 +31,50 @@ public abstract class Controller {
     return this.request;
   }
 
+  protected String beginSession() {
+    String sessionID = request.getSessionId();
+
+    if (sessionID == null) {
+      sessionID = UUID.randomUUID().toString();
+      request.setSessionId(sessionID);
+    }
+
+    return sessionID;
+  }
+
+  protected void endSession() {
+    String sessionID = request.getSessionId();
+
+    if (sessionID == null) {
+      return;
+    }
+
+    // TODO: remove persistence backend
+    request.setSessionId(null);
+  }
+
+  protected boolean isActiveSession() {
+    return request.getSessionId() != null;
+  }
+
   protected Map<String, Object> session() {
-    return vertx.sharedData().getMap("session");
+    // TODO: I'm going to rely heavily on the Yoke sessionID implementation for
+    // this
+    // If there are any significant security/auth leaking issues then we may
+    // relook this.
+    String sessionID = request.getSessionId();
+
+    if (sessionID == null) {
+      // TODO: provide warning about accessing map
+      return Collections.emptyMap();
+    }
+
+    // TODO: implement different types of session persistence strategies
+
+    // return the session map for this session
+    // if there isn't one, then create one
+    return vertx.sharedData().getMap("edge:sessions:" + sessionID);
+
   }
 
   /* Result Methods */

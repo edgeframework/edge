@@ -1,15 +1,18 @@
 package org.edgeframework.core.faces.controller;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.crypto.Mac;
 
 import org.edgeframework.core.faces.AbstractFace;
 
 import rx.util.functions.Func1;
 
 import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.middleware.CookieParser;
 import com.jetdrone.vertx.yoke.middleware.Router;
+import com.jetdrone.vertx.yoke.middleware.Session;
+import com.jetdrone.vertx.yoke.util.Utils;
 
 public abstract class ControllerFace extends AbstractFace {
   private String routesPath = "";
@@ -20,9 +23,6 @@ public abstract class ControllerFace extends AbstractFace {
 
   private TypeConverter converter = new TypeConverter();
 
-  private List<ActionMiddleware> handlers = new LinkedList<>(); // TODO: vertx
-                                                                // hack
-
   public ControllerFace(String name, String host, int port, String routesPath) {
     super(name, host, port);
 
@@ -31,10 +31,10 @@ public abstract class ControllerFace extends AbstractFace {
 
   @Override
   public void configure(Yoke yoke) {
-    for (ActionMiddleware handler : handlers) {
-      handler.setVertx(vertx);
-    }
+    final Mac hmac = Utils.newHmacSHA256("keyboard.cat");
 
+    yoke.use(new CookieParser(hmac));
+    yoke.use(new Session("edge:session", "/", false, 60 * 60 * 1000, hmac));
     yoke.use(router);
   }
 
@@ -42,11 +42,10 @@ public abstract class ControllerFace extends AbstractFace {
     final RequestAction action = new RequestAction(controller, actionString, converter);
     ActionMiddleware handler = new ActionMiddleware(action);
 
-    handlers.add(handler);
     router.all(pattern, handler);
   }
 
-  protected void register(final String name, final Class<?> type, Func1<String, ?> converterFunction) {
+  protected void register(final String name, final Class<?> type, Func1<String, ?> converterFunction) throws Exception {
     converter.addConverter(name, type, converterFunction);
   }
 

@@ -25,7 +25,6 @@ class ActionMiddleware extends Middleware {
 
   @Override
   public void handle(YokeRequest request, Handler<Object> next) {
-    System.out.println(vertx);
     try {
       this.action.invoke(vertx, request);
     } catch (Throwable e) {

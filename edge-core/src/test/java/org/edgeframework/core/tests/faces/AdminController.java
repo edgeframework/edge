@@ -66,13 +66,24 @@ public class AdminController extends Controller {
 
   /* Sessions and Cookies */
   public Result sessions(String value) {
+    beginSession();
     session().put("key", value);
+
     return ok("sessions:" + value);
   }
 
+  public Result sessionsEnd() {
+    endSession();
+    return ok("sessions:end");
+  }
+
   public Result sessions() {
-    String value = (String) session().get("key");
-    return ok("sessions:" + value);
+    if (isActiveSession()) {
+      String value = (String) session().get("key");
+      return ok("sessions:" + value);
+    } else {
+      return ok("Not Logged In");
+    }
   }
 
   public Result cookies(String value) {
