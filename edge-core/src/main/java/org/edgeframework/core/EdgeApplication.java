@@ -1,8 +1,12 @@
 package org.edgeframework.core;
 
+import org.edgeframework.core.faces.Face;
 
 public class EdgeApplication {
   public EdgeApplication() {
-    System.out.println("New Edge instantiated: " + this);
+  }
+
+  public void register(Face face) {
+
   }
 }

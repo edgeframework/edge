@@ -13,9 +13,38 @@ import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 
 public abstract class Controller {
+
+  /* Persistence Strategies */
+  public static abstract class PersistenceStrategy {
+    private Map<String, String> existing;
+
+    private Map<String, String> getMap() {
+      if (existing != null) {
+        return existing;
+      }
+      existing = createMap();
+      return existing;
+    }
+
+    abstract Map<String, String> createMap();
+  }
+
+  public class Persistence {
+    public final PersistenceStrategy IN_MEMORY = new PersistenceStrategy() {
+      @Override
+      public Map<String, String> createMap() {
+        return vertx.sharedData().getMap("edge:session");
+      }
+    };
+  }
+
+  /* Instance Variables */
   private Vertx vertx;
   private ControllerFace face;
   private YokeRequest request;
+
+  private Persistence strategies = new Persistence();
+  private PersistenceStrategy sessionStrategy = strategies.IN_MEMORY;
 
   void setRequest(YokeRequest request) {
     this.request = request;
@@ -65,7 +94,7 @@ public abstract class Controller {
     return request.getSessionId() != null;
   }
 
-  protected Map<String, Object> session() {
+  protected Map<String, String> session() {
     // TODO: I'm going to rely heavily on the Yoke sessionID implementation for
     // this
     // If there are any significant security/auth leaking issues then we may
@@ -81,7 +110,7 @@ public abstract class Controller {
 
     // return the session map for this session
     // if there isn't one, then create one
-    return vertx.sharedData().getMap("edge:sessions:" + sessionID);
+    return this.sessionStrategy.getMap();
   }
 
   protected String cookies(String name) {
