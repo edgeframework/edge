@@ -15,7 +15,12 @@ class BuilderPluginTests {
     project.apply plugin: BuilderPlugin
 
     project.evaluate()
+    executeTask(project, "clean")
     executeTask(project, "build")
+
+    project.with {
+      assertTrue("Build was not successful: possibly a classpath issue", file("$buildDir/libs/root.jar").isFile());
+    }
   }
 
   def executeTask(Project project, String taskName) {
@@ -30,7 +35,7 @@ class BuilderPluginTests {
       if(t in executed) {
         continue
       }
-      
+
       executeTask(t,executed)
     }
 
