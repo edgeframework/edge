@@ -1,7 +1,6 @@
 import java.io.File;
 import java.nio.file.Paths;
 
-import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
@@ -27,7 +26,7 @@ public class Daemon {
 
     conn
       .newBuild()
-      .withArguments("--build-file", "conf/build.gradle")
+      .withArguments("--init-script", "conf/build.gradle")
       .setJvmArguments("-cp", "../bin")
       .forTasks("tasks")
       .run();
@@ -51,4 +50,4 @@ public class Daemon {
     // });
 
   }
-}
+};

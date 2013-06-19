@@ -1,4 +1,4 @@
-buildscript {
+initscript {
   repositories {
     mavenLocal()
   }
@@ -8,4 +8,6 @@ buildscript {
   }
 }
 
-apply plugin: org.edgeframework.gradle.Builder
+rootProject {
+  apply plugin: org.edgeframework.gradle.builder.BuilderPlugin
+}
