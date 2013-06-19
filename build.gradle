@@ -8,14 +8,27 @@ buildscript {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } // for vertx core
   }
 
+  dependencies { classpath "com.darylteo:vertx-gradle-plugin:1.0.0-ALPHA4-SNAPSHOT" }
+}
+
+subprojects { apply plugin: VertxPlugin }
+
+project(':edge-core') {
   dependencies {
-    classpath "com.darylteo:vertx-gradle-plugin:1.0.0-ALPHA4-SNAPSHOT"
+    modules vertxModule('com.darylteo~vertx-promises~1.0.0-ALPHA1-SNAPSHOT')
+    modules vertxModule('com.jetdrone~yoke~1.0.0-SNAPSHOT')
   }
 }
 
-apply plugin: VertxPlugin
+project('edge-daemon') {
+  repositories { maven { url 'http://repo.gradle.org/gradle/libs-releases-local' } }
 
-dependencies {
-  modules vertxModule('com.darylteo~vertx-promises~1.0.0-ALPHA1-SNAPSHOT')
-	// modules vertxModule('com.jetdrone~yoke~1.0.0-SNAPSHOT')
+  dependencies { compile "org.gradle:gradle-tooling-api:${toolingApiVersion}" }
+}
+
+project('edge-builder') {
+  dependencies {
+    provided gradleApi()
+    provided localGroovy()
+  }
 }
