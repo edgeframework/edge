@@ -13,6 +13,7 @@ class BuilderPlugin implements Plugin<Project>{
 
       /* Properties */
       buildDir = '.build'
+      ext.confDir = 'conf'
 
       /* Add Dependencies */
       repositories {
@@ -39,6 +40,9 @@ class BuilderPlugin implements Plugin<Project>{
 
         unmanaged fileTree('libs'){ include '*.jar' }
       }
+      
+      /* Allow custom configuration */
+      apply from: file("$confDir/build.gradle")
     }
   }
 }

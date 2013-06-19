@@ -1,25 +1,39 @@
 package org.edgeframework.gradle.builder.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.*
 
-import org.edgeframework.gradle.builder.BuilderPlugin;
-import org.gradle.api.Project;
-import org.gradle.api.Task;
-import org.gradle.testfixtures.ProjectBuilder;
-import org.junit.Test;
+import org.edgeframework.gradle.builder.BuilderPlugin
+import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Before
+import org.junit.Test
 
 class BuilderPluginTests {
+  Project project;
+  
+  @Before
+  public void before() {
+    project = ProjectBuilder.builder().withProjectDir(new File("testroot")).withName("root").build()
+    project.apply plugin: BuilderPlugin
+    
+    executeTask(project, "clean")
+    project.evaluate()
+  }
+  
   @Test
   public void testClasspath() {
-    Project project = ProjectBuilder.builder().withProjectDir(new File("testroot")).withName("root").build()
-    project.apply plugin: BuilderPlugin
-
-    project.evaluate()
-    executeTask(project, "clean")
     executeTask(project, "build")
 
     project.with {
       assertTrue("Build was not successful: possibly a classpath issue", file("$buildDir/libs/root.jar").isFile());
+    }
+  }
+  
+  @Test
+  public void testLoadBuildGradle() {
+    project.with {
+      assertTrue("conf/build.gradle was not loaded", project.hasProperty("builder"));
     }
   }
 

@@ -22,13 +22,15 @@ public class Daemon {
     System.out.println("Running Daemon in: " + Paths.get("").toAbsolutePath());
     System.out.println("Creating Vertx Platform Manager");
 
+    String initScriptPath = getClass().getResource("edgeframework.gradle").toString();
+
     ProjectConnection conn = GradleConnector.newConnector().forProjectDirectory(new File("")).connect();
 
     conn
       .newBuild()
-      .withArguments("--init-script", "conf/build.gradle")
+      .withArguments("--init-script", initScriptPath)
       .setJvmArguments("-cp", "../bin")
-      .forTasks("tasks")
+      .forTasks("build")
       .run();
 
     conn.close();
