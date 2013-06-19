@@ -1,0 +1,3 @@
+import org.edgeframework.gradle.builder.BuilderPlugin
+
+apply plugin: BuilderPlugin
