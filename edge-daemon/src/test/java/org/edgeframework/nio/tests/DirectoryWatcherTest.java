@@ -161,35 +161,6 @@ public class DirectoryWatcherTest {
   }
 
   @Test
-  public void testDeleteDirectory3() throws InterruptedException, IOException {
-    /* Nested Deletion Test */
-    final CountDownLatch latch = new CountDownLatch(4);
-    final Set<Path> paths = new HashSet<>();
-    paths.add(root.resolve("level1/level2").toAbsolutePath());
-    paths.add(root.resolve("level1/level2/file").toAbsolutePath());
-
-    watcher.subscribe(new DirectoryWatcherSubscriber() {
-      @Override
-      public void fileDeleted(Path path) {
-        System.out.println("File Deleted");
-        assertTrue("Watcher did not return a correct path", paths.remove(path));
-        latch.countDown();
-      }
-
-      @Override
-      public void directoryDeleted(Path path) {
-        assertTrue("Watcher did not return a correct path", paths.remove(path));
-        latch.countDown();
-      }
-    });
-
-    deleteFileTree(root.resolve("level1/level2"));
-
-    latch.await(LATCH_TIMEOUT, TimeUnit.SECONDS);
-    assertEquals("Test timed out", 0, latch.getCount());
-  }
-
-  @Test
   public void testDeleteFile1() throws IOException, InterruptedException {
     /* Delete a file in root */
     final CountDownLatch latch = new CountDownLatch(1);
@@ -254,6 +225,26 @@ public class DirectoryWatcherTest {
     assertEquals("Test timed out", 0, latch.getCount());
   }
 
+  @Test
+  public void testFileModified1() throws IOException, InterruptedException {
+    /* Modify a single file in root */
+    final CountDownLatch latch = new CountDownLatch(1);
+    final Path modifyPath = root.resolve("file").toAbsolutePath();
+
+    watcher.subscribe(new DirectoryWatcherSubscriber() {
+      @Override
+      public void fileModified(Path path) {
+        assertEquals("Watcher did not return a correct path", modifyPath, path);
+        latch.countDown();
+      }
+    });
+
+    writeToFile(modifyPath);
+
+    latch.await(LATCH_TIMEOUT, TimeUnit.SECONDS);
+    assertEquals("Test timed out", 0, latch.getCount());
+  }
+
   private void deleteFileTree(Path path) throws IOException {
     Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
       @Override
@@ -270,4 +261,7 @@ public class DirectoryWatcherTest {
     });
   }
 
+  private void writeToFile(Path path) throws IOException {
+    Files.write(path, "Hello World!".getBytes());
+  }
 }
