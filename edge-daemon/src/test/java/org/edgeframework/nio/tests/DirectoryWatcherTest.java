@@ -31,6 +31,7 @@ public class DirectoryWatcherTest {
 
   @Before
   public void before() throws IOException {
+    System.out.println("\nRunning Test\n");
     watcher = new DirectoryWatcher();
 
     resetTestFolder(root);
@@ -239,7 +240,36 @@ public class DirectoryWatcherTest {
       }
     });
 
+    // Need this to give the polling mechanism time to hook into events
+    Thread.sleep(1000);
     writeToFile(modifyPath);
+
+    latch.await(LATCH_TIMEOUT, TimeUnit.SECONDS);
+    assertEquals("Test timed out", 0, latch.getCount());
+  }
+
+  @Test
+  public void testFileModified2() throws IOException, InterruptedException {
+    /* Modify multiple files */
+    final CountDownLatch latch = new CountDownLatch(3);
+    final Set<Path> paths = new HashSet<>();
+    paths.add(root.resolve("file").toAbsolutePath());
+    paths.add(root.resolve("level1/file").toAbsolutePath());
+    paths.add(root.resolve("level1/level2/file").toAbsolutePath());
+
+    watcher.subscribe(new DirectoryWatcherSubscriber() {
+      @Override
+      public void fileModified(Path path) {
+        assertTrue("Watcher did not return a correct path", paths.remove(path));
+        latch.countDown();
+      }
+    });
+
+    // Need this to give the polling mechanism time to hook into events
+    Thread.sleep(1000);
+    for (Path p : paths) {
+      writeToFile(p);
+    }
 
     latch.await(LATCH_TIMEOUT, TimeUnit.SECONDS);
     assertEquals("Test timed out", 0, latch.getCount());

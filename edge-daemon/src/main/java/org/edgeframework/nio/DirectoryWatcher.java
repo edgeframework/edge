@@ -1,5 +1,6 @@
 package org.edgeframework.nio;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.FileVisitResult;
@@ -46,7 +47,7 @@ public class DirectoryWatcher implements AutoCloseable {
     SensitivityWatchEventModifier.HIGH
   };
   private WatchEvent.Modifier[] modifiers = FILETREE_MODIFIERS;
-  private WatchEvent.Kind<?> kinds[] = new WatchEvent.Kind<?>[] {
+  private WatchEvent.Kind<?> WATCH_EVENTS[] = new WatchEvent.Kind<?>[] {
     StandardWatchEventKinds.ENTRY_CREATE,
     StandardWatchEventKinds.ENTRY_DELETE,
     StandardWatchEventKinds.ENTRY_MODIFY
@@ -68,30 +69,15 @@ public class DirectoryWatcher implements AutoCloseable {
   public void addPath(Path path) throws IOException {
     path = path.toAbsolutePath();
 
-    if (!Files.isDirectory(path)) {
-      return;
+    if (!Files.exists(path)) {
+      throw new FileNotFoundException(path.toString());
     }
 
     // passed the FILE_TREE supported test
     Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
       @Override
       public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-        try {
-          WatchKey key = dir.register(watchService, kinds, modifiers);
-          keys.put(key, dir);
-          watched.add(dir);
-        } catch (UnsupportedOperationException e) {
-          /* FILE_TREE modifier not supported */
-          /* this code should only fire once since we modify the modifiers here */
-          System.out.println("FILE_TREE modifier is not supported by this operating system. Switching to Polling");
-
-          isFileTreeModifierSupported = false;
-          modifiers = POLLING_MODIFIERS;
-
-          addPath(dir);
-          return FileVisitResult.TERMINATE;
-        }
-
+        registerPath(dir, WATCH_EVENTS);
         return FileVisitResult.CONTINUE;
       }
     });
@@ -106,9 +92,53 @@ public class DirectoryWatcher implements AutoCloseable {
     subscribers.remove(subscriber);
   }
 
+  /* AutoCloseable */
   @Override
   public void close() throws Exception {
     watcher.stopWatching();
+  }
+
+  /* Private Methods */
+  private boolean registerPath(Path path, WatchEvent.Kind<?>[] kinds) throws IOException {
+    if (!shouldTrack(path)) {
+      return false;
+    }
+
+    try {
+      WatchKey key = path.register(watchService, kinds, modifiers);
+      keys.put(key, path);
+      watched.add(path);
+      return true;
+    } catch (UnsupportedOperationException e) {
+      /* FILE_TREE modifier not supported */
+      /* this code should only fire once since we modify the modifiers here */
+      System.out.println("FILE_TREE modifier is not supported by this operating system. Switching to Polling");
+
+      isFileTreeModifierSupported = false;
+      modifiers = POLLING_MODIFIERS;
+
+      return registerPath(path, kinds);
+    }
+  }
+
+  private boolean shouldTrack(Path path) {
+    return shouldInclude(path) && !shouldExclude(path);
+  }
+
+  private boolean shouldInclude(Path path) {
+    for (Pattern pattern : includes) {
+      // TODO:
+    }
+
+    return true;
+  }
+
+  private boolean shouldExclude(Path path) {
+    for (Pattern pattern : excludes) {
+      // TODO:
+    }
+
+    return false;
   }
 
   /*
@@ -261,38 +291,13 @@ public class DirectoryWatcher implements AutoCloseable {
     }
 
     private void handleFileModified(Path path) {
-      if (Files.isDirectory(path)) {
-        // ignore this... the files are what we are tracking
-        return;
-      }
-
       if (!shouldTrack(path)) {
         return;
       }
 
       for (DirectoryWatcherSubscriber s : subscribers) {
-        s.fileDeleted(path);
+        s.fileModified(path);
       }
-    }
-
-    private boolean shouldTrack(Path path) {
-      return shouldInclude(path) && !shouldExclude(path);
-    }
-
-    private boolean shouldInclude(Path path) {
-      for (Pattern pattern : includes) {
-        // TODO:
-      }
-
-      return true;
-    }
-
-    private boolean shouldExclude(Path path) {
-      for (Pattern pattern : excludes) {
-        // TODO:
-      }
-
-      return false;
     }
   }
 }
