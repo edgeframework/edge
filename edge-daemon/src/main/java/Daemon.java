@@ -4,10 +4,12 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.edgeframework.nio.DirectoryChangedSubscriber;
 import org.edgeframework.nio.DirectoryWatcher;
 import org.edgeframework.nio.DirectoryWatcherFactory;
-import org.edgeframework.nio.DirectoryWatcherSubscriber;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 
@@ -24,6 +26,8 @@ public class Daemon {
   }
 
   private DirectoryWatcherFactory factory = new DirectoryWatcherFactory();
+  private ProjectConnection gradle;
+  private Timer timer = new Timer();
 
   public Daemon() throws IOException {
     System.out.println("Running Daemon in: " + Paths.get("").toAbsolutePath());
@@ -37,7 +41,11 @@ public class Daemon {
   private void setupDirectoryWatcher() throws IOException {
     DirectoryWatcher watcher = factory.newWatcher(Paths.get("src"));
 
-    watcher.subscribe(new DirectoryWatcherSubscriber() {
+    watcher.subscribe(new DirectoryChangedSubscriber() {
+      @Override
+      public void directoryChanged(DirectoryWatcher watcher, Path path) {
+        scheduleBuild();
+      }
     });
   }
 
@@ -61,14 +69,21 @@ public class Daemon {
   }
 
   private void setupGradleDaemon() {
-    ProjectConnection conn = GradleConnector.newConnector().forProjectDirectory(new File("")).connect();
+    gradle = GradleConnector.newConnector().forProjectDirectory(new File("")).connect();
+  }
 
-    conn
-      .newBuild()
-      .setJvmArguments("-cp", "../bin")
-      .forTasks("copyToMods")
-      .run();
+  private void scheduleBuild() {
+    timer.cancel();
+    timer = new Timer();
 
-    conn.close();
+    timer.schedule(new TimerTask() {
+      @Override
+      public void run() {
+        gradle
+          .newBuild()
+          .forTasks("build")
+          .run();
+      }
+    }, 3000);
   }
 };

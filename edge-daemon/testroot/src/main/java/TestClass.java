@@ -3,7 +3,7 @@ import org.vertx.java.platform.Verticle;
 public class TestClass extends Verticle {
   @Override
   public void start() {
-    System.out.println("Starting!2");
+    System.out.println("Starting!5");
   }
 
   @Override
