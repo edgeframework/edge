@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.edgeframework.nio.DirectoryWatcher;
+import org.edgeframework.nio.DirectoryWatcherFactory;
 import org.edgeframework.nio.DirectoryWatcherSubscriber;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
@@ -22,7 +23,7 @@ public class Daemon {
     }
   }
 
-  private DirectoryWatcher watcher = new DirectoryWatcher();
+  private DirectoryWatcherFactory factory = new DirectoryWatcherFactory();
 
   public Daemon() throws IOException {
     System.out.println("Running Daemon in: " + Paths.get("").toAbsolutePath());
@@ -34,34 +35,10 @@ public class Daemon {
   }
 
   private void setupDirectoryWatcher() throws IOException {
+    DirectoryWatcher watcher = factory.newWatcher(Paths.get("src"));
+
     watcher.subscribe(new DirectoryWatcherSubscriber() {
-      @Override
-      public void directoryCreated(Path path) {
-        System.out.println(path + " Created");
-      }
-
-      @Override
-      public void directoryDeleted(Path path) {
-        System.out.println(path + " Deleted");
-      }
-
-      @Override
-      public void fileCreated(Path path) {
-        System.out.println(path + " Created");
-      }
-
-      @Override
-      public void fileDeleted(Path path) {
-        System.out.println(path + " Deleted");
-      }
-
-      @Override
-      public void fileModified(Path path) {
-        System.out.println(path + " Changed");
-      }
     });
-
-    watcher.addPath(Paths.get("module1"));
   }
 
   private void setupBuildFiles() throws IOException {

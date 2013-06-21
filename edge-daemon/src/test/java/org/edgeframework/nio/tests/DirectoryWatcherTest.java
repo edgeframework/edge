@@ -17,6 +17,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import org.edgeframework.nio.DirectoryWatcher;
+import org.edgeframework.nio.DirectoryWatcherFactory;
 import org.edgeframework.nio.DirectoryWatcherSubscriber;
 import org.junit.After;
 import org.junit.Before;
@@ -24,6 +25,7 @@ import org.junit.Test;
 
 public class DirectoryWatcherTest {
 
+  private DirectoryWatcherFactory factory;
   private DirectoryWatcher watcher;
   private Path root = Paths.get("watcher_test");
 
@@ -31,16 +33,17 @@ public class DirectoryWatcherTest {
 
   @Before
   public void before() throws IOException {
-    System.out.println("\nRunning Test\n");
-    watcher = new DirectoryWatcher();
+    System.out.println("\nRunning Test");
 
     resetTestFolder(root);
-    watcher.addPath(root);
+
+    factory = new DirectoryWatcherFactory();
+    watcher = factory.newWatcher(root);
   }
 
   @After
   public void after() throws Exception {
-    watcher.close();
+    factory.close();
   }
 
   public void resetTestFolder(Path root) throws IOException {
@@ -81,12 +84,12 @@ public class DirectoryWatcherTest {
   @Test
   public void testCreateDirectory1() throws InterruptedException, IOException {
     final CountDownLatch latch = new CountDownLatch(1);
-    final Path newPath = root.resolve("newdir").toAbsolutePath();
+    final Path newPath = root.resolve("newdir");
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void directoryCreated(Path path) {
-        assertEquals("Two absolute paths are not equal", newPath, path);
+      public void directoryCreated(DirectoryWatcher watcher, Path dir) {
+        assertEquals("Two absolute paths are not equal", newPath, dir);
         latch.countDown();
       }
     });
@@ -101,13 +104,13 @@ public class DirectoryWatcherTest {
   public void testCreateDirectory2() throws InterruptedException, IOException {
     final CountDownLatch latch = new CountDownLatch(2);
     final Set<Path> paths = new HashSet<>();
-    paths.add(root.resolve("newdir1").toAbsolutePath());
-    paths.add(root.resolve("newdir1/newdir2").toAbsolutePath());
+    paths.add(root.resolve("newdir1"));
+    paths.add(root.resolve("newdir1/newdir2"));
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void directoryCreated(Path path) {
-        assertTrue("Watcher did not return a correct path", paths.remove(path));
+      public void directoryCreated(DirectoryWatcher watcher, Path dir) {
+        assertTrue("Watcher did not return a correct path", paths.remove(dir));
         latch.countDown();
       }
     });
@@ -122,12 +125,12 @@ public class DirectoryWatcherTest {
   public void testDeleteDirectory1() throws InterruptedException, IOException {
     /* Basic Deletion Test */
     final CountDownLatch latch = new CountDownLatch(1);
-    final Path deletePath = root.resolve("empty1/empty2").toAbsolutePath();
+    final Path deletePath = root.resolve("empty1/empty2");
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void directoryDeleted(Path path) {
-        assertEquals("Watcher did not return a correct path", deletePath, path);
+      public void directoryDeleted(DirectoryWatcher watcher, Path dir) {
+        assertEquals("Watcher did not return a correct path", deletePath, dir);
         latch.countDown();
       }
     });
@@ -144,13 +147,13 @@ public class DirectoryWatcherTest {
     final CountDownLatch latch = new CountDownLatch(2);
 
     final Set<Path> paths = new HashSet<>();
-    paths.add(root.resolve("empty1/empty2").toAbsolutePath());
-    paths.add(root.resolve("empty1").toAbsolutePath());
+    paths.add(root.resolve("empty1/empty2"));
+    paths.add(root.resolve("empty1"));
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void directoryDeleted(Path path) {
-        assertTrue("Watcher did not return a correct path", paths.remove(path));
+      public void directoryDeleted(DirectoryWatcher watcher, Path dir) {
+        assertTrue("Watcher did not return a correct path", paths.remove(dir));
         latch.countDown();
       }
     });
@@ -165,12 +168,12 @@ public class DirectoryWatcherTest {
   public void testDeleteFile1() throws IOException, InterruptedException {
     /* Delete a file in root */
     final CountDownLatch latch = new CountDownLatch(1);
-    final Path deletePath = root.resolve("file").toAbsolutePath();
+    final Path deletePath = root.resolve("file");
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void fileDeleted(Path path) {
-        assertEquals("Watcher did not return a correct path", deletePath, path);
+      public void fileDeleted(DirectoryWatcher watcher, Path file) {
+        assertEquals("Watcher did not return a correct path", deletePath, file);
         latch.countDown();
       }
     });
@@ -185,12 +188,12 @@ public class DirectoryWatcherTest {
   public void testDeleteFile2() throws IOException, InterruptedException {
     /* Delete a file deep in hierarchy */
     final CountDownLatch latch = new CountDownLatch(1);
-    final Path deletePath = root.resolve("level1/level2/file").toAbsolutePath();
+    final Path deletePath = root.resolve("level1/level2/file");
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void fileDeleted(Path path) {
-        assertEquals("Watcher did not return a correct path", deletePath, path);
+      public void fileDeleted(DirectoryWatcher watcher, Path file) {
+        assertEquals("Watcher did not return a correct path", deletePath, file);
         latch.countDown();
       }
     });
@@ -206,14 +209,14 @@ public class DirectoryWatcherTest {
     /* Delete multiple files */
     final CountDownLatch latch = new CountDownLatch(1);
     final Set<Path> paths = new HashSet<>();
-    paths.add(root.resolve("file").toAbsolutePath());
-    paths.add(root.resolve("level1/file").toAbsolutePath());
-    paths.add(root.resolve("level1/level2/file").toAbsolutePath());
+    paths.add(root.resolve("file"));
+    paths.add(root.resolve("level1/file"));
+    paths.add(root.resolve("level1/level2/file"));
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void fileDeleted(Path path) {
-        assertTrue("Watcher did not return a correct path", paths.remove(path));
+      public void fileDeleted(DirectoryWatcher watcher, Path file) {
+        assertTrue("Watcher did not return a correct path", paths.remove(file));
         latch.countDown();
       }
     });
@@ -230,12 +233,12 @@ public class DirectoryWatcherTest {
   public void testFileModified1() throws IOException, InterruptedException {
     /* Modify a single file in root */
     final CountDownLatch latch = new CountDownLatch(1);
-    final Path modifyPath = root.resolve("file").toAbsolutePath();
+    final Path modifyPath = root.resolve("file");
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void fileModified(Path path) {
-        assertEquals("Watcher did not return a correct path", modifyPath, path);
+      public void fileModified(DirectoryWatcher watcher, Path file) {
+        assertEquals("Watcher did not return a correct path", modifyPath, file);
         latch.countDown();
       }
     });
@@ -253,14 +256,14 @@ public class DirectoryWatcherTest {
     /* Modify multiple files */
     final CountDownLatch latch = new CountDownLatch(3);
     final Set<Path> paths = new HashSet<>();
-    paths.add(root.resolve("file").toAbsolutePath());
-    paths.add(root.resolve("level1/file").toAbsolutePath());
-    paths.add(root.resolve("level1/level2/file").toAbsolutePath());
+    paths.add(root.resolve("file"));
+    paths.add(root.resolve("level1/file"));
+    paths.add(root.resolve("level1/level2/file"));
 
     watcher.subscribe(new DirectoryWatcherSubscriber() {
       @Override
-      public void fileModified(Path path) {
-        assertTrue("Watcher did not return a correct path", paths.remove(path));
+      public void fileModified(DirectoryWatcher watcher, Path file) {
+        assertTrue("Watcher did not return a correct path", paths.remove(file));
         latch.countDown();
       }
     });

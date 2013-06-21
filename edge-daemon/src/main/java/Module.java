@@ -14,10 +14,10 @@ public class Module {
 
   public Module(String name) {
     this.sources = new Path[] {
-        Paths.get("src", name, "java"),
-        Paths.get("src", name, "groovy"),
-        Paths.get("src", name, "scala"),
-        Paths.get("src", name, "resources")
+      Paths.get("src", name, "java"),
+      Paths.get("src", name, "groovy"),
+      Paths.get("src", name, "scala"),
+      Paths.get("src", name, "resources")
     };
     this.destination = Paths.get("mods", String.format("vertx~daemon~%s", name));
 
