@@ -5,15 +5,17 @@ import org.gradle.api.Project
 import org.gradle.api.tasks.Sync;
 
 class BuilderPlugin implements Plugin<Project>{
+
   @Override
   public void apply(Project target) {
     target.with {
       /* Plugins */
+      // groovy plugin automatically applies java plugin
+      // may need to pull in scala plugin in the future when supported
       apply plugin: 'groovy'
 
       /* Properties */
-      buildDir = '.build'
-      ext.confDir = 'conf'
+      convention.plugins.buildPlugin = new BuilderPluginConvention(it);
 
       /* Add Dependencies */
       repositories {
@@ -40,9 +42,44 @@ class BuilderPlugin implements Plugin<Project>{
 
         unmanaged fileTree('libs'){ include '*.jar' }
       }
-      
+
       /* Allow custom configuration */
-      apply from: file("$confDir/build.gradle")
+      File config = file("$configDir/config.gradle");
+      println config
+      if(config.exists()) {
+        apply from: config
+      }
+      
+      /* Add Tasks */
+      task('copyToMods', type: Sync) {
+        from sourceSets.main.output
+        into file(vertxDir)
+      }
+    }
+  }
+
+  class BuilderPluginConvention {
+    private Project project;
+    private String confDir = 'conf'
+
+    BuilderPluginConvention(Project project) {
+      this.project = project
+    }
+
+    void setConfigDir(String confDir) {
+      this.confDir = confDir;
+    }
+
+    String getConfigDir(){
+      return this.confDir;
+    }
+
+    File getVertxName() {
+      return project.file("edge~${project.name}~${project.version}")
+    }
+
+    File getVertxDir() {
+      return project.file("mods/edge~${project.name}~${project.version}")
     }
   }
 }

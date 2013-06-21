@@ -1,0 +1,8 @@
+sourceSets {
+  main
+  test
+  web
+}
+
+version = '1.0.0'
+println "${project.version}"

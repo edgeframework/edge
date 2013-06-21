@@ -1,0 +1,11 @@
+buildscript {
+  repositories {
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath "org.edgeframework:edge-builder:1.0.0-ALPHA1-SNAPSHOT"
+  }
+}
+
+apply plugin: org.edgeframework.gradle.builder.BuilderPlugin

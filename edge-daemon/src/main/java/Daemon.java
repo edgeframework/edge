@@ -1,13 +1,17 @@
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.edgeframework.nio.DirectoryWatcher;
+import org.edgeframework.nio.DirectoryWatcherSubscriber;
 import org.gradle.tooling.GradleConnector;
-import org.gradle.tooling.ModelBuilder;
 import org.gradle.tooling.ProjectConnection;
-import org.gradle.tooling.model.GradleProject;
 
 public class Daemon {
-  public static void main(String args[]) {
+  public static void main(String args[]) throws IOException {
     Daemon daemon = new Daemon();
 
     synchronized (daemon) {
@@ -18,38 +22,76 @@ public class Daemon {
     }
   }
 
-  public Daemon() {
+  private DirectoryWatcher watcher = new DirectoryWatcher();
+
+  public Daemon() throws IOException {
     System.out.println("Running Daemon in: " + Paths.get("").toAbsolutePath());
     System.out.println("Creating Vertx Platform Manager");
 
-    String initScriptPath = getClass().getResource("edgeframework.gradle").toString();
+    setupBuildFiles();
+    setupDirectoryWatcher();
+    setupGradleDaemon();
+  }
 
+  private void setupDirectoryWatcher() throws IOException {
+    watcher.subscribe(new DirectoryWatcherSubscriber() {
+      @Override
+      public void directoryCreated(Path path) {
+        System.out.println(path + " Created");
+      }
+
+      @Override
+      public void directoryDeleted(Path path) {
+        System.out.println(path + " Deleted");
+      }
+
+      @Override
+      public void fileCreated(Path path) {
+        System.out.println(path + " Created");
+      }
+
+      @Override
+      public void fileDeleted(Path path) {
+        System.out.println(path + " Deleted");
+      }
+
+      @Override
+      public void fileModified(Path path) {
+        System.out.println(path + " Changed");
+      }
+    });
+
+    watcher.addPath(Paths.get("module1"));
+  }
+
+  private void setupBuildFiles() throws IOException {
+    InputStream buildScriptStream = getClass().getResourceAsStream("edge/conf/build.gradle");
+    Path buildScriptPath = Paths.get("build.gradle");
+    Path settingsScriptPath = Paths.get("settings.gradle");
+    Path confScriptPath = Paths.get("conf", "config.gradle");
+
+    if (!Files.exists(buildScriptPath)) {
+      Files.copy(buildScriptStream, buildScriptPath);
+    }
+
+    if (!Files.exists(settingsScriptPath)) {
+      Files.createFile(settingsScriptPath);
+    }
+
+    if (!Files.exists(confScriptPath)) {
+      Files.createFile(confScriptPath);
+    }
+  }
+
+  private void setupGradleDaemon() {
     ProjectConnection conn = GradleConnector.newConnector().forProjectDirectory(new File("")).connect();
 
     conn
       .newBuild()
-      .withArguments("--init-script", initScriptPath)
       .setJvmArguments("-cp", "../bin")
-      .forTasks("build")
+      .forTasks("copyToMods")
       .run();
 
     conn.close();
-
-    // PlatformManager man = PlatformLocator.factory.createPlatformManager();
-    // new Module("main");
-    //
-    // /* Platform API vs shell exec? */
-    // man.deployModule("vertx~daemon~main", new JsonObject(), 1, new
-    // Handler<AsyncResult<String>>() {
-    // @Override
-    // public void handle(AsyncResult<String> event) {
-    // if (event.succeeded()) {
-    // System.out.println("Verticle Deployed: " + event.result());
-    // } else {
-    // System.out.println("Deployment Failed: " + event.cause());
-    // }
-    // }
-    // });
-
   }
 };

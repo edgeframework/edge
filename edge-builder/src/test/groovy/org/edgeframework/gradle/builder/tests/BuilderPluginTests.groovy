@@ -11,30 +11,36 @@ import org.junit.Test
 
 class BuilderPluginTests {
   Project project;
-  
+
   @Before
   public void before() {
     project = ProjectBuilder.builder().withProjectDir(new File("testroot")).withName("root").build()
     project.apply plugin: BuilderPlugin
-    
+
     executeTask(project, "clean")
     project.evaluate()
   }
-  
+
   @Test
   public void testClasspath() {
     executeTask(project, "build")
 
     project.with {
-      assertTrue("Build was not successful: possibly a classpath issue", file("$buildDir/libs/root.jar").isFile());
+      assertTrue("Build was not successful: possibly a classpath issue", file("$buildDir/libs/root.jar").isFile())
     }
   }
-  
+
   @Test
   public void testLoadBuildGradle() {
-    project.with {
-      assertTrue("conf/build.gradle was not loaded", project.hasProperty("builder"));
-    }
+    assertTrue("conf/config.gradle was not loaded", project.hasProperty("builder"))
+  }
+
+  @Test
+  public void testCopyToMods() {
+    project.delete "${project.vertxDir}"
+    executeTask(project, "copyToMods")
+
+    assertTrue("Module was not deployed into mods dir", project.file("${project.vertxDir}").isDirectory());
   }
 
   def executeTask(Project project, String taskName) {
