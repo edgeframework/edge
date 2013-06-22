@@ -21,9 +21,15 @@ project(':edge-core') {
 }
 
 project('edge-daemon') {
-  repositories { maven { url 'http://repo.gradle.org/gradle/libs-releases-local' } }
+  repositories {
+    maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
+    maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
+  }
 
-  dependencies { compile "org.gradle:gradle-tooling-api:${toolingApiVersion}" }
+  dependencies {
+    compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
+    compile "com.darylteo:directorywatcher:1.0.0"
+  }
 }
 
 project('edge-builder') {

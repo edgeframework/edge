@@ -7,11 +7,12 @@ import java.nio.file.Paths;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.edgeframework.nio.DirectoryChangedSubscriber;
-import org.edgeframework.nio.DirectoryWatcher;
-import org.edgeframework.nio.DirectoryWatcherFactory;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
+
+import com.darylteo.nio.DirectoryChangedSubscriber;
+import com.darylteo.nio.DirectoryWatcher;
+import com.darylteo.nio.DirectoryWatcherFactory;
 
 public class Daemon {
   public static void main(String args[]) throws IOException {
