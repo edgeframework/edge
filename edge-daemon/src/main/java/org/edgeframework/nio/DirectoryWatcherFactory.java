@@ -171,7 +171,7 @@ public class DirectoryWatcherFactory implements AutoCloseable {
 
       /* ENTRY_MODIFY */
       if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
-        if (Files.isDirectory(path)) {
+        if (dirs.contains(path)) {
           // ignore
           return;
         }
