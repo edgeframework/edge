@@ -8,6 +8,6 @@ buildscript {
   }
 }
 
-rootProject {
+allprojects {
   apply plugin: org.edgeframework.gradle.builder.BuilderPlugin
 }

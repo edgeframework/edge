@@ -11,7 +11,9 @@ buildscript {
   dependencies { classpath "com.darylteo:vertx-gradle-plugin:1.0.0-ALPHA4-SNAPSHOT" }
 }
 
-subprojects { apply plugin: VertxPlugin }
+subprojects {
+    apply plugin: VertxPlugin
+}
 
 project(':edge-core') {
   dependencies {
@@ -20,7 +22,9 @@ project(':edge-core') {
   }
 }
 
-project('edge-daemon') {
+project(':edge-daemon') {
+  apply plugin: 'java'
+
   repositories {
     maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
     maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
@@ -28,13 +32,15 @@ project('edge-daemon') {
 
   dependencies {
     compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
-    compile "com.darylteo:directorywatcher:1.0.0"
+    compile "com.darylteo:directorywatcher:${directoryWatcherVersion}"
   }
 }
 
-project('edge-builder') {
+project(':edge-builder') {
+  apply plugin: 'groovy'
+
   dependencies {
-    provided gradleApi()
-    provided localGroovy()
+    compile gradleApi()
+    compile localGroovy()
   }
 }

@@ -53,8 +53,10 @@ class BuilderPlugin implements Plugin<Project>{
       /* Add Tasks */
       task('copyToMods', type: Sync) {
         from sourceSets.main.output
-        into file(vertxDir)
+        into vertxDir
       }
+      
+      println "HELLO!"
     }
   }
 
@@ -79,7 +81,7 @@ class BuilderPlugin implements Plugin<Project>{
     }
 
     File getVertxDir() {
-      return project.file("mods/edge~${project.name}~${project.version}")
+      return project.file("${project.rootDir}/mods/edge~${project.name}~${project.version}")
     }
   }
 }
