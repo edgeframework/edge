@@ -21,6 +21,10 @@ public class Module {
     DirectoryWatcher watcher = factory.newWatcher(Paths.get(path));
 
     watcher.include("src/**");
+    watcher.include("conf/**");
+    watcher.include("build.gradle");
+    watcher.include("gradle.properties");
+    watcher.include("settings.gradle");
 
     watcher.subscribe(new DirectoryChangedSubscriber() {
       @Override

@@ -23,8 +23,11 @@ project(':edge-core') {
 }
 
 project(':edge-daemon') {
-  apply plugin: 'java'
+  apply plugin: 'application'
 
+  mainClassName = 'org.edgeframework.daemon.Daemon'
+  applicationName = 'edge'
+  
   repositories {
     maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
     maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
