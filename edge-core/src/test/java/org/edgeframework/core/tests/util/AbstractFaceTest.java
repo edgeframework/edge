@@ -11,10 +11,10 @@ import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.testtools.TestVerticle;
 import org.vertx.testtools.VertxAssert;
 
-import com.darylteo.rx.promises.FinallyAction;
 import com.darylteo.rx.promises.Promise;
-import com.darylteo.rx.promises.PromiseAction;
-import com.darylteo.rx.promises.RepromiseFunction;
+import com.darylteo.rx.promises.functions.FinallyAction;
+import com.darylteo.rx.promises.functions.PromiseAction;
+import com.darylteo.rx.promises.functions.RepromiseFunction;
 
 public class AbstractFaceTest extends TestVerticle {
   private List<String> cookies = Collections.emptyList();

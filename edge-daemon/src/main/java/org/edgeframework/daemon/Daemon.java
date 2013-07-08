@@ -1,5 +1,7 @@
 package org.edgeframework.daemon;
 
+import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -9,6 +11,8 @@ import java.nio.file.Paths;
 import org.edgeframework.daemon.internal.GradleBuilder;
 import org.edgeframework.daemon.internal.Module;
 import org.gradle.tooling.model.GradleProject;
+import org.vertx.java.platform.PlatformLocator;
+import org.vertx.java.platform.PlatformManager;
 
 import com.darylteo.nio.DirectoryWatcherFactory;
 
@@ -19,12 +23,6 @@ public class Daemon {
 
   private DirectoryWatcherFactory factory = new DirectoryWatcherFactory();
   private GradleProject project;
-
-  private void displayHelp() {
-    System.out.println("Edge Help - please use the following commands:   ");
-    System.out.println(" init - initialises a new Edge/Vert.x project    ");
-    System.out.println(" run  - starts a daemon for a Edge/Vert.x project");
-  }
 
   public Daemon(String[] args) throws IOException {
     if (args.length == 0) {
@@ -42,30 +40,38 @@ public class Daemon {
     System.exit(0);
   }
 
+  private void displayHelp() {
+    System.out.println("Edge Help - please use the following commands:   ");
+    System.out.println(" init - initialises a new Edge/Vert.x project    ");
+    System.out.println(" run  - starts a daemon for a Edge/Vert.x project");
+  }
+
   private void initBuildFiles() throws IOException {
+    if (!isEmpty(Paths.get(""))) {
+      System.err.println("Current directory is not empty and cannot be initialised.");
+      System.exit(1);
+    }
+
     InputStream buildScriptStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("edge/conf/build.gradle");
     Path buildScriptPath = Paths.get("build.gradle");
     Path settingsScriptPath = Paths.get("settings.gradle");
     Path confScriptPath = Paths.get("conf", "config.gradle");
 
-    if (!Files.exists(buildScriptPath)) {
-      Files.copy(buildScriptStream, buildScriptPath);
-    } else {
-      System.out.println("Warning: " + buildScriptPath + " already exists.");
-    }
+    Files.copy(buildScriptStream, buildScriptPath);
+    Files.createFile(settingsScriptPath);
 
-    if (!Files.exists(settingsScriptPath)) {
-      Files.createFile(settingsScriptPath);
-    } else {
-      System.out.println("Warning: " + settingsScriptPath + " already exists.");
-    }
+    Files.createDirectories(Paths.get("conf"));
+    Files.createFile(confScriptPath);
+  }
 
-    if (!Files.exists(confScriptPath)) {
-      Files.createDirectories(Paths.get("conf"));
-      Files.createFile(confScriptPath);
-    } else {
-      System.out.println("Warning: " + confScriptPath + " already exists.");
-    }
+  private boolean isEmpty(Path path) {
+    return path.toAbsolutePath().toFile().listFiles(new FileFilter() {
+      @Override
+      public boolean accept(File pathname) {
+        System.out.println(pathname);
+        return !pathname.isHidden();
+      }
+    }).length > 0;
   }
 
   private boolean isInitialised() throws IOException {
@@ -78,6 +84,7 @@ public class Daemon {
       System.exit(1);
     }
 
+    PlatformManager manager = PlatformLocator.factory.createPlatformManager();
     GradleBuilder builder = new GradleBuilder();
 
     new Module(builder.getProject(), builder, factory);

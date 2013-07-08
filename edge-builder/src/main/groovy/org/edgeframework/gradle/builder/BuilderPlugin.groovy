@@ -49,13 +49,18 @@ class BuilderPlugin implements Plugin<Project>{
       if(config.exists()) {
         apply from: config
       }
-      
+
       /* Add Tasks */
       task('copyToMods', type: Sync) {
         from sourceSets.main.output
         into vertxDir
       }
-      
+
+      /* */
+      task('pullInDeps') {
+        
+      }
+
       println "HELLO!"
     }
   }

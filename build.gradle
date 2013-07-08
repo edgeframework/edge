@@ -1,24 +1,41 @@
-import com.darylteo.gradle.vertx.VertxPlugin
+import com.darylteo.gradle.plugins.vertx.*
+import com.darylteo.gradle.plugins.*
 
 buildscript {
   repositories {
     mavenLocal()
     mavenCentral()
-    maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' } // for vertx core
   }
 
-  dependencies { classpath "com.darylteo:vertx-gradle-plugin:1.0.0-ALPHA4-SNAPSHOT" }
+  dependencies {
+    classpath "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT"
+  }
 }
 
 subprojects {
-    apply plugin: VertxPlugin
+  apply plugin: MavenPlugin
+
+  repositories {
+    mavenLocal();
+    mavenCentral();
+  }
 }
 
 project(':edge-core') {
   dependencies {
-    modules vertxModule('com.darylteo~vertx-promises~1.0.0-ALPHA1-SNAPSHOT')
-    modules vertxModule('com.jetdrone~yoke~1.0.0-SNAPSHOT')
+    runtime "io.vertx:vertx-platform:2.0.0-CR2"
+  }
+  
+  apply plugin: VertxProjectPlugin
+  apply plugin: VertxPublishPlugin
+
+  vertx {
+    config {
+      includes = [
+        'com.darylteo~vertx-promises~1.1.0-SNAPSHOT',
+        'com.jetdrone~yoke~1.0.0-beta2'
+      ]
+    }
   }
 }
 
@@ -27,7 +44,7 @@ project(':edge-daemon') {
 
   mainClassName = 'org.edgeframework.daemon.Daemon'
   applicationName = 'edge'
-  
+
   repositories {
     maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
     maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin

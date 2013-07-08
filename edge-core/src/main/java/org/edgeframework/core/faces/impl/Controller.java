@@ -1,9 +1,9 @@
 package org.edgeframework.core.faces.impl;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
 import org.vertx.java.core.Vertx;
@@ -114,7 +114,7 @@ public abstract class Controller {
   }
 
   protected String cookies(String name) {
-    Set<YokeCookie> cookies = request.cookies();
+    List<YokeCookie> cookies = request.getAllCookies(name);
 
     if (cookies != null) {
       for (YokeCookie cookie : cookies) {
