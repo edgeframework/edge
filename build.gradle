@@ -7,9 +7,7 @@ buildscript {
     mavenCentral()
   }
 
-  dependencies {
-    classpath "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT"
-  }
+  dependencies { classpath "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT" }
 }
 
 subprojects {
@@ -22,10 +20,6 @@ subprojects {
 }
 
 project(':edge-core') {
-  dependencies {
-    runtime "io.vertx:vertx-platform:2.0.0-CR2"
-  }
-  
   apply plugin: VertxProjectPlugin
   apply plugin: VertxPublishPlugin
 
@@ -51,6 +45,7 @@ project(':edge-daemon') {
   }
 
   dependencies {
+    compile "io.vertx:vertx-platform:${vertxVersion}"
     compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
     compile "com.darylteo:directorywatcher:${directoryWatcherVersion}"
   }
@@ -62,5 +57,7 @@ project(':edge-builder') {
   dependencies {
     compile gradleApi()
     compile localGroovy()
+    
+    compile "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT" 
   }
 }

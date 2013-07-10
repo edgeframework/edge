@@ -2,7 +2,7 @@ package org.edgeframework.gradle.builder;
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Sync;
+import org.gradle.api.tasks.Sync
 
 class BuilderPlugin implements Plugin<Project>{
 
@@ -13,6 +13,7 @@ class BuilderPlugin implements Plugin<Project>{
       // groovy plugin automatically applies java plugin
       // may need to pull in scala plugin in the future when supported
       apply plugin: 'groovy'
+      apply plugin: VertxProjectPlugin
 
       /* Properties */
       convention.plugins.buildPlugin = new BuilderPluginConvention(it);
@@ -38,30 +39,19 @@ class BuilderPlugin implements Plugin<Project>{
 
       dependencies {
         edge "org.edgeframework:edge-core:1.0.0-ALPHA1-SNAPSHOT"
-        edge "io.vertx:vertx-platform:2.0.0-CR1"
 
         unmanaged fileTree('libs'){ include '*.jar' }
+      }
+      
+      vertx {
+        version = '2.0.0-CR2'
       }
 
       /* Allow custom configuration */
       File config = file("$configDir/config.gradle");
-      println config
       if(config.exists()) {
         apply from: config
       }
-
-      /* Add Tasks */
-      task('copyToMods', type: Sync) {
-        from sourceSets.main.output
-        into vertxDir
-      }
-
-      /* */
-      task('pullInDeps') {
-        
-      }
-
-      println "HELLO!"
     }
   }
 

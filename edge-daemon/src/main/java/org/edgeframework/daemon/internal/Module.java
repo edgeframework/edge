@@ -30,7 +30,7 @@ public class Module {
       @Override
       public void directoryChanged(DirectoryWatcher watcher, Path path) {
         System.out.println(project.getPath() + " > Changed Detected: " + path);
-        builder.scheduleTask(String.format("%s:%s", project.getPath(), "copyToMods"));
+        builder.scheduleTask(String.format("%s:%s", project.getPath(), "copyMod"));
       }
     });
   }
