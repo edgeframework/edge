@@ -10,19 +10,17 @@ buildscript {
   dependencies { classpath "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA3-SNAPSHOT" }
 }
 
-project(':edge-core') {
-  apply plugin: VertxProjectPlugin
-  apply plugin: VertxPublishPlugin
-
-  vertx {
-    version = '2.0.1-final'
-
-    config { include 'com.jetdrone~yoke~1.0.1' }
+subprojects {
+  repositories {
+    mavenCentral();
+    mavenLocal();
   }
 }
 
 project(':edge-daemon') {
+  apply plugin: 'java'
   apply plugin: 'application'
+  apply plugin: MavenPlugin
 
   mainClassName = 'org.edgeframework.daemon.Daemon'
   applicationName = 'edge'
@@ -47,20 +45,12 @@ project(':edge-daemon') {
 
 project(':edge-builder') {
   apply plugin: 'groovy'
+  apply plugin: MavenPlugin
 
   dependencies {
     compile gradleApi()
     compile localGroovy()
 
     compile "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT"
-  }
-}
-
-subprojects {
-  apply plugin: MavenPlugin
-
-  repositories {
-    mavenLocal();
-    mavenCentral();
   }
 }
