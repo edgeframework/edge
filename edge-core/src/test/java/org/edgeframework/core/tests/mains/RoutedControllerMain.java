@@ -2,7 +2,7 @@ package org.edgeframework.core.tests.mains;
 
 import java.net.URLClassLoader;
 
-import org.edgeframework.core.tests.faces.AdminControllerFace;
+import org.edgeframework.core.tests.faces.AdminControllerEdge;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -17,7 +17,7 @@ public class RoutedControllerMain {
   public RoutedControllerMain() throws InterruptedException {
     PlatformManager manager = PlatformLocator.factory.createPlatformManager();
     manager.deployVerticle(
-      AdminControllerFace.class.getCanonicalName(),
+      AdminControllerEdge.class.getCanonicalName(),
       new JsonObject(),
       ((URLClassLoader) (Thread.currentThread().getContextClassLoader())).getURLs(),
       1,

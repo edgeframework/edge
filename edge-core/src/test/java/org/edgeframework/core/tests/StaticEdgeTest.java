@@ -1,10 +1,10 @@
 package org.edgeframework.core.tests;
 
 import org.edgeframework.core.tests.faces.StaticAssets;
-import org.edgeframework.core.tests.util.AbstractFaceTest;
+import org.edgeframework.core.tests.util.AbstractEdgeTest;
 import org.junit.Test;
 
-public class StaticFaceTest extends AbstractFaceTest {
+public class StaticEdgeTest extends AbstractEdgeTest {
   @Test
   public void testGet() {
     deployVerticle(StaticAssets.class.getCanonicalName())

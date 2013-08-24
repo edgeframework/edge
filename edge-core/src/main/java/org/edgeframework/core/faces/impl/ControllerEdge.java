@@ -16,7 +16,7 @@ import com.jetdrone.vertx.yoke.middleware.Session;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;
 
-public abstract class ControllerFace extends AbstractFace {
+public abstract class ControllerEdge extends AbstractEdge {
   private String routesPath = "";
   private Router router = new Router();
 
@@ -27,7 +27,7 @@ public abstract class ControllerFace extends AbstractFace {
 
   private TypeConverter converter = new TypeConverter();
 
-  public ControllerFace(String name, String host, int port, String routesPath) {
+  public ControllerEdge(String name, String host, int port, String routesPath) {
     super(name, host, port);
 
     this.routesPath = routesPath;
@@ -47,7 +47,7 @@ public abstract class ControllerFace extends AbstractFace {
         @Override
         public void handle(YokeRequest request, Handler<Object> next) {
           try {
-            action.invoke(vertx, request, ControllerFace.this);
+            action.invoke(vertx, request, ControllerEdge.this);
           } catch (Throwable e) {
             e.printStackTrace();
             next.handle(e);

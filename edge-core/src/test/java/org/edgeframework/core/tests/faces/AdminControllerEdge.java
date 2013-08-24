@@ -2,12 +2,12 @@ package org.edgeframework.core.tests.faces;
 
 import java.util.UUID;
 
-import org.edgeframework.core.faces.impl.ControllerFace;
+import org.edgeframework.core.faces.impl.ControllerEdge;
 
 import rx.util.functions.Func1;
 
-public class AdminControllerFace extends ControllerFace {
-  public AdminControllerFace() throws Exception {
+public class AdminControllerEdge extends ControllerEdge {
+  public AdminControllerEdge() throws Exception {
     super("Admin", "localhost", 8081, "");
   }
 

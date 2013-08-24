@@ -3,20 +3,11 @@ import com.darylteo.gradle.plugins.*
 
 buildscript {
   repositories {
-    mavenLocal()
     mavenCentral()
+    mavenLocal()
   }
 
-  dependencies { classpath "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT" }
-}
-
-subprojects {
-  apply plugin: MavenPlugin
-
-  repositories {
-    mavenLocal();
-    mavenCentral();
-  }
+  dependencies { classpath "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA3-SNAPSHOT" }
 }
 
 project(':edge-core') {
@@ -24,12 +15,9 @@ project(':edge-core') {
   apply plugin: VertxPublishPlugin
 
   vertx {
-    config {
-      includes = [
-        'com.darylteo~vertx-promises~1.1.0-SNAPSHOT',
-        'com.jetdrone~yoke~1.0.0-beta2'
-      ]
-    }
+    version = '2.0.1-final'
+
+    config { include 'com.jetdrone~yoke~1.0.1' }
   }
 }
 
@@ -42,12 +30,18 @@ project(':edge-daemon') {
   repositories {
     maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
     maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
+    mavenLocal()
   }
 
   dependencies {
     compile "io.vertx:vertx-platform:${vertxVersion}"
     compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
     compile "com.darylteo:directorywatcher:${directoryWatcherVersion}"
+  }
+
+  task installLocal(type:Sync, dependsOn: installApp) {
+    from installApp
+    into '/usr/local/bin/edge/'
   }
 }
 
@@ -57,7 +51,16 @@ project(':edge-builder') {
   dependencies {
     compile gradleApi()
     compile localGroovy()
-    
-    compile "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT" 
+
+    compile "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT"
+  }
+}
+
+subprojects {
+  apply plugin: MavenPlugin
+
+  repositories {
+    mavenLocal();
+    mavenCentral();
   }
 }

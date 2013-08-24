@@ -40,7 +40,7 @@ public abstract class Controller {
 
   /* Instance Variables */
   private Vertx vertx;
-  private ControllerFace face;
+  private ControllerEdge face;
   private YokeRequest request;
 
   private Persistence strategies = new Persistence();
@@ -50,7 +50,7 @@ public abstract class Controller {
     this.request = request;
   }
 
-  void setFace(ControllerFace face) {
+  void setFace(ControllerEdge face) {
     this.face = face;
   }
 

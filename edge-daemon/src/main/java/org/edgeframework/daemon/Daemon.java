@@ -75,7 +75,7 @@ public class Daemon {
   }
 
   private boolean isInitialised() throws IOException {
-    return Files.exists(Paths.get("build.gradle")) && Files.exists(Paths.get("settings.gradle")) && Files.exists(Paths.get("conf", "config.gradle"));
+    return Files.exists(Paths.get("build.gradle"));
   }
 
   private void initDaemon() throws IOException {
@@ -84,7 +84,6 @@ public class Daemon {
       System.exit(1);
     }
 
-    PlatformManager manager = PlatformLocator.factory.createPlatformManager();
     GradleBuilder builder = new GradleBuilder();
 
     new Module(builder.getProject(), builder, factory);

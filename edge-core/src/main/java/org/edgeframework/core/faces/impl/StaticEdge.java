@@ -3,10 +3,10 @@ package org.edgeframework.core.faces.impl;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Static;
 
-public abstract class StaticFace extends AbstractFace {
+public abstract class StaticEdge extends AbstractEdge {
   private String basePath = "";
 
-  public StaticFace(String name, String host, int port, String basePath) {
+  public StaticEdge(String name, String host, int port, String basePath) {
     super(name, host, port);
     this.basePath = basePath;
   }

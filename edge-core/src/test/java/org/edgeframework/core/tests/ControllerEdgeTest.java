@@ -1,12 +1,12 @@
 package org.edgeframework.core.tests;
 
-import org.edgeframework.core.tests.faces.AdminControllerFace;
-import org.edgeframework.core.tests.util.AbstractFaceTest;
+import org.edgeframework.core.tests.faces.AdminControllerEdge;
+import org.edgeframework.core.tests.util.AbstractEdgeTest;
 import org.junit.Test;
 
 import com.darylteo.rx.promises.Promise;
 
-public class ControllerFaceTest extends AbstractFaceTest {
+public class ControllerEdgeTest extends AbstractEdgeTest {
   @Test
   public void testGetNoParams() {
     deploy()
@@ -72,7 +72,7 @@ public class ControllerFaceTest extends AbstractFaceTest {
   }
 
   private Promise<String> deploy() {
-    return deployVerticle(AdminControllerFace.class.getCanonicalName());
+    return deployVerticle(AdminControllerEdge.class.getCanonicalName());
   }
 
 }

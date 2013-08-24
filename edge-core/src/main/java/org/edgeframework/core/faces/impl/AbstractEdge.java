@@ -5,14 +5,14 @@ import org.vertx.java.platform.Verticle;
 
 import com.jetdrone.vertx.yoke.Yoke;
 
-public abstract class AbstractFace extends Verticle {
+public abstract class AbstractEdge extends Verticle {
   private String name;
 
   private String host;
   private int port;
   private Yoke yoke;
 
-  public AbstractFace(String name, String host, int port) {
+  public AbstractEdge(String name, String host, int port) {
     this.name = name;
     this.host = host;
     this.port = port;

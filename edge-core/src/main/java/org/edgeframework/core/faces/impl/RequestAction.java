@@ -69,7 +69,7 @@ class RequestAction {
       .findVirtual(controller, this.name, mt);
   }
 
-  public void invoke(Vertx vertx, YokeRequest request, ControllerFace face) throws Throwable {
+  public void invoke(Vertx vertx, YokeRequest request, ControllerEdge face) throws Throwable {
     /* Setup Receiver */
     Controller receiver = this.controller.newInstance();
     receiver.setRequest(request);

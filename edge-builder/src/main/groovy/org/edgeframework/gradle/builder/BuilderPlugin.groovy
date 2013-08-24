@@ -2,7 +2,8 @@ package org.edgeframework.gradle.builder;
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.tasks.Sync
+
+import com.darylteo.gradle.plugins.vertx.VertxProjectPlugin
 
 class BuilderPlugin implements Plugin<Project>{
 
@@ -13,7 +14,7 @@ class BuilderPlugin implements Plugin<Project>{
       // groovy plugin automatically applies java plugin
       // may need to pull in scala plugin in the future when supported
       apply plugin: 'groovy'
-      apply plugin: VertxProjectPlugin
+      apply plugin: com.darylteo.gradle.plugins.vertx.VertxProjectPlugin
 
       /* Properties */
       convention.plugins.buildPlugin = new BuilderPluginConvention(it);
@@ -38,13 +39,16 @@ class BuilderPlugin implements Plugin<Project>{
       }
 
       dependencies {
-        edge "org.edgeframework:edge-core:1.0.0-ALPHA1-SNAPSHOT"
-
         unmanaged fileTree('libs'){ include '*.jar' }
       }
-      
+
       vertx {
-        version = '2.0.0-CR2'
+        version = '2.0.0-CR3'
+        config {
+          includes = [
+            'org.edgeframework~edge-core~1.0.0-ALPHA1-SNAPSHOT'
+          ]
+        }
       }
 
       /* Allow custom configuration */
