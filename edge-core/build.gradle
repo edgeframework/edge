@@ -4,12 +4,14 @@ import com.darylteo.gradle.plugins.vertx.*
 apply plugin: VertxProjectPlugin
 apply plugin: VertxPublishPlugin
 
-dependencies { vertxlibs 'com.netflix.rxjava:rxjava-core:0.10.1' }
-
 vertx {
   version = '2.0.1-final'
 
-  config { includes 'com.darylteo~vertx-promises~1.1.0-ALPHA1,com.jetdrone~yoke~1.0.1' }
+  config { includes 'com.darylteo~vertx-promises~1.1.0-ALPHA2-SNAPSHOT,com.jetdrone~yoke~1.0.1' }
+}
+
+test {
+  workingDir = 'testdir'
 }
 
 maven {

@@ -16,7 +16,7 @@ import com.darylteo.rx.promises.functions.FinallyAction;
 import com.darylteo.rx.promises.functions.PromiseAction;
 import com.darylteo.rx.promises.functions.RepromiseFunction;
 
-public class AbstractEdgeTest extends TestVerticle {
+public abstract class AbstractEdgeTest extends TestVerticle {
   private List<String> cookies = Collections.emptyList();
 
   protected Promise<String> deployVerticle(String main) {
@@ -108,7 +108,7 @@ public class AbstractEdgeTest extends TestVerticle {
     for (String cookie : cookies) {
       System.out.println(cookie);
     }
-    
+
     request.end();
     return promise;
   }
