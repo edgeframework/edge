@@ -1,6 +1,6 @@
 package org.edgeframework.core.tests.faces;
 
-import org.edgeframework.core.faces.impl.StaticEdge;
+import org.edgeframework.core.edges.types.StaticEdge;
 
 public class StaticAssets extends StaticEdge {
   public StaticAssets() {

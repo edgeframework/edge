@@ -1,4 +1,4 @@
-package org.edgeframework.core.faces.impl;
+package org.edgeframework.core.edges;
 
 import org.edgeframework.core.exceptions.EdgeException;
 import org.vertx.java.platform.Verticle;
@@ -34,7 +34,7 @@ public abstract class AbstractEdge extends Verticle {
   }
 
   /* Lifecycle */
-  void configure(Yoke yoke) {
+  protected void configure(Yoke yoke) {
     // no-op
   }
 

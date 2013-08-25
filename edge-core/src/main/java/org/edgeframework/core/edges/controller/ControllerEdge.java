@@ -1,9 +1,10 @@
-package org.edgeframework.core.faces.impl;
+package org.edgeframework.core.edges.controller;
 
 import java.util.regex.Pattern;
 
 import javax.crypto.Mac;
 
+import org.edgeframework.core.edges.AbstractEdge;
 import org.vertx.java.core.Handler;
 
 import rx.util.functions.Func1;
@@ -34,7 +35,7 @@ public abstract class ControllerEdge extends AbstractEdge {
   }
 
   @Override
-  void configure(Yoke yoke) {
+  protected void configure(Yoke yoke) {
     yoke.use(new CookieParser(hmac));
     yoke.use(new Session("edge:session", "/", false, 60 * 60 * 1000, hmac));
     yoke.use(router);

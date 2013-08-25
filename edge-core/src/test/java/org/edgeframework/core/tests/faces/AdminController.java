@@ -3,7 +3,7 @@ package org.edgeframework.core.tests.faces;
 import java.util.Date;
 import java.util.UUID;
 
-import org.edgeframework.core.faces.impl.Controller;
+import org.edgeframework.core.edges.types.Controller;
 
 public class AdminController extends Controller {
   public AdminController() {

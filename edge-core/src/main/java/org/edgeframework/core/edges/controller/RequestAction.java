@@ -1,4 +1,4 @@
-package org.edgeframework.core.faces.impl;
+package org.edgeframework.core.edges.controller;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.edgeframework.core.faces.impl.Controller.Result;
+import org.edgeframework.core.edges.controller.Controller.Result;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 

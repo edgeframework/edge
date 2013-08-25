@@ -1,4 +1,4 @@
-package org.edgeframework.core.faces.impl;
+package org.edgeframework.core.edges.controller;
 
 import java.text.DateFormat;
 import java.text.ParseException;

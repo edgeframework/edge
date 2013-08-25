@@ -1,4 +1,4 @@
-package org.edgeframework.core.faces.impl;
+package org.edgeframework.core.edges.controller;
 
 import java.util.Collections;
 import java.util.List;
