@@ -1,17 +1,54 @@
 package org.edgeframework.java.core;
 
-import java.util.regex.Pattern;
-
-import org.edgeframework.java.core.controller.TypeConverter;
 import org.edgeframework.java.core.routing.Router;
 import org.vertx.java.platform.Verticle;
 
 public abstract class Edge extends Verticle {
-  private String routesPath = "";
+  /* ^.*\.(?<action>\w*\(.*\))$ */
   private Router router = new Router();
 
-  /* ^.*\.(?<action>\w*\(.*\))$ */
-  private Pattern ROUTE_PATTERN = Pattern.compile("^(?<controller>.*)\\.(?<action>\\w*\\(.*\\))$");
+  /* Verticle Methods */
+  @Override
+  public void start(org.vertx.java.core.Future<Void> startedResult) {
+    try {
+      beforeStart();
+      _configure();
+      _begin();
+      afterStart();
+    } catch (Throwable e) {
+      onError(e);
+    }
+  }
 
-  private TypeConverter converter = new TypeConverter();
+  @Override
+  public void stop() {
+    try {
+      beforeStop();
+    } catch (Throwable e) {
+      onError(e);
+    }
+  }
+
+  /* Lifecycle Hooks */
+  public void beforeStart() {
+  }
+
+  public void afterStart() {
+  }
+
+  public void beforeStop() {
+  }
+
+  public void onError(Throwable error) {
+  }
+
+  public void registerRoutes(Router router) {
+  }
+
+  /* Private Lifecycle Hooks */
+  private void _configure() throws Exception {
+  }
+
+  private void _begin() throws Exception {
+  }
 }

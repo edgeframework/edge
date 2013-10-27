@@ -1,4 +1,4 @@
-package org.edgeframework.util;
+package com.edgeframework.core.util;
 
 public enum HttpMethods {
   OPTIONS,
