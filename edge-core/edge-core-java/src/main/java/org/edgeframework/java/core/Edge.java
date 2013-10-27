@@ -15,8 +15,11 @@ public abstract class Edge extends Verticle {
       _configure();
       _begin();
       afterStart();
+
+      startedResult.setResult(null);
     } catch (Throwable e) {
       onError(e);
+      startedResult.setFailure(e);
     }
   }
 
