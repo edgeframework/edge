@@ -1,4 +1,4 @@
-package org.edgeframework.core.edges.controller;
+package org.edgeframework.java.core.controller;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -10,13 +10,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.edgeframework.core.edges.controller.Controller.Result;
+import org.edgeframework.java.core.Edge;
+import org.edgeframework.java.core.controller.Controller.Result;
+import org.edgeframework.java.core.http.Request;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
-
-import rx.util.functions.Func1;
-
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 
 /**
  * Used to hold details of an Action e.g. index(value:int)
@@ -35,7 +33,7 @@ class RequestAction {
 
   /* Action Properties */
   private final String name;
-  private final LinkedHashMap<String, Func1<String, ?>> captures = new LinkedHashMap<>();
+  private final LinkedHashMap<String, TypeConverterFunction<String, ?>> captures = new LinkedHashMap<>();
 
   public RequestAction(Class<? extends Controller> controller, String actionString, TypeConverter converter) throws Exception {
     this.controller = controller;
@@ -69,28 +67,28 @@ class RequestAction {
       .findVirtual(controller, this.name, mt);
   }
 
-  public void invoke(Vertx vertx, YokeRequest request, ControllerEdge face) throws Throwable {
+  public void invoke(Vertx vertx, Request request, Edge edge) throws Throwable {
     /* Setup Receiver */
     Controller receiver = this.controller.newInstance();
     receiver.setRequest(request);
     receiver.setVertx(vertx);
-    receiver.setFace(face);
+    receiver.setEdge(edge);
 
     /* Get Param Values */
-    List<Object> args = coerceParams(request.params());
+    List<Object> args = coerceParams(request.getParams());
 
     /* Invoke Receiver, receive result */
     args.add(0, receiver);
     Result result = (Result) this.handle.invokeWithArguments(args);
 
     /* Render result to response */
-    result.render(request.response());
+    result.render(request.getResponse());
   }
 
   private List<Object> coerceParams(MultiMap params) {
     List<Object> result = new LinkedList<>();
 
-    for (Map.Entry<String, Func1<String, ?>> entry : this.captures.entrySet()) {
+    for (Map.Entry<String, TypeConverterFunction<String, ?>> entry : this.captures.entrySet()) {
       String value = params.get(entry.getKey());
       result.add(entry.getValue().call(value));
     }

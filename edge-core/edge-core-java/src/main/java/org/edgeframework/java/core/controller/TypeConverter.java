@@ -1,4 +1,4 @@
-package org.edgeframework.core.edges.controller;
+package org.edgeframework.java.core.controller;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -7,15 +7,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import rx.util.functions.Func1;
-
-class TypeConverter {
+public class TypeConverter {
   private Map<String, Class<?>> namesToType = new HashMap<>();
-  private Map<Class<?>, Func1<String, ? extends Object>> typeToConverter = new HashMap<>();
+  private Map<Class<?>, TypeConverterFunction<String, ? extends Object>> typeToConverter = new HashMap<>();
 
   public TypeConverter() {
     // default string types
-    addConverter("string", String.class, new Func1<String, Object>() {
+    addConverter("string", String.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         return value;
@@ -23,42 +21,42 @@ class TypeConverter {
     });
 
     // default primitives
-    addConverter("byte", byte.class, new Func1<String, Object>() {
+    addConverter("byte", byte.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         return Byte.parseByte(value);
       }
     });
 
-    addConverter("short", short.class, new Func1<String, Object>() {
+    addConverter("short", short.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         return Short.parseShort(value);
       }
     });
 
-    addConverter("int", int.class, new Func1<String, Object>() {
+    addConverter("int", int.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         return Integer.parseInt(value);
       }
     });
 
-    addConverter("long", long.class, new Func1<String, Object>() {
+    addConverter("long", long.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         return Long.parseLong(value);
       }
     });
 
-    addConverter("float", float.class, new Func1<String, Object>() {
+    addConverter("float", float.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         return Float.parseFloat(value);
       }
     });
 
-    addConverter("double", double.class, new Func1<String, Object>() {
+    addConverter("double", double.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         return Double.parseDouble(value);
@@ -66,7 +64,7 @@ class TypeConverter {
     });
 
     // default date
-    addConverter("date", Date.class, new Func1<String, Object>() {
+    addConverter("date", Date.class, new TypeConverterFunction<String, Object>() {
       @Override
       public Object call(String value) {
         // attempt to parse long
@@ -86,7 +84,7 @@ class TypeConverter {
     });
   }
 
-  public void addConverter(String name, Class<?> type, Func1<String, ? extends Object> converter) {
+  public void addConverter(String name, Class<?> type, TypeConverterFunction<String, ? extends Object> converter) {
     this.namesToType.put(name, type);
     this.typeToConverter.put(type, converter);
   }
@@ -113,7 +111,7 @@ class TypeConverter {
     return this.namesToType.get(name);
   }
 
-  public Func1<String, ? extends Object> getConverter(Class<?> type) {
+  public TypeConverterFunction<String, ? extends Object> getConverter(Class<?> type) {
     return this.typeToConverter.get(type);
   }
 }

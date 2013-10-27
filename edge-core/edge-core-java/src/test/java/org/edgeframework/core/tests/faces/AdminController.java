@@ -3,7 +3,7 @@ package org.edgeframework.core.tests.faces;
 import java.util.Date;
 import java.util.UUID;
 
-import org.edgeframework.core.edges.controller.Controller;
+import org.edgeframework.java.core.controller.Controller;
 
 public class AdminController extends Controller {
   public AdminController() {
@@ -11,8 +11,8 @@ public class AdminController extends Controller {
 
   public Result echo() {
     String echo = "index";
-    if (request().params().contains("get")) {
-      echo = request().params().get("get");
+    if (request().getParams().contains("get")) {
+      echo = request().getParams().get("get");
     }
 
     return ok(echo);

@@ -1,1 +1,1 @@
-include 'edge-core'
+include ':edge-core:edge-core-java'

@@ -2,7 +2,7 @@ package org.edgeframework.core.tests.faces;
 
 import java.util.UUID;
 
-import org.edgeframework.core.edges.controller.ControllerEdge;
+import org.edgeframework.java.core.controller.ControllerEdge;
 
 import rx.util.functions.Func1;
 
