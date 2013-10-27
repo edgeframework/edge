@@ -1,0 +1,9 @@
+apply plugin: 'groovy'
+apply plugin: MavenPlugin
+
+dependencies {
+  compile gradleApi()
+  compile localGroovy()
+
+  compile "com.darylteo:vertx-gradle-plugin:1.1.0-ALPHA1-SNAPSHOT"
+}

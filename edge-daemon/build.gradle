@@ -1,0 +1,23 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: MavenPlugin
+
+mainClassName = 'org.edgeframework.daemon.Daemon'
+applicationName = 'edge'
+
+repositories {
+  maven { url 'http://repo.gradle.org/gradle/libs-releases-local' }
+  maven { url 'https://oss.sonatype.org/content/repositories/releases' }  // for gradle plugin
+  mavenLocal()
+}
+
+dependencies {
+  compile "io.vertx:vertx-platform:${vertxVersion}"
+  compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
+  compile "com.darylteo:directorywatcher:${directoryWatcherVersion}"
+}
+
+task installLocal(type:Sync, dependsOn: installApp) {
+  from installApp
+  into '/usr/local/bin/edge/'
+}

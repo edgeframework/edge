@@ -1,1 +1,1 @@
-include 'edge-core','edge-daemon','edge-builder'
+include 'edge-core'
