@@ -1,4 +1,4 @@
-package org.edgeframework.java.core.controller;
+package org.edgeframework.core.api.controllers;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -10,9 +10,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.edgeframework.java.core.Edge;
-import org.edgeframework.java.core.controller.Controller.Result;
-import org.edgeframework.java.core.http.Request;
+import org.edgeframework.core.api.Edge;
+import org.edgeframework.core.api.controllers.Controller.Result;
+import org.edgeframework.core.api.http.Request;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 
@@ -75,16 +75,16 @@ class RequestAction {
     receiver.setEdge(edge);
 
     /* Get Param Values */
-    List<Object> args = coerceParams(request.getParams());
+    List<Object> args = coerceParams(request.params());
 
     /* Invoke Receiver, receive result */
     args.add(0, receiver);
     Result result = (Result) this.handle.invokeWithArguments(args);
 
     /* Render result to response */
-    result.render(request.getResponse());
+    result.render(request.response());
   }
-
+ 
   private List<Object> coerceParams(MultiMap params) {
     List<Object> result = new LinkedList<>();
 

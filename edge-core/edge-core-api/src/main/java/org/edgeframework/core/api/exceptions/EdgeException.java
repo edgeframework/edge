@@ -1,4 +1,4 @@
-package org.edgeframework.java.core.exceptions;
+package org.edgeframework.core.api.exceptions;
 
 public class EdgeException extends RuntimeException {
   private static final long serialVersionUID = 1L;

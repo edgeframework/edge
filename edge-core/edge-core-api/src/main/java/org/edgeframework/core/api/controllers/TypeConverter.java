@@ -1,4 +1,4 @@
-package org.edgeframework.java.core.controller;
+package org.edgeframework.core.api.controllers;
 
 import java.text.DateFormat;
 import java.text.ParseException;

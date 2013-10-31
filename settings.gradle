@@ -1,1 +1,3 @@
-include ':edge-core:edge-core-java'
+['api','java','groovy'].each { name ->
+  include ":edge-core:edge-core-$name" 
+}

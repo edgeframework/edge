@@ -1,13 +1,11 @@
-package org.edgeframework.java.core.controller;
+package org.edgeframework.core.api.controllers;
 
 import java.util.Map;
 
-import org.edgeframework.java.core.Edge;
-import org.edgeframework.java.core.http.Request;
-import org.edgeframework.java.core.http.Response;
+import org.edgeframework.core.api.Edge;
+import org.edgeframework.core.api.http.Request;
+import org.edgeframework.core.api.http.Response;
 import org.vertx.java.core.Vertx;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public abstract class Controller {
 
@@ -74,7 +72,7 @@ public abstract class Controller {
     // }
     //
     // return sessionID;
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   protected void endSession() {
@@ -86,12 +84,12 @@ public abstract class Controller {
     //
     // // TODO: remove persistence backend
     // request.setSessionId(null);
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   protected boolean isActiveSession() {
     // return request.getSessionId() != null;
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   protected Map<String, String> session() {
@@ -112,7 +110,7 @@ public abstract class Controller {
     // // return the session map for this session
     // // if there isn't one, then create one
     // return this.sessionStrategy.getMap();
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   protected String cookies(String name) {
@@ -127,14 +125,14 @@ public abstract class Controller {
     // }
     //
     // return null;
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   protected void cookies(String name, String value) {
     // YokeCookie cookie = new YokeCookie(name, this.face.getMac());
     // cookie.setValue(value);
     // request.response().addCookie(cookie);
-    throw new NotImplementedException();
+    throw new UnsupportedOperationException();
   }
 
   /* Result Methods */

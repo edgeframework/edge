@@ -8,6 +8,7 @@ buildscript {
 }
 
 def testdir = file('testdir')
+def apiProject = childProjects.'edge-core-api'
 
 subprojects {
   repositories {
@@ -16,7 +17,10 @@ subprojects {
   }
 
   apply plugin: 'vertx'
+  apply plugin: 'maven'
 
+  version = '0.1.0-SNAPSHOT'
+  
   vertx {
     platform { version '2.0.2-final' }
 
@@ -24,6 +28,11 @@ subprojects {
     }
   }
 
+  dependencies { 
+    if(project != apiProject) {
+      compile apiProject
+    }
+  }
 
   test { workingDir = testdir }
 
