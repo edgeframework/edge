@@ -1,0 +1,28 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+  
+  dependencies {
+    classpath 'com.darylteo.vertx:vertx-gradle-plugin:0.1.0-SNAPSHOT'
+  }
+}
+
+apply plugin: 'vertx'
+
+repositories {
+  mavenLocal()
+}
+
+vertx {
+  platform {
+    version '2.0.2-final'
+  }
+  
+  config {
+    main 'MyEdgeApplication'
+    includes 'org.edgeframework~edge-core-java~0.1.0-SNAPSHOT'
+  }
+
+}

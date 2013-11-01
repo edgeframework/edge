@@ -1,3 +1,5 @@
 ['api','java','groovy'].each { name ->
   include ":edge-core:edge-core-$name" 
 }
+
+include ":edge-samples"

@@ -1,3 +1,5 @@
+import javax.security.auth.login.Configuration
+
 buildscript {
   repositories {
     mavenCentral()
@@ -9,6 +11,7 @@ buildscript {
 
 def testdir = file('testdir')
 def apiProject = childProjects.'edge-core-api'
+def langProjects = subprojects - apiProject
 
 subprojects {
   repositories {
@@ -20,23 +23,24 @@ subprojects {
   apply plugin: 'maven'
 
   version = '0.1.0-SNAPSHOT'
-  
-  vertx {
-    platform { version '2.0.2-final' }
 
-    config {
-    }
-  }
+  vertx.platform.version '2.0.2-final'
 
-  dependencies { 
-    if(project != apiProject) {
-      compile apiProject
-    }
-  }
+  test.workingDir = testdir
 
-  test { workingDir = testdir }
-
-  def release = !project.version.endsWith('-SNAPSHOT')
+  ext.release = !project.version.endsWith('-SNAPSHOT')
 }
 
+configure(langProjects) {
+  dependencies { compile apiProject }
 
+  artifacts { archives modZip }
+
+  uploadArchives {
+    repositories {
+      mavenDeployer { configuration = configurations.archives }
+    }
+  }
+}
+
+task('install') { dependsOn subprojects*.install }
