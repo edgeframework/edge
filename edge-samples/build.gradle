@@ -24,5 +24,6 @@ vertx {
     main 'MyEdgeApplication'
     includes 'org.edgeframework~edge-core-java~0.1.0-SNAPSHOT'
   }
-
 }
+
+runMod.dependsOn ':edge-core:edge-core-java:copyMod'

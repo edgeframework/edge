@@ -9,6 +9,16 @@ public interface Edge<V> {
   public void beforeStop();
 
   public void onError(Throwable error);
-  
+
+  /* Configuration */
+  public int port();
+
+  public Edge<V> port(int port);
+
+  public String host();
+
+  public Edge<V> host(String host);
+
+  /* Accessors */
   public V vertx();
 }

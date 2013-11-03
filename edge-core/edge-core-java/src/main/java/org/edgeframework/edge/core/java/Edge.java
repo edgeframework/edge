@@ -24,6 +24,30 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
   private int port;
   private String host;
 
+  /* Configuration Methods */
+  @Override
+  public int port() {
+    return this.port;
+  }
+
+  @Override
+  public Edge port(int port) {
+    this.port = port;
+    return this;
+  }
+
+  @Override
+  public String host() {
+    return this.host;
+  }
+
+  @Override
+  public Edge host(String host) {
+    this.host = host;
+    return this;
+  }
+
+  /* Constructor */
   public Edge() {
     this.engine = new Engine();
   }
@@ -38,8 +62,7 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
     this.engine.stop(this);
   }
 
-  /* Edge Interface Methods */
-
+  /* Edge Interface Lifecycle Methods */
   @Override
   public void beforeStart() {
   }
@@ -54,11 +77,13 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
 
   @Override
   public void onError(Throwable error) {
+    error.printStackTrace();
   }
 
   /* EdgeInternal Interface Methods */
   @Override
   public final void __configure() {
+    System.out.println("Configuring Edge");
     this.server = vertx.createHttpServer();
     server.requestHandler(new Handler<HttpServerRequest>() {
       @Override
@@ -73,6 +98,7 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
   @Override
   public final void __begin() {
     this.server.listen(this.port, this.host);
+    System.out.println("Server Listening");
   }
 
   @Override

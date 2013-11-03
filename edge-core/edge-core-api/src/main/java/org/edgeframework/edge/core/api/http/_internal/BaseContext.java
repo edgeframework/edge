@@ -7,6 +7,7 @@ import org.edgeframework.edge.core.api.filters.Filter;
 import org.edgeframework.edge.core.api.http.Context;
 import org.edgeframework.edge.core.api.http.Request;
 import org.edgeframework.edge.core.api.http.Response;
+import org.vertx.java.core.Handler;
 
 public abstract class BaseContext<V> implements Context<V> {
   private V vertx;
@@ -36,4 +37,15 @@ public abstract class BaseContext<V> implements Context<V> {
     this.filters = new LinkedList<>(filters);
   }
 
+  @Override
+  public void next() {
+    if (filters.isEmpty()) {
+      // TODO: Execute controller
+      return;
+    }
+
+    this.processFilter(filters.remove(0));
+  }
+
+  protected abstract void processFilter(Filter filter);
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.edgeframework.edge.core.api.Edge;
 import org.edgeframework.edge.core.api.filters.Filter;
 import org.edgeframework.edge.core.api.http._internal.BaseContext;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 
 public class Context extends BaseContext<Vertx> {
@@ -13,9 +14,12 @@ public class Context extends BaseContext<Vertx> {
   }
 
   @Override
-  public void next() {
-    // TODO Auto-generated method stub
-
+  protected void processFilter(final Filter filter) {
+    this.vertx().runOnContext(new Handler<Void>() {
+      @Override
+      public void handle(Void event) {
+        filter.action(Context.this);
+      }
+    });
   }
-
 }
