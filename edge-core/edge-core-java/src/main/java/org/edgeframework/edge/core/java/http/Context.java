@@ -9,7 +9,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 
 public class Context extends BaseContext<Vertx> {
-  public Context(Edge<Vertx> edge, Request request, List<Filter> filters) {
+  public Context(Edge<Vertx, ?> edge, Request request, List<Filter> filters) {
     super(edge.vertx(), request, filters);
   }
 
