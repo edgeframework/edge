@@ -7,7 +7,6 @@ import org.edgeframework.edge.core.api.filters.Filter;
 import org.edgeframework.edge.core.api.http.Context;
 import org.edgeframework.edge.core.api.http.Request;
 import org.edgeframework.edge.core.api.http.Response;
-import org.vertx.java.core.Handler;
 
 public abstract class BaseContext<V> implements Context<V> {
   private V vertx;

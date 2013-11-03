@@ -24,24 +24,23 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
   private int port;
   private String host;
 
+  /* Filters and Delegates */
+  
+  
   /* Configuration Methods */
-  @Override
   public int port() {
     return this.port;
   }
 
-  @Override
   public Edge port(int port) {
     this.port = port;
     return this;
   }
 
-  @Override
   public String host() {
     return this.host;
   }
 
-  @Override
   public Edge host(String host) {
     this.host = host;
     return this;
@@ -82,6 +81,12 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
 
   /* EdgeInternal Interface Methods */
   @Override
+  public void __defaults(int port, String host) {
+    this.port = port;
+    this.host = host;
+  }
+
+  @Override
   public final void __configure() {
     System.out.println("Configuring Edge");
     this.server = vertx.createHttpServer();
@@ -90,7 +95,8 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
       public void handle(HttpServerRequest vRequest) {
         Request request = new Request(vRequest);
 
-        final Context context = new Context(Edge.this, request, Edge.this.__filters());
+        final Context context = new Context(Edge.this, request, Edge.this.filters());
+        context.next();
       }
     });
   }
@@ -102,7 +108,7 @@ public class Edge extends Verticle implements org.edgeframework.edge.core.api.Ed
   }
 
   @Override
-  public List<Filter> __filters() {
+  public List<Filter> filters() {
     // TODO Auto-generated method stub
     return null;
   }

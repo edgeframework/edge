@@ -1,5 +1,9 @@
 package org.edgeframework.edge.core.api;
 
+import java.util.List;
+
+import org.edgeframework.edge.core.api.filters.Filter;
+
 public interface Edge<V> {
   /* Lifecycle Hooks */
   public void beforeStart();
@@ -10,14 +14,8 @@ public interface Edge<V> {
 
   public void onError(Throwable error);
 
-  /* Configuration */
-  public int port();
-
-  public Edge<V> port(int port);
-
-  public String host();
-
-  public Edge<V> host(String host);
+  /* Properties */
+  public List<? extends Filter> filters();
 
   /* Accessors */
   public V vertx();

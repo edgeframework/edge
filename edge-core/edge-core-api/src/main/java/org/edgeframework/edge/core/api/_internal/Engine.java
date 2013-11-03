@@ -7,9 +7,7 @@ public class Engine {
   /* Verticle Methods */
   public <E extends Edge<?> & EdgeInternal> void start(E edge, Future<Void> startedResult) {
     try {
-      /* Set Defaults */
-      edge.port(8000);
-      edge.host("localhost");
+      edge.__defaults(8080, "localhost");
 
       /* Lifecycle */
       edge.beforeStart();
