@@ -4,7 +4,7 @@ import org.vertx.groovy.core.Vertx
 import org.vertx.groovy.platform.Verticle
 import org.vertx.java.core.Future
 
-public abstract class Edge extends Verticle implements org.edgeframework.edge.core.api.Edge<Vertx, Application> {
+public abstract class Edge extends Verticle {
   final Application app
 
   public Application app() {

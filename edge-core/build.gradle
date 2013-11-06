@@ -9,7 +9,7 @@ buildscript {
 }
 
 def testdir = file('testdir')
-def apiProject = childProjects.'edge-core-api'
+def apiProject = childProjects.'edge-core-java'
 def langProjects = subprojects - apiProject
 
 subprojects {
@@ -38,7 +38,7 @@ subprojects {
     classifier = 'javadoc'
     from javadoc
   }
-  
+
   artifacts {
     archives sourcesJar
     archives javadocJar

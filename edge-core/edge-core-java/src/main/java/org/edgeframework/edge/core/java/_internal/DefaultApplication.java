@@ -1,35 +1,41 @@
-package org.edgeframework.edge.core.api._internal;
+package org.edgeframework.edge.core.java._internal;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.edgeframework.edge.core.api.Application;
-import org.edgeframework.edge.core.api.delegates.Delegate;
-import org.edgeframework.edge.core.api.delegates.DelegatesContainer;
-import org.edgeframework.edge.core.api.filters.Filter;
+import org.edgeframework.edge.core.java.Application;
+import org.edgeframework.edge.core.java.delegates.AppDelegate;
+import org.edgeframework.edge.core.java.delegates.AppDelegateContainer;
+import org.edgeframework.edge.core.java.delegates._internal.DefaultAppDelegateContainer;
+import org.edgeframework.edge.core.java.filters.FilterContainer;
+import org.edgeframework.edge.core.java.filters._internal.DefaultFilterContainer;
+import org.edgeframework.edge.core.java.http._internal.DefaultHttpContext;
 import org.vertx.java.core.Future;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
+import org.vertx.java.core.http.HttpServerRequest;
 
-public class BaseApplication<A extends BaseApplication<A>> implements Application {
+public class DefaultApplication implements Application {
   // TODO:
-  private final DelegatesContainer delegates;
+  private final AppDelegateContainer delegates;
 
-  public DelegatesContainer getDelegates() {
+  @Override
+  public AppDelegateContainer getDelegates() {
     return this.delegates;
   }
 
-  public DelegatesContainer delegates() {
+  @Override
+  public AppDelegateContainer delegates() {
     return this.delegates;
   }
 
-  private final List<Filter> filters;
+  private final FilterContainer filters;
 
-  public List<Filter> getFilters() {
+  @Override
+  public FilterContainer getFilters() {
     return this.filters;
   }
 
-  public List<Filter> filters() {
+  @Override
+  public FilterContainer filters() {
     return this.filters;
   }
 
@@ -91,11 +97,11 @@ public class BaseApplication<A extends BaseApplication<A>> implements Applicatio
     return this.vertx;
   }
 
-  public BaseApplication(Vertx vertx) {
+  public DefaultApplication(Vertx vertx) {
     this.vertx = vertx;
 
-    this.delegates = null;
-    this.filters = new LinkedList<>();
+    this.delegates = new DefaultAppDelegateContainer();
+    this.filters = new DefaultFilterContainer();
   }
 
   /* Verticle Methods */
@@ -124,32 +130,41 @@ public class BaseApplication<A extends BaseApplication<A>> implements Applicatio
 
   /* Delegate Methods */
   private void afterStart() {
-    for (Delegate delegate : delegates) {
+    for (AppDelegate delegate : delegates) {
       delegate.afterStart(this);
     }
   }
 
   private void beforeStart() {
-    for (Delegate delegate : delegates) {
+    for (AppDelegate delegate : delegates) {
       delegate.beforeStart(this);
     }
   }
 
   private void beforeStop() {
-    for (Delegate delegate : delegates) {
+    for (AppDelegate delegate : delegates) {
       delegate.beforeStop(this);
     }
   }
 
   private void onError(Throwable e) {
-    for (Delegate delegate : delegates) {
+    for (AppDelegate delegate : delegates) {
       delegate.onError(e);
     }
   }
 
   /* Abstract Methods */
   protected void startServer(Vertx vertx, int port, String host) {
-    HttpServer server = vertx.createHttpServer();
+    final DefaultApplication that = this;
+    final HttpServer server = vertx.createHttpServer();
+
+    server.requestHandler(new Handler<HttpServerRequest>() {
+      @Override
+      public void handle(HttpServerRequest request) {
+        DefaultHttpContext context = new DefaultHttpContext(that.vertx, request, that.filters);
+        context.next();
+      }
+    });
 
     server.listen(port, host);
   }
