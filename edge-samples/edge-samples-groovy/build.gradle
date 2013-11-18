@@ -1,0 +1,26 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies { classpath 'com.darylteo.vertx:vertx-gradle-plugin:0.1.0-SNAPSHOT' }
+}
+
+apply plugin: 'vertx'
+
+repositories { mavenLocal() }
+
+vertx {
+  platform {
+    version '2.0.2-final'
+    groovy '2.0.0-final'
+  }
+
+  config {
+    main 'groovy:MyEdgeApplication'
+    includes 'org.edgeframework~edge-core-java~0.1.0-SNAPSHOT'
+  }
+}
+
+runMod.dependsOn ':edge-core:edge-core-java:copyMod'

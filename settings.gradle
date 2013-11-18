@@ -1,5 +1,6 @@
-['java','groovy'].each { name ->
+['java','groovy','scala'].each { name ->
   include ":edge-core:edge-core-$name" 
 }
 
-include ":edge-samples"
+include ":edge-samples:edge-samples-java"
+include ":edge-samples:edge-samples-groovy"
