@@ -32,7 +32,7 @@ public class MyEdgeApplication extends Edge {
       }
 
       @Override
-      public void onError(Throwable e) {
+      public void onError(Application app, Throwable e) {
         System.out.println("Error Occurred!");
         e.printStackTrace();
       }

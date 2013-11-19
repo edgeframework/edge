@@ -19,8 +19,9 @@ vertx {
 
   config {
     main 'groovy:MyEdgeApplication'
-    includes 'org.edgeframework~edge-core-java~0.1.0-SNAPSHOT'
+    autoRedeploy true
+    includes 'org.edgeframework~edge-core-groovy~0.1.0-SNAPSHOT'
   }
 }
 
-runMod.dependsOn ':edge-core:edge-core-java:copyMod'
+runMod.dependsOn ':edge-core:edge-core-groovy:copyMod'

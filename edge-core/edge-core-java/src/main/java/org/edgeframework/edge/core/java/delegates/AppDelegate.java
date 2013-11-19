@@ -9,5 +9,5 @@ public interface AppDelegate {
 
   public void beforeStop(Application app);
 
-  public void onError(Throwable e);
+  public void onError(Application app, Throwable e);
 }

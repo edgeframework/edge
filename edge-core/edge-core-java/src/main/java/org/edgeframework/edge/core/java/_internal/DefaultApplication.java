@@ -149,7 +149,7 @@ public class DefaultApplication implements Application {
 
   private void onError(Throwable e) {
     for (AppDelegate delegate : delegates) {
-      delegate.onError(e);
+      delegate.onError(this, e);
     }
   }
 

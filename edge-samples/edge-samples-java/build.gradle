@@ -22,6 +22,7 @@ vertx {
   
   config {
     main 'MyEdgeApplication'
+    autoRedeploy true
     includes 'org.edgeframework~edge-core-java~0.1.0-SNAPSHOT'
   }
 }

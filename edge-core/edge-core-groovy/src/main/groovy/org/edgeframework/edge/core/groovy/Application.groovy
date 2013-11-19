@@ -7,7 +7,7 @@ import org.vertx.groovy.core.Vertx
 
 @CompileStatic
 public class Application {
-  private org.edgeframework.edge.core.java.Application jApplication
+  private org.edgeframework.edge.core.java._internal.DefaultApplication jApplication
 
   public int getPort() {
     return this.jApplication.port
