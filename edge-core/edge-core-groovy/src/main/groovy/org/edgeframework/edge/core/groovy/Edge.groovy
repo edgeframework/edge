@@ -1,5 +1,6 @@
 package org.edgeframework.edge.core.groovy
 
+import org.edgeframework.edge.core.groovy._impl.DefaultApplication
 import org.vertx.groovy.platform.Verticle
 import org.vertx.java.core.Future
 
@@ -16,7 +17,7 @@ public abstract class Edge extends Verticle {
 
   @Override
   public def start(Future<Void> startedResult) {
-    this.app = new Application(this.vertx)
+    this.app = new DefaultApplication(this.vertx)
     this.configure(this.app)
 
     this.app.start(startedResult)

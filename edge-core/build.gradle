@@ -9,7 +9,7 @@ buildscript {
 }
 
 def testdir = file('testdir')
-def apiProject = childProjects.'edge-core-java'
+def apiProject = childProjects.'edge-core-api'
 def langProjects = subprojects - apiProject
 
 subprojects {

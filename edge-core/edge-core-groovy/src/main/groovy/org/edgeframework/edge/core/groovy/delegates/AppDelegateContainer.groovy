@@ -1,8 +1,11 @@
 package org.edgeframework.edge.core.groovy.delegates
 
-public class AppDelegateContainer implements Iterable<AppDelegate> {
-  private org.edgeframework.edge.core.java.delegates.AppDelegateContainer jDelegates
-  private def emptyClosure = {
+import org.edgeframework.edge.core._internal.delegates.AppDelegateContainerInternal
+
+public class AppDelegateContainer {
+  private AppDelegateContainerInternal jDelegates
+
+  private final def emptyClosure = {
   }
 
   public void add(AppDelegate delegate) {
@@ -31,7 +34,7 @@ public class AppDelegateContainer implements Iterable<AppDelegate> {
   public Iterator<AppDelegate> iterator() {
   }
 
-  public AppDelegateContainer(org.edgeframework.edge.core.java.delegates.AppDelegateContainer jDelegates){
+  public AppDelegateContainer(AppDelegateContainerInternal jDelegates){
     this.jDelegates = jDelegates
   }
 }
