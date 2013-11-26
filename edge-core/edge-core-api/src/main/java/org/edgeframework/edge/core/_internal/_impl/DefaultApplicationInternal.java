@@ -1,26 +1,27 @@
 package org.edgeframework.edge.core._internal._impl;
 
-import org.edgeframework.edge.core._internal.ApplicationInternal;
 import org.edgeframework.edge.core._internal.delegates.AppDelegateContainerInternal;
 import org.edgeframework.edge.core._internal.delegates.AppDelegateInternal;
-import org.edgeframework.edge.core._internal.filters.FilterContainer;
-import org.edgeframework.edge.core._internal.http.HttpContextFactory;
+import org.edgeframework.edge.core._internal.filters.FilterContainerInternal;
+import org.edgeframework.edge.core._internal.http.HttpContextFactoryInternal;
+import org.edgeframework.edge.core._internal.http.HttpContextInternal;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 
-public abstract class DefaultApplicationInternal implements ApplicationInternal {
+public class DefaultApplicationInternal {
   private AppDelegateContainerInternal delegates;
-  private FilterContainer filters;
+  private FilterContainerInternal filters;
+  private HttpContextFactoryInternal factory;
 
   private int port = 8080;
   private String host = "localhost";
 
   private Vertx vertx;
 
-  public DefaultApplicationInternal(Vertx vertx, AppDelegateContainerInternal delegates, FilterContainer filters, HttpContextFactory factory) {
+  public DefaultApplicationInternal(Vertx vertx, AppDelegateContainerInternal delegates, FilterContainerInternal filters, HttpContextFactoryInternal factory) {
     this.vertx = vertx;
 
     this.delegates = delegates;
@@ -76,7 +77,7 @@ public abstract class DefaultApplicationInternal implements ApplicationInternal 
     }
   }
 
-  /* Abstract Methods */
+  /* Server Methods */
   protected void startServer(Vertx vertx, int port, String host) {
     final DefaultApplicationInternal that = this;
     final HttpServer server = vertx.createHttpServer();
@@ -89,5 +90,11 @@ public abstract class DefaultApplicationInternal implements ApplicationInternal 
     });
 
     server.listen(port, host);
+  }
+
+  @Override
+  public void handle(Vertx vertx, HttpServerRequest request, FilterContainerInternal filters) {
+    HttpContextInternal context = this.factory.newContext(vertx, request, filters);
+    context.next();
   }
 }

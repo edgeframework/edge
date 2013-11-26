@@ -2,7 +2,7 @@ package org.edgeframework.edge.core.groovy.http
 
 import groovy.transform.CompileStatic
 
-import org.edgeframework.edge.core._internal.filters.FilterContainer
+import org.edgeframework.edge.core._internal.filters.FilterContainerInternal
 import org.edgeframework.edge.core._internal.http.HttpContextInternal
 import org.vertx.groovy.core.Vertx
 import org.vertx.java.core.http.HttpServerRequest
@@ -24,7 +24,7 @@ public class HttpContext implements HttpContextInternal {
     return this.response
   }
 
-  HttpContext(org.vertx.java.core.Vertx jVertex, HttpServerRequest jRequest, FilterContainer jfilters) {
+  HttpContext(org.vertx.java.core.Vertx jVertex, HttpServerRequest jRequest, FilterContainerInternal jfilters) {
     this.vertx = new Vertx(jVertex)
     this.request = new HttpRequest(jRequest)
     this.response = new HttpResponse(jRequest.response())
