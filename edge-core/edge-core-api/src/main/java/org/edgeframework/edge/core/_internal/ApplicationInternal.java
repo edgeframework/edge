@@ -1,7 +1,20 @@
 package org.edgeframework.edge.core._internal;
 
+import org.vertx.java.core.Future;
+import org.vertx.java.core.http.HttpServerRequest;
 
 public interface ApplicationInternal {
-  // public void handle(Vertx vertx, HttpServerRequest request,
-  // FilterContainerInternal filters);
+  void start(Future<Void> startedResult);
+
+  void stop();
+
+  void afterStart();
+
+  void beforeStart();
+
+  void beforeStop();
+
+  void onError(Throwable e);
+
+  void handle(HttpServerRequest request);
 }
