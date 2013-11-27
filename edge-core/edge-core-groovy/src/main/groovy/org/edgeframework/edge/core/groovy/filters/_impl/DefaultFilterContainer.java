@@ -1,25 +1,24 @@
 package org.edgeframework.edge.core.groovy.filters._impl;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import org.edgeframework.edge.core._internal.filters.FilterContainerInternal;
-import org.edgeframework.edge.core._internal.filters.FilterInternal;
-import org.edgeframework.edge.core._internal.filters._impl.DefaultFilterContainerInternal;
 import org.edgeframework.edge.core.groovy.filters.Filter;
 import org.edgeframework.edge.core.groovy.filters.FilterContainer;
 
-public class DefaultFilterContainer implements FilterContainer, FilterContainerInternal {
-  private DefaultFilterContainerInternal jFilters;
+public class DefaultFilterContainer implements FilterContainer {
+  private List<Filter> filters;
 
-  public DefaultFilterContainer(DefaultFilterContainerInternal jFilters) {
-    this.jFilters = jFilters;
+  public DefaultFilterContainer() {
+    this.filters = new LinkedList<>();
   }
 
   public void add(Filter filter) {
   }
 
   @Override
-  public Iterator<FilterInternal> iterator() {
-    return this.jFilters.iterator();
+  public Iterator<Filter> iterator() {
+    return this.filters.iterator();
   }
 }

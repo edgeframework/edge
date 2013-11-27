@@ -1,8 +1,5 @@
-package org.edgeframework.edge.core._internal._impl;
+package org.edgeframework.edge.core._internal;
 
-import org.edgeframework.edge.core._internal.ApplicationInternal;
-import org.edgeframework.edge.core._internal.delegates._impl.DefaultAppDelegateContainerInternal;
-import org.edgeframework.edge.core._internal.filters._impl.DefaultFilterContainerInternal;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -10,18 +7,6 @@ import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 
 public class ApplicationEngine {
-  private DefaultAppDelegateContainerInternal delegates;
-
-  public DefaultAppDelegateContainerInternal getDelegates() {
-    return this.delegates;
-  }
-
-  private DefaultFilterContainerInternal filters;
-
-  public DefaultFilterContainerInternal getFilters() {
-    return this.filters;
-  }
-
   private Vertx vertx;
 
   public Vertx getVertx() {
@@ -36,9 +21,6 @@ public class ApplicationEngine {
   public ApplicationEngine(Vertx vertx, ApplicationInternal app) {
     this.vertx = vertx;
     this.app = app;
-
-    this.delegates = new DefaultAppDelegateContainerInternal();
-    this.filters = new DefaultFilterContainerInternal();
   }
 
   /* Verticle Methods */

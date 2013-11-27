@@ -1,7 +1,7 @@
 package org.edgeframework.edge.core.groovy._impl;
 
+import org.edgeframework.edge.core._internal.ApplicationEngine;
 import org.edgeframework.edge.core._internal.ApplicationInternal;
-import org.edgeframework.edge.core._internal._impl.ApplicationEngine;
 import org.edgeframework.edge.core.groovy.Application;
 import org.edgeframework.edge.core.groovy.delegates.AppDelegate;
 import org.edgeframework.edge.core.groovy.delegates.AppDelegateContainer;
@@ -25,8 +25,8 @@ public class DefaultApplication implements Application, ApplicationInternal {
     this.vertx = vertx;
     this.engine = new ApplicationEngine(vertx.toJavaVertx(), this);
 
-    this.delegates = new DefaultAppDelegateContainer(this.engine.getDelegates());
-    this.filters = new DefaultFilterContainer(this.engine.getFilters());
+    this.delegates = new DefaultAppDelegateContainer();
+    this.filters = new DefaultFilterContainer();
   }
 
   @Override
@@ -69,17 +69,17 @@ public class DefaultApplication implements Application, ApplicationInternal {
 
   @Override
   public void handle(HttpServerRequest request) {
-    HttpContext context = new HttpContext(this.vertx, request, this.engine.filters);
+    HttpContext context = new HttpContext(this.vertx, request, this.filters);
     context.next();
   }
 
   @Override
   public void start(Future<Void> startedResult) {
-    this.engine.start(startedResult)
+    this.engine.start(startedResult);
   }
 
   @Override
   public void stop() {
-    this.engine.stop()
+    this.engine.stop();
   }
 }

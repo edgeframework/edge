@@ -1,7 +1,10 @@
 package org.edgeframework.edge.core.groovy.http;
 
-import org.edgeframework.edge.core._internal.filters.FilterContainerInternal;
+import java.util.Iterator;
+
 import org.edgeframework.edge.core._internal.http.HttpContextInternal;
+import org.edgeframework.edge.core.groovy.filters.Filter;
+import org.edgeframework.edge.core.groovy.filters.FilterContainer;
 import org.vertx.groovy.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 
@@ -24,14 +27,21 @@ public class HttpContext implements HttpContextInternal {
     return this.response;
   }
 
-  HttpContext(Vertx vertx, HttpServerRequest jRequest, FilterContainerInternal jfilters) {
+  final Iterator<Filter> iterator;
+
+  public HttpContext(Vertx vertx, HttpServerRequest jRequest, FilterContainer filters) {
     this.vertx = vertx;
     this.request = new HttpRequest(jRequest);
     this.response = new HttpResponse(jRequest.response());
+
+    this.iterator = filters.iterator();
   }
 
   @Override
   public void next() {
-    // TODO Auto-generated method stub
+    if (iterator.hasNext()) {
+      Filter f = iterator.next();
+      f.action(this);
+    }
   }
 }
