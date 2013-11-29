@@ -1,10 +1,10 @@
 package org.edgeframework.edge.core.groovy;
 
+import org.edgeframework.edge.core.api._Application;
+import org.edgeframework.edge.core.groovy.delegates.AppDelegate;
 import org.edgeframework.edge.core.groovy.delegates.AppDelegateContainer;
-import org.edgeframework.edge.core.groovy.filters.FilterContainer;
 
-public interface Application {
+public interface Application extends _Application<Application, AppDelegateContainer, AppDelegate> {
+  @Override
   public AppDelegateContainer getDelegates();
-
-  public FilterContainer getFilters();
 }

@@ -1,9 +1,8 @@
 package org.edgeframework.edge.core.groovy.delegates;
 
-import java.util.Map;
+import org.edgeframework.edge.core.api.delegates._AppDelegateContainer;
+import org.edgeframework.edge.core.groovy.Application;
 
-public interface AppDelegateContainer {
-  public void add(AppDelegate delegate);
+public class AppDelegateContainer extends _AppDelegateContainer<Application, AppDelegate> {
 
-  public void add(Map<String, Object> delegate);
 }

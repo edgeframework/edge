@@ -1,33 +1,17 @@
 package org.edgeframework.edge.core.groovy;
 
-import org.edgeframework.edge.core.groovy._impl.DefaultApplication;
+import org.edgeframework.edge.core.api._ApplicationEngine;
 import org.vertx.groovy.platform.Verticle;
 import org.vertx.java.core.Future;
 
-public abstract class Edge extends Verticle {
-  private DefaultApplication app;
+public class Edge extends Verticle {
 
   @Override
   public Object start(Future<Void> startedResult) {
-    try {
-      this.app = new DefaultApplication(this.getVertx());
-      this.configure(this.app);
+    startedResult.setResult(null);
 
-      this.app.start(startedResult);
-    } catch (Throwable e) {
-      e.printStackTrace();
-      startedResult.setFailure(e);
-    }
-
+    DefaultApplication app = new DefaultApplication(this.getVertx());
+    _ApplicationEngine<Application> engine = new _ApplicationEngine<Application>(app);
     return null;
-  }
-
-  @Override
-  public Object stop() {
-    this.app.stop();
-    return null;
-  }
-
-  public void configure(Application app) {
   }
 }
