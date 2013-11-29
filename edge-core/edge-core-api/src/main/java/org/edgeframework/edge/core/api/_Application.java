@@ -1,8 +1,9 @@
 package org.edgeframework.edge.core.api;
 
-import org.edgeframework.edge.core.api.delegates._AppDelegate;
 import org.edgeframework.edge.core.api.delegates._AppDelegateContainer;
 
-public interface _Application<A extends _Application<A, C, AD>, C extends _AppDelegateContainer<A, AD>, AD extends _AppDelegate<A>> {
+// A - a implementation of _Application
+// C - a implementation of _AppDelegateContainer. Must hold and return AppDelegates of A.
+public interface _Application<A extends _Application<A, C>, C extends _AppDelegateContainer<A, ?>> {
   C getDelegates();
 }

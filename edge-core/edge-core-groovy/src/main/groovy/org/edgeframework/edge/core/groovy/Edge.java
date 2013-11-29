@@ -12,6 +12,12 @@ public class Edge extends Verticle {
 
     DefaultApplication app = new DefaultApplication(this.getVertx());
     _ApplicationEngine<Application> engine = new _ApplicationEngine<Application>(app);
+
+    this.configure(app);
+
     return null;
+  }
+
+  public void configure(Application app) {
   }
 }
