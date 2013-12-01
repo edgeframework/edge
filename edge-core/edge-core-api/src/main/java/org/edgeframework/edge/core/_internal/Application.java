@@ -3,7 +3,7 @@ package org.edgeframework.edge.core._internal;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.http.HttpServerRequest;
 
-public interface ApplicationInternal {
+public interface Application {
   void start(Future<Void> startedResult);
 
   void stop();

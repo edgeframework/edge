@@ -1,11 +1,13 @@
-
 buildscript {
   repositories {
     mavenCentral()
     mavenLocal()
   }
 
-  dependencies { classpath "com.darylteo.vertx:vertx-gradle-plugin:0.1.0-SNAPSHOT" }
+  dependencies {
+    classpath "com.darylteo.vertx:vertx-gradle-plugin:0.1.0-SNAPSHOT"
+    classpath "com.darylteo.gradle:codegen-plugin:0.1.0-SNAPSHOT"
+  }
 }
 
 def testdir = file('testdir')
@@ -45,8 +47,36 @@ subprojects {
   }
 }
 
+configure(apiProject) {
+  vertx {
+    platform {
+      groovy '2.0.0-final'
+      scala '0.2.0'
+    }
+  }
+
+  task('generateGroovy', type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
+    dependsOn classes
+    classFiles(sourceSets.main)
+  }
+}
+
 configure(langProjects) {
-  dependencies { compile apiProject }
+  def apiDir = "$buildDir/api"
+  task getApi(type: Sync) {
+    from apiProject.generateGroovy
+    into file(apiDir)
+  }
+
+  sourceSets {
+    main {
+      compileClasspath += files(apiDir) { builtBy getApi }
+    }
+  }
+
+  modZip { from apiDir }
+
+  jar { from apiDir }
 
   artifacts { archives modZip }
 

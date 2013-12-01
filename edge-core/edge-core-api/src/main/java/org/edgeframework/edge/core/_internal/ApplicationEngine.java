@@ -13,12 +13,12 @@ public class ApplicationEngine {
     return this.vertx;
   }
 
-  private ApplicationInternal app;
+  private Application app;
 
   private int port = 8080;
   private String host = "localhost";
 
-  public ApplicationEngine(Vertx vertx, ApplicationInternal app) {
+  public ApplicationEngine(Vertx vertx, Application app) {
     this.vertx = vertx;
     this.app = app;
   }
