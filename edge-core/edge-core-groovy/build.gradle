@@ -1,0 +1,28 @@
+def apiDir = "$buildDir/api"
+def apiProject = parent.childProjects.'edge-core-api'
+
+import javassist.CtClass
+
+def _generator = { CtClass c -> 
+  println c.name
+}
+
+task('generateGroovy', type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
+  dependsOn apiProject.classes
+  from apiProject
+//  generator = _generator
+}
+task getApi(type: Sync) {
+  from generateGroovy
+  into file(apiDir)
+}
+
+sourceSets {
+  main {
+    compileClasspath += files(apiDir) { builtBy getApi }
+  }
+}
+
+modZip { from apiDir }
+
+jar { from apiDir }

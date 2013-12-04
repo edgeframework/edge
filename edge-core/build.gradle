@@ -54,30 +54,9 @@ configure(apiProject) {
       scala '0.2.0'
     }
   }
-
-  task('generateGroovy', type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
-    dependsOn classes
-    classFiles(sourceSets.main)
-  }
 }
 
 configure(langProjects) {
-  def apiDir = "$buildDir/api"
-  task getApi(type: Sync) {
-    from apiProject.generateGroovy
-    into file(apiDir)
-  }
-
-  sourceSets {
-    main {
-      compileClasspath += files(apiDir) { builtBy getApi }
-    }
-  }
-
-  modZip { from apiDir }
-
-  jar { from apiDir }
-
   artifacts { archives modZip }
 
   uploadArchives {
