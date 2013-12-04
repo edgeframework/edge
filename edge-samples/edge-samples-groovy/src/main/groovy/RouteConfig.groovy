@@ -21,7 +21,7 @@ class RouteConfig implements AppDelegate{
   }
 
   @Override
-  public void onError(Application app, Throwable e) {
+  public void onError(Application arg0, Throwable arg1) {
     // TODO Auto-generated method stub
 
   }

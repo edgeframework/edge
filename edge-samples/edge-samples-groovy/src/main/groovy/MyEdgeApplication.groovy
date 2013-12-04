@@ -1,4 +1,4 @@
-import org.edgeframework.edge.core._internal.ApplicationEngine
+import org.edgeframework.edge.core.groovy.ApplicationEngine
 import org.vertx.groovy.platform.Verticle
 
 public class MyEdgeApplication extends Verticle {

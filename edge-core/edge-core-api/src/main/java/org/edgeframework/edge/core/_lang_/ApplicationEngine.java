@@ -1,4 +1,4 @@
-package org.edgeframework.edge.core._internal;
+package org.edgeframework.edge.core._lang_;
 
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;

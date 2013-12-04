@@ -2,15 +2,38 @@ def apiDir = "$buildDir/api"
 def apiProject = parent.childProjects.'edge-core-api'
 
 import javassist.CtClass
+import javassist.CtMethod
+import javassist.CtField
 
-def _generator = { CtClass c -> 
+def _generator = { CtClass c ->
+  def placeholder = '_lang_'
+  def lang = 'groovy'
+
   println c.name
+  c.declaredMethods.each { CtMethod method ->
+    //    method.parameterTypes.each { CtClass param ->
+    //      println "  Parameter: $param.name"
+    //      try{
+    //        if(param.name.contains('_lang_')){
+    //          param.name = param.name.replace('_lang_','groovy')
+    //        }
+    //      }catch(Exception e){
+    //        e.printStackTrace()
+    //      }
+    //    }
+
+    def info = method.methodInfo
+    println "Method: $info.descriptor"
+    info.descriptor = info.descriptor.replace(placeholder, lang)
+  }
+
+  c.name = c.name.replace(placeholder, lang)
 }
 
 task('generateGroovy', type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
   dependsOn apiProject.classes
   from apiProject
-//  generator = _generator
+  generator = _generator
 }
 task getApi(type: Sync) {
   from generateGroovy
