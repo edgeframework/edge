@@ -1,32 +1,25 @@
 def apiDir = "$buildDir/api"
 def apiProject = parent.childProjects.'edge-core-api'
 
-import javassist.CtClass
-import javassist.CtMethod
-import javassist.CtField
+import javassist.*
 
 def _generator = { CtClass c ->
   def placeholder = '_lang_'
   def lang = 'groovy'
 
   println c.name
-  c.declaredMethods.each { CtMethod method ->
-    //    method.parameterTypes.each { CtClass param ->
-    //      println "  Parameter: $param.name"
-    //      try{
-    //        if(param.name.contains('_lang_')){
-    //          param.name = param.name.replace('_lang_','groovy')
-    //        }
-    //      }catch(Exception e){
-    //        e.printStackTrace()
-    //      }
-    //    }
-
+  c.declaredBehaviors.each { CtBehavior method ->
     def info = method.methodInfo
     println "Method: $info.descriptor"
     info.descriptor = info.descriptor.replace(placeholder, lang)
   }
 
+  c.declaredFields.each { CtField field ->
+    def info = field.fieldInfo
+    println "Field: $info.descriptor"
+    info.descriptor = info.descriptor.replace(placeholder, lang)
+  }
+  
   c.name = c.name.replace(placeholder, lang)
 }
 

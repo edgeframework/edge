@@ -18,7 +18,7 @@ public class ApplicationEngine {
   private int port = 8080;
   private String host = "localhost";
 
-  public ApplicationEngine(Vertx vertx, Application app) {
+  public ApplicationEngine(Vertx vertx) {
     this.vertx = vertx;
     this.app = app;
   }

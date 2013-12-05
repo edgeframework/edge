@@ -4,25 +4,22 @@ import org.edgeframework.edge.core.groovy.delegates.AppDelegate
 class RouteConfig implements AppDelegate{
   @Override
   public void afterStart(Application arg0) {
-    // TODO Auto-generated method stub
-
+    println "Start"
   }
 
   @Override
   public void beforeStart(Application arg0) {
-    // TODO Auto-generated method stub
-
+    println "Starting"
   }
 
   @Override
   public void beforeStop(Application arg0) {
-    // TODO Auto-generated method stub
-
+    println "Stopping"
   }
 
   @Override
   public void onError(Application arg0, Throwable arg1) {
-    // TODO Auto-generated method stub
-
+    println "Error"
+    arg1.printStackTrace()
   }
 }
