@@ -50,8 +50,7 @@ subprojects {
 configure(apiProject) {
   vertx {
     platform {
-      groovy '2.0.0-final'
-      scala '0.2.0'
+      java '2.0.2-final'
     }
   }
 }

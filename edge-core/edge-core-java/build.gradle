@@ -1,1 +1,53 @@
 apply plugin: 'java'
+
+def apiDir = "$buildDir/api"
+def apiProject = parent.childProjects.'edge-core-api'
+
+import javassist.*
+
+def _generator = { CtClass c ->
+  def placeholder = '_lang_'
+  def lang = 'java'
+
+  println c.name
+
+  def map = new ClassMap()
+  c.refClasses.each { name ->
+    if(name.contains(placeholder)) {
+      println '  ' + ClassMap.toJvmName(name) + " to " + ClassMap.toJvmName(name.replace(placeholder,lang))
+      map.putAt(ClassMap.toJvmName(name), ClassMap.toJvmName(name.replace(placeholder,lang)))
+    }
+  }
+
+  c.replaceClassName(map)
+  c.name = c.name.replace(placeholder, lang)
+
+  // perform generic changes
+  [
+    c,
+    c.declaredBehaviors,
+    c.declaredFields
+  ].flatten().each { it ->
+    if(it.genericSignature) {
+      it.genericSignature = it.genericSignature.replace(placeholder,lang)
+    }
+  }
+}
+
+task('generateJava', type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
+  dependsOn apiProject.build, apiProject.clean
+  from apiProject
+  generator = _generator
+}
+task getApi(type: Sync) {
+  from generateJava
+  into file(apiDir)
+}
+
+sourceSets {
+  main {
+    compileClasspath += files(apiDir) { builtBy getApi }
+  }
+}
+
+[modZip, copyMod, jar].each { task -> task.from(file(apiDir)) }

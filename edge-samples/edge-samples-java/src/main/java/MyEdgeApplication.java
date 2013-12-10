@@ -1,41 +1,24 @@
-import org.edgeframework.edge.core.java.Application;
-import org.edgeframework.edge.core.java.Edge;
-import org.edgeframework.edge.core.java.delegates.AppDelegate;
-import org.edgeframework.edge.core.java.filters.Filter;
-import org.edgeframework.edge.core.java.http.HttpContext;
+import org.edgeframework.edge.core.java.app.Application;
+import org.edgeframework.edge.core.java.app.ApplicationEventHandler;
+import org.edgeframework.edge.core.java.app.DefaultApplication;
+import org.vertx.java.core.Future;
+import org.vertx.java.platform.Verticle;
 
-public class MyEdgeApplication extends Edge {
-  @Override
-  public void configure(Application app) {
-    app.delegates().add(new AppDelegate() {
+public class MyEdgeApplication extends Verticle {
+  public void start(Future<Void> result) {
+    DefaultApplication app = new DefaultApplication(vertx);
+
+    System.out.println("Starting");
+
+    app.afterStart(new ApplicationEventHandler() {
       @Override
-      public void beforeStart(Application app) {
-        System.out.println("Application Starting");
-
-        app.filters().add(new Filter() {
-          @Override
-          public void action(HttpContext context) {
-            System.out.println(context.request().path());
-            context.response().write("Blah!").close();
-          }
-        });
-      }
-
-      @Override
-      public void beforeStop(Application app) {
-        System.out.println("Application Stopping");
-      }
-
-      @Override
-      public void afterStart(Application app) {
-        System.out.println("Application Started");
-      }
-
-      @Override
-      public void onError(Application app, Throwable e) {
-        System.out.println("Error Occurred!");
-        e.printStackTrace();
+      public void call(Application app) {
+        System.out.println("It worked!");
       }
     });
+
+    app.getRouter().getRoutes().add("");
+
+    app.start(result);
   }
 }

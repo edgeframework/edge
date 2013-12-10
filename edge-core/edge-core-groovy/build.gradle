@@ -7,24 +7,47 @@ def _generator = { CtClass c ->
   def placeholder = '_lang_'
   def lang = 'groovy'
 
-  println c.name
+  def map = new ClassMap()
+  c.refClasses.each { name ->
+    if(name.contains(placeholder)) {
+      map.putAt(name, name.replace(placeholder,lang))
+    }
+  }
+
+  c.name = c.name.replace(placeholder, lang)
+  c.replaceClassName(map)
+
+  def cf = c.classFile
+  cf.interfaces = cf.interfaces.collect { name ->
+    return name.replace(placeholder, lang)
+  }
+
+  // perform generic changes
+  if(c.genericSignature) {
+    c.genericSignature = c.genericSignature.replace(placeholder,lang)
+  }
+
   c.declaredBehaviors.each { CtBehavior method ->
+    if(method.genericSignature) {
+      method.genericSignature = method.genericSignature.replace(placeholder,lang)
+    }
+
     def info = method.methodInfo
-    println "Method: $info.descriptor"
     info.descriptor = info.descriptor.replace(placeholder, lang)
   }
 
   c.declaredFields.each { CtField field ->
+    if(field.genericSignature) {
+      field.genericSignature = field.genericSignature.replace(placeholder,lang)
+    }
+
     def info = field.fieldInfo
-    println "Field: $info.descriptor"
     info.descriptor = info.descriptor.replace(placeholder, lang)
   }
-  
-  c.name = c.name.replace(placeholder, lang)
 }
 
 task('generateGroovy', type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
-  dependsOn apiProject.classes
+  dependsOn apiProject.build, apiProject.clean
   from apiProject
   generator = _generator
 }
@@ -39,6 +62,4 @@ sourceSets {
   }
 }
 
-modZip { from apiDir }
-
-jar { from apiDir }
+[modZip, copyMod, jar].each { task -> task.from(file(apiDir)) }
