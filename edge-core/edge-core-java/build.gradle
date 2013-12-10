@@ -9,12 +9,9 @@ def _generator = { CtClass c ->
   def placeholder = '_lang_'
   def lang = 'java'
 
-  println c.name
-
   def map = new ClassMap()
   c.refClasses.each { name ->
     if(name.contains(placeholder)) {
-      println '  ' + ClassMap.toJvmName(name) + " to " + ClassMap.toJvmName(name.replace(placeholder,lang))
       map.putAt(ClassMap.toJvmName(name), ClassMap.toJvmName(name.replace(placeholder,lang)))
     }
   }

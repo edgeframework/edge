@@ -1,14 +1,19 @@
-import groovy.transform.CompileStatic
-
 import org.edgeframework.edge.core.groovy.app.Application
+import org.edgeframework.edge.core.groovy.app.ApplicationEventHandler
 import org.edgeframework.edge.core.groovy.app.DefaultApplication
-import org.vertx.groovy.platform.Verticle
+import org.vertx.java.core.Future
+import org.vertx.java.platform.Verticle
 
-@CompileStatic
 public class MyEdgeApplication extends Verticle {
-  public def start() {
-    Application app = new DefaultApplication(vertx.toJavaVertx())
+  public void start(Future<Void> result) {
+    DefaultApplication app = new DefaultApplication(vertx)
 
-    app.router.routes.add("")
+    System.out.println("Starting")
+
+    app.afterStart({ println("It worked!") } as ApplicationEventHandler)
+
+    app.getRouter().getRoutes().add("")
+
+    app.start(result)
   }
 }
