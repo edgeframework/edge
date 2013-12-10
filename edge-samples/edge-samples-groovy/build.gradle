@@ -24,4 +24,4 @@ vertx {
   }
 }
 
-runMod.dependsOn ':edge-core:edge-core-groovy:copyMod'
+runMod.dependsOn ':edge-core:edge-core-groovy:copyMod',':edge-core:edge-core-groovy:install'

@@ -42,7 +42,7 @@ def _generator = { CtClass c ->
 }
 
 task generateSources(type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
-  generators = [_generator]
+  addGenerator(_generator)
   from apiProject
   into file(apiDir)
 }
@@ -55,5 +55,9 @@ sourceSets {
 
 assembleVertx {
   dependsOn generateSources
+  from(generateSources)
+}
+
+jar {
   from(generateSources)
 }

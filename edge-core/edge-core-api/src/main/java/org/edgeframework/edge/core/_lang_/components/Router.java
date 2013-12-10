@@ -12,7 +12,9 @@ public class Router implements Filter {
 
   @Override
   public void call(HttpContext context) {
-    System.out.println("Request received!");
+    context.getResponse()
+      .header("Content-Length", 11)
+      .write("Hello World");
     context.end();
   }
 

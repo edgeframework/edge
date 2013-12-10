@@ -27,4 +27,4 @@ vertx {
   }
 }
 
-runMod.dependsOn ':edge-core:edge-core-java:copyMod'
+runMod.dependsOn ':edge-core:edge-core-java:copyMod',':edge-core:edge-core-java:install'

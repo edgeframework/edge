@@ -6,7 +6,6 @@ import java.util.List;
 import org.edgeframework.edge.core._lang_.components.Router;
 import org.edgeframework.edge.core._lang_.http.Filter;
 import org.edgeframework.edge.core._lang_.http.HttpContext;
-import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
@@ -61,21 +60,21 @@ public class DefaultApplication implements Application {
 
   public DefaultApplication(Vertx vertx) {
     this.vertx = vertx;
+
+    this.requestFilters.add(this.router);
   }
 
   /* Verticle Methods */
-  public void start(Future<Void> startedResult) {
+  public void start() {
     try {
       /* Lifecycle */
       this.beforeStart();
 
       /* Begin */
       startServer(this.vertx, this.port, this.host);
-      startedResult.setResult(null);
       this.afterStart();
     } catch (Throwable e) {
       this.onError(e);
-      startedResult.setFailure(e);
     }
   }
 

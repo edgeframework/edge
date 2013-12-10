@@ -31,7 +31,6 @@ public class HttpContext {
     this.response = new HttpResponse(request.response());
     this.filters = new LinkedList<>(filters);
 
-    System.out.println("Http Context spawned");
     next();
   }
 

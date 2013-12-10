@@ -1,4 +1,3 @@
-import org.edgeframework.edge.core.groovy.app.Application
 import org.edgeframework.edge.core.groovy.app.ApplicationEventHandler
 import org.edgeframework.edge.core.groovy.app.DefaultApplication
 import org.vertx.java.core.Future
@@ -14,6 +13,6 @@ public class MyEdgeApplication extends Verticle {
 
     app.getRouter().getRoutes().add("")
 
-    app.start(result)
+    app.start()
   }
 }

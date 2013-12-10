@@ -19,6 +19,6 @@ public class MyEdgeApplication extends Verticle {
 
     app.getRouter().getRoutes().add("");
 
-    app.start(result);
+    app.start();
   }
 }
