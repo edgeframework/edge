@@ -1,0 +1,59 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies {
+    classpath "com.darylteo.gradle:codegen-plugin:0.1.0-SNAPSHOT"
+  }
+}
+
+
+def apiDir = "$buildDir/api"
+def apiProject = parent.childProjects.'edge-core-api'
+
+import javassist.*
+
+def _generator = { CtClass c ->
+  def placeholder = '_lang_'
+  def lang = (project.name - 'edge-core-')
+
+  def map = new ClassMap()
+  c.refClasses.each { name ->
+    if(name.contains(placeholder)) {
+      map.putAt(ClassMap.toJvmName(name), ClassMap.toJvmName(name.replace(placeholder,lang)))
+    }
+  }
+
+  c.replaceClassName(map)
+  c.name = c.name.replace(placeholder, lang)
+
+  // perform generic changes
+  [
+    c,
+    c.declaredBehaviors,
+    c.declaredFields
+  ].flatten().each { it ->
+    if(it.genericSignature) {
+      it.genericSignature = it.genericSignature.replace(placeholder,lang)
+    }
+  }
+}
+
+task generateSources(type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
+  generators = [_generator]
+  from apiProject
+  into file(apiDir)
+}
+
+sourceSets {
+  main {
+    compileClasspath += files(apiDir) { builtBy generateSources }
+  }
+}
+
+assembleVertx {
+  dependsOn generateSources
+  from(generateSources)
+}

@@ -6,7 +6,6 @@ buildscript {
 
   dependencies {
     classpath "com.darylteo.vertx:vertx-gradle-plugin:0.1.0-SNAPSHOT"
-    classpath "com.darylteo.gradle:codegen-plugin:0.1.0-SNAPSHOT"
   }
 }
 
@@ -56,6 +55,8 @@ configure(apiProject) {
 }
 
 configure(langProjects) {
+  apply from: parent.file('gradle/generation.gradle')
+  
   artifacts { archives modZip }
 
   uploadArchives {
