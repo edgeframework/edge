@@ -3,7 +3,8 @@ package org.edgeframework.edge.core._lang_.app;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.edgeframework.edge.core._lang_.components.Router;
+import org.edgeframework.edge.core._lang_.filters.assets.Assets;
+import org.edgeframework.edge.core._lang_.filters.mvc.Router;
 import org.edgeframework.edge.core._lang_.http.Filter;
 import org.edgeframework.edge.core._lang_.http.HttpContext;
 import org.vertx.java.core.Handler;
@@ -58,10 +59,17 @@ public class DefaultApplication implements Application {
     return this.router;
   }
 
+  private Assets assets = new Assets("public");
+
+  public Assets getAssets() {
+    return this.assets;
+  }
+
   public DefaultApplication(Vertx vertx) {
     this.vertx = vertx;
 
-    this.requestFilters.add(this.router);
+    this.requestFilters.add(this.assets);
+//    this.requestFilters.add(this.router);
   }
 
   /* Verticle Methods */

@@ -1,4 +1,4 @@
-package org.edgeframework.edge.core._lang_.components;
+package org.edgeframework.edge.core._lang_.filters.mvc;
 
 import org.edgeframework.edge.core._lang_.http.Filter;
 import org.edgeframework.edge.core._lang_.http.HttpContext;
@@ -12,10 +12,14 @@ public class Router implements Filter {
 
   @Override
   public void call(HttpContext context) {
-    context.getResponse()
-      .header("Content-Length", 11)
-      .write("Hello World");
-    context.end();
+    Controller controller = match(context.getRequest().getPath());
+    
+    if (controller != null) {
+      
+    }
   }
 
+  private Controller match(String path) {
+    return new Controller();
+  }
 }

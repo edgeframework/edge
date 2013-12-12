@@ -10,6 +10,10 @@ import org.vertx.java.core.http.HttpServerRequest;
 public class HttpContext {
   private Vertx vertx;
 
+  public Vertx getVertx() {
+    return this.vertx;
+  }
+
   private HttpRequest request;
 
   public HttpRequest getRequest() {

@@ -8,4 +8,8 @@ public class HttpRequest {
   public HttpRequest(HttpServerRequest request) {
     this.request = request;
   }
+
+  public String getPath() {
+    return this.request.path();
+  }
 }

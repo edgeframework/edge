@@ -29,6 +29,11 @@ public class HttpResponse {
     return this;
   }
 
+  public HttpResponse sendFile(String file) {
+    this.response.sendFile(file);
+    return this;
+  }
+
   public HttpResponse close() {
     this.response.close();
     return this;
