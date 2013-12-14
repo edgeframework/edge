@@ -4,11 +4,10 @@ buildscript {
     mavenLocal()
   }
 
-  dependencies {
-    classpath "com.darylteo.gradle:codegen-plugin:0.1.0-SNAPSHOT"
-  }
+  dependencies { classpath "com.darylteo.gradle:codegen-plugin:0.1.0-SNAPSHOT" }
 }
 
+apply plugin: 'eclipse'
 
 def apiDir = "$buildDir/api"
 def apiProject = parent.childProjects.'edge-core-api'
@@ -41,23 +40,27 @@ def _generator = { CtClass c ->
   }
 }
 
-task generateSources(type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
+task generateClasses(type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
   addGenerator(_generator)
   from apiProject
   into file(apiDir)
 }
 
-sourceSets {
-  main {
-    compileClasspath += files(apiDir) { builtBy generateSources }
+task apiJar(type: Jar) {
+  from generateClasses
+  classifier = 'api'
+}
+
+dependencies {
+  provided files(apiJar) { 
+    builtBy apiJar
   }
 }
 
 assembleVertx {
-  dependsOn generateSources
-  from(generateSources)
+  dependsOn apiJar
+  
+  from(generateClasses)
 }
 
-jar {
-  from(generateSources)
-}
+jar { from(generateClasses) }

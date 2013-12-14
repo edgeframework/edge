@@ -18,8 +18,6 @@ public class Assets implements Filter {
   public void call(final HttpContext context) {
     final String file = Paths.get(path, context.getRequest().getPath()).toString();
 
-    System.out.println("Assets request: " + file);
-
     context.getVertx().fileSystem().exists(file, new Handler<AsyncResult<Boolean>>() {
       @Override
       public void handle(AsyncResult<Boolean> event) {
