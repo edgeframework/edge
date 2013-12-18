@@ -46,14 +46,6 @@ subprojects {
   }
 }
 
-configure(apiProject) {
-  vertx {
-    platform {
-      java '2.0.2-final'
-    }
-  }
-}
-
 configure(langProjects) {
   apply from: parent.file('gradle/generation.gradle')
   

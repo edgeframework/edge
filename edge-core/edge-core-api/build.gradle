@@ -1,3 +1,51 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+
+  dependencies { classpath "com.darylteo.gradle:javassist-plugin:0.1.1" }
+}
+
+import javassist.*
+
 apply plugin: 'java'
 
-build.mustRunAfter clean
+vertx { platform { java '2.0.2-final' } }
+
+['java', 'groovy'].each { lang ->
+  def taskName = "generate${lang.capitalize()}"
+  def placeholder = '_lang_'
+
+  task(taskName, type:com.darylteo.gradle.javassist.tasks.TransformationTask) {
+    dependsOn sourceSets.main.classesTaskName
+    
+    from(sourceSets.main.output)
+
+    all({ c ->
+      // general replacement
+      def map = new ClassMap()
+      c.refClasses.each { name ->
+        if(name.contains(placeholder)) {
+          map.putAt(ClassMap.toJvmName(name), ClassMap.toJvmName(name.replace(placeholder,lang)))
+        }
+      }
+
+      c.replaceClassName(map)
+      c.name = c.name.replace(placeholder, lang)
+
+      // perform generic changes (not handled by replaceClassName for some reason)
+      [
+        c,
+        c.declaredBehaviors,
+        c.declaredFields
+      ].flatten().each { element ->
+        if(element.genericSignature) {
+          element.genericSignature = element.genericSignature.replace(placeholder,lang)
+        }
+      }
+
+      return c
+    }).write()
+  }
+}

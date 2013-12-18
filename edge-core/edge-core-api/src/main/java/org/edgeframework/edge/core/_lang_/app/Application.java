@@ -6,7 +6,8 @@ import java.util.List;
 import org.edgeframework.edge.core._lang_.filters.assets.Assets;
 import org.edgeframework.edge.core._lang_.filters.mvc.Router;
 import org.edgeframework.edge.core._lang_.http.Filter;
-import org.edgeframework.edge.core._lang_.http.HttpContext;
+import org.edgeframework.edge.core._lang_.http.Context;
+import org.edgeframework.edge.core._lang_.services.ServicesContainer;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
@@ -48,9 +49,15 @@ public class Application {
   private Handler<HttpServerRequest> requestHandler = new Handler<HttpServerRequest>() {
     @Override
     public void handle(HttpServerRequest request) {
-      new HttpContext(Application.this.vertx, request, Application.this.requestFilters);
+      new Context(Application.this, Application.this.vertx, request, Application.this.requestFilters);
     }
   };
+
+  private ServicesContainer services = new ServicesContainer();
+
+  public ServicesContainer getServices() {
+    return this.services;
+  }
 
   private Router router = new Router();
 
@@ -69,6 +76,8 @@ public class Application {
 
     this.requestFilters.add(this.assets);
     // this.requestFilters.add(this.router);
+
+    this.services.add(vertx);
   }
 
   /* Verticle Methods */

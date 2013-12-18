@@ -1,7 +1,7 @@
 package org.edgeframework.edge.core._lang_.filters.mvc;
 
 import org.edgeframework.edge.core._lang_.http.Filter;
-import org.edgeframework.edge.core._lang_.http.HttpContext;
+import org.edgeframework.edge.core._lang_.http.Context;
 
 public class Router implements Filter {
   private RouteContainer routes = new RouteContainer();
@@ -11,7 +11,7 @@ public class Router implements Filter {
   }
 
   @Override
-  public void call(HttpContext context) {
+  public void call(Context context) {
     Controller controller = match(context.getRequest().getPath());
     
     if (controller != null) {

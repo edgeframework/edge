@@ -3,64 +3,34 @@ buildscript {
     mavenCentral()
     mavenLocal()
   }
-
-  dependencies { classpath "com.darylteo.gradle:codegen-plugin:0.1.0-SNAPSHOT" }
 }
-
-apply plugin: 'eclipse'
 
 def apiDir = "$buildDir/api"
 def apiProject = parent.childProjects.'edge-core-api'
+def lang = (project.name - 'edge-core-')
 
-import javassist.*
+apiProject.afterEvaluate {
+  def generatorTask = apiProject.tasks.findByPath "generate${lang.capitalize()}"
 
-def _generator = { CtClass c ->
-  def placeholder = '_lang_'
-  def lang = (project.name - 'edge-core-')
-
-  def map = new ClassMap()
-  c.refClasses.each { name ->
-    if(name.contains(placeholder)) {
-      map.putAt(ClassMap.toJvmName(name), ClassMap.toJvmName(name.replace(placeholder,lang)))
-    }
+  if(!generatorTask) {
+    return
   }
 
-  c.replaceClassName(map)
-  c.name = c.name.replace(placeholder, lang)
+  task apiJar(type: Jar) {
+    dependsOn generatorTask
 
-  // perform generic changes
-  [
-    c,
-    c.declaredBehaviors,
-    c.declaredFields
-  ].flatten().each { it ->
-    if(it.genericSignature) {
-      it.genericSignature = it.genericSignature.replace(placeholder,lang)
-    }
+    from files(generatorTask)
+    classifier = 'api'
   }
-}
 
-task generateClasses(type: com.darylteo.gradle.codegen.tasks.GenerateSources) {
-  addGenerator(_generator)
-  from apiProject
-  into file(apiDir)
-}
-
-task apiJar(type: Jar) {
-  from generateClasses
-  classifier = 'api'
-}
-
-dependencies {
-  provided files(apiJar) { 
-    builtBy apiJar
+  dependencies {
+    provided files(apiJar) { builtBy apiJar }
   }
-}
 
-assembleVertx {
-  dependsOn apiJar
-  
-  from(generateClasses)
-}
+  assembleVertx {
+    dependsOn apiJar
+    from(generatorTask)
+  }
 
-jar { from(generateClasses) }
+  jar { from(generatorTask) }
+}

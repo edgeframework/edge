@@ -3,15 +3,18 @@ package org.edgeframework.edge.core._lang_.http;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.edgeframework.edge.core._lang_.app.Application;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 
-public class HttpContext {
+public class Context {
   private Vertx vertx;
 
-  public Vertx getVertx() {
-    return this.vertx;
+  private Application app;
+
+  public Application getApplication() {
+    return this.app;
   }
 
   private HttpRequest request;
@@ -28,8 +31,9 @@ public class HttpContext {
 
   private List<Filter> filters;
 
-  public HttpContext(Vertx vertx, HttpServerRequest request, List<Filter> filters) {
+  public Context(Application app, Vertx vertx, HttpServerRequest request, List<Filter> filters) {
     this.vertx = vertx;
+    this.app = app;
 
     this.request = new HttpRequest(request);
     this.response = new HttpResponse(request.response());
@@ -43,8 +47,8 @@ public class HttpContext {
       vertx.runOnContext(new Handler<Void>() {
         @Override
         public void handle(Void event) {
-          Filter filter = HttpContext.this.filters.remove(0);
-          filter.call(HttpContext.this);
+          Filter filter = Context.this.filters.remove(0);
+          filter.call(Context.this);
         }
       });
     } else {
