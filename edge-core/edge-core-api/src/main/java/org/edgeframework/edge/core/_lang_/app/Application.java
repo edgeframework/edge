@@ -5,11 +5,11 @@ import java.util.List;
 
 import org.edgeframework.edge.core._lang_.filters.assets.Assets;
 import org.edgeframework.edge.core._lang_.filters.mvc.Router;
-import org.edgeframework.edge.core._lang_.http.Filter;
 import org.edgeframework.edge.core._lang_.http.Context;
+import org.edgeframework.edge.core._lang_.http.Filter;
 import org.edgeframework.edge.core._lang_.services.ServicesContainer;
+import org.edgeframework.edge.core._lang_.vertx.Vertx;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 
@@ -49,7 +49,7 @@ public class Application {
   private Handler<HttpServerRequest> requestHandler = new Handler<HttpServerRequest>() {
     @Override
     public void handle(HttpServerRequest request) {
-      new Context(Application.this, Application.this.vertx, request, Application.this.requestFilters);
+      new Context(Application.this, Application.this.vertx.getInternal(), request, Application.this.requestFilters);
     }
   };
 
@@ -71,13 +71,13 @@ public class Application {
     return this.assets;
   }
 
-  public Application(Vertx vertx) {
-    this.vertx = vertx;
+  public Application(org.vertx.java.core.Vertx vertxInternal) {
+    this.vertx = new Vertx(vertxInternal);
 
     this.requestFilters.add(this.assets);
     // this.requestFilters.add(this.router);
 
-    this.services.add(vertx);
+    this.services.add(this.vertx);
   }
 
   /* Verticle Methods */
@@ -145,7 +145,7 @@ public class Application {
 
   /* Server Methods */
   private void startServer(Vertx vertx, int port, String host) {
-    final HttpServer server = vertx.createHttpServer();
+    final HttpServer server = vertx.getInternal().createHttpServer();
     server.requestHandler(this.requestHandler);
     server.listen(port, host);
   }
