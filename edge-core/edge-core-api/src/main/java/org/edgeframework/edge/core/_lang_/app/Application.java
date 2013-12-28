@@ -75,9 +75,13 @@ public class Application {
     this.vertx = new Vertx(vertxInternal);
 
     this.requestFilters.add(this.assets);
-    // this.requestFilters.add(this.router);
+    this.requestFilters.add(this.router);
 
-    this.services.add(this.vertx);
+    this.services.add("assets", this.assets);
+    this.services.add("router", this.router);
+
+    this.services.add("vertx", this.vertx);
+    this.services.add("filesystem", this.vertx.getFileSystem());
   }
 
   /* Verticle Methods */

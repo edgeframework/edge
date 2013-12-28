@@ -12,9 +12,6 @@ import javassist.*
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-sourceCompatibility = '1.7'
-targetCompatbility = '1.7'
-
 vertx { platform { java '2.0.2-final' } }
 
 def langs = ['java', 'groovy']
@@ -27,7 +24,7 @@ langs.each { lang ->
     transform({ c ->
       // general replacement
       def map = new ClassMap()
-      c.refClasses.each { name ->x
+      c.refClasses.each { name ->
         if(name.contains(placeholder)) {
           map.putAt(ClassMap.toJvmName(name), ClassMap.toJvmName(name.replace(placeholder,lang)))
         }
@@ -50,64 +47,5 @@ langs.each { lang ->
       return c
     })
     .write()
-  }
-}
-
-/* Create wrappers*/
-def taskName = "generateVertxWrappers"
-def jars = configurations.vertxcore.files.findAll({ jar ->
-  jar.name.startsWith('vertx-')
-})
-
-def wrapperTask = task(taskName, type:com.darylteo.gradle.javassist.tasks.TransformationTask) {
-  // clear task dependencies
-  dependsOn = []
-  sources = jars
-
-  transform('org.vertx.java.core.Vertx', { c ->
-    println "Transforming $c.name"
-
-    def packageName = "org.edgeframework.edge.core._lang_"
-    def pool = c.classPool
-
-    def wrapper = pool.makeClass("${packageName}.vertx.Vertx")
-
-    // create elements
-    def fieldInternal = new CtField(c, 'internal', wrapper)
-    wrapper.addField(fieldInternal)
-    
-    def methodGetInternal = CtNewMethod.getter('getInternal', fieldInternal)
-
-    // add elements
-    wrapper.addConstructor(CtNewConstructor.make("""\
-public Vertx(${c.name} internal) {
-      System.out.println("Hello World " + internal.toString());
-}\
-""", wrapper))
-
-    
-    wrapper.addMethod(methodGetInternal)
-
-    c.declaredBehaviors.each { method ->
-      println "Method Name: $method.name"
-      println "Method Return: $method.returnType"
-      
-      def wrapperMethod = new CtMethod(method.returnType, method.name, method.parameters, wrapper)
-      wrapper.addMethod(wrapperMethod)
-    }
-
-    return wrapper
-  })
-  .write()
-}
-
-compileJava.dependsOn(wrapperTask)
-
-sourceSets {
-  main {
-    compileClasspath += files(wrapperTask.outputDir)
-    output.dir(wrapperTask.outputDir)
-
-    println output.collect { it }
   }
 }

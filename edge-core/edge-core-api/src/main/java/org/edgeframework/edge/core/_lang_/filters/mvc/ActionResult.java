@@ -1,5 +1,7 @@
 package org.edgeframework.edge.core._lang_.filters.mvc;
 
-public interface ActionResult {
+import org.edgeframework.edge.core._lang_.http.Context;
 
+public interface ActionResult {
+  public void action(Context context);
 }

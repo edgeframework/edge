@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.edgeframework.edge.core._lang_.app.Application;
+import org.edgeframework.edge.core._lang_.services.ServicesContainer;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
@@ -15,6 +16,10 @@ public class Context {
 
   public Application getApplication() {
     return this.app;
+  }
+
+  public ServicesContainer getServices() {
+    return this.app.getServices();
   }
 
   private HttpRequest request;
