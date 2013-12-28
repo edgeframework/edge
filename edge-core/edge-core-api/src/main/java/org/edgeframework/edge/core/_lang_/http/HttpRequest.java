@@ -12,4 +12,8 @@ public class HttpRequest {
   public String getPath() {
     return this.request.path();
   }
+
+  public String getMethod() {
+    return request.method();
+  }
 }

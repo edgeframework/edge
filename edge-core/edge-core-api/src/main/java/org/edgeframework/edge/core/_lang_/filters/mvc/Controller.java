@@ -9,11 +9,11 @@ public class Controller {
     return this.context;
   }
 
-  public ActionResult ok() {
+  public ActionResult ok(final String message) {
     return new ActionResult() {
       @Override
       public void action(Context context) {
-        context.getResponse().header("content-length", "6").write("Hello!").close();
+        context.getResponse().header("content-length", message.length()).write(message).close();
       }
     };
   }
