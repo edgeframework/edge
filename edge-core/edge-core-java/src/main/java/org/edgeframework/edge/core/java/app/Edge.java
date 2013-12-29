@@ -9,6 +9,8 @@ public abstract class Edge extends Verticle {
     this.configure(app);
 
     app.start();
+
+    result.setResult(null);
   }
 
   public abstract void configure(Application app);
