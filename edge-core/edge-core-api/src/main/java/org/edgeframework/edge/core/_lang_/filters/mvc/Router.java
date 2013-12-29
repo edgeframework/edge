@@ -13,23 +13,23 @@ public class Router implements Filter {
 
   /* Routing Functions */
   public void get(String route, Controller controller, String action) {
-    this.add(this.compile(route), "GET", controller);
+    this.add(this.compile(route), "GET", controller, action);
   }
 
   public void post(String route, Controller controller, String action) {
-    this.add(this.compile(route), "POST", controller);
+    this.add(this.compile(route), "POST", controller, action);
   }
 
   public void put(String route, Controller controller, String action) {
-    this.add(this.compile(route), "PUT", controller);
+    this.add(this.compile(route), "PUT", controller, action);
   }
 
   public void delete(String route, Controller controller, String action) {
-    this.add(this.compile(route), "DELETE", controller);
+    this.add(this.compile(route), "DELETE", controller, action);
   }
 
-  private void add(Pattern pattern, String method, Controller controller) {
-    RouteMapping mapping = new RouteMapping(pattern, method, controller);
+  private void add(Pattern pattern, String method, Controller controller, String action) {
+    RouteMapping mapping = new RouteMapping(pattern, method, controller, action);
     this.routes.add(mapping);
   }
 
@@ -37,10 +37,10 @@ public class Router implements Filter {
     return Pattern.compile(Pattern.quote(route));
   }
 
-  private Controller match(HttpRequest request) {
+  private RouteMapping match(HttpRequest request) {
     for (RouteMapping mapping : routes) {
       if (mapping.handles(request)) {
-        return mapping.getController();
+        return mapping;
       }
     }
 
@@ -50,10 +50,10 @@ public class Router implements Filter {
   /* Filter Override */
   @Override
   public void call(Context context) {
-    Controller controller = this.match(context.getRequest());
+    RouteMapping mapping = this.match(context.getRequest());
 
-    if (controller != null) {
-      ActionResult result = controller.ok("Hello World");
+    if (mapping != null) {
+      ActionResult result = mapping.handle();
       result.action(context);
     } else {
       context.next();
