@@ -18,10 +18,12 @@ public class RouteMapping {
     return this.controller;
   }
 
-  public RouteMapping(Pattern pattern, String method, Controller controller, String action) {
-    this.pattern = pattern;
+  public RouteMapping(String pattern, String method, Controller controller, String action) {
+    this.pattern = this.compile(pattern);
     this.method = method.toUpperCase();
     this.controller = controller;
+
+    System.out.printf("Route Compiled %s to %s\n", pattern, this.pattern.toString());
 
     try {
       this.handle = MethodHandles.lookup().findVirtual(controller.getClass(), action, MethodType.methodType(ActionResult.class));
@@ -52,5 +54,11 @@ public class RouteMapping {
       e.printStackTrace();
       return null;
     }
+  }
+
+  private Pattern compile(String pattern) {
+    // replace all :<id> with regex .* capture group
+    String regex = "^" + pattern.replaceAll(":([^/]+)(/?)", "(?<$1>.*?)$2") + "$";
+    return Pattern.compile(regex);
   }
 }

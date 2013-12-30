@@ -2,7 +2,6 @@ package org.edgeframework.edge.core._lang_.filters.mvc;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.edgeframework.edge.core._lang_.http.Context;
 import org.edgeframework.edge.core._lang_.http.Filter;
@@ -13,28 +12,24 @@ public class Router implements Filter {
 
   /* Routing Functions */
   public void get(String route, Controller controller, String action) {
-    this.add(this.compile(route), "GET", controller, action);
+    this.add(route, "GET", controller, action);
   }
 
   public void post(String route, Controller controller, String action) {
-    this.add(this.compile(route), "POST", controller, action);
+    this.add(route, "POST", controller, action);
   }
 
   public void put(String route, Controller controller, String action) {
-    this.add(this.compile(route), "PUT", controller, action);
+    this.add(route, "PUT", controller, action);
   }
 
   public void delete(String route, Controller controller, String action) {
-    this.add(this.compile(route), "DELETE", controller, action);
+    this.add(route, "DELETE", controller, action);
   }
 
-  private void add(Pattern pattern, String method, Controller controller, String action) {
+  private void add(String pattern, String method, Controller controller, String action) {
     RouteMapping mapping = new RouteMapping(pattern, method, controller, action);
     this.routes.add(mapping);
-  }
-
-  private Pattern compile(String route) {
-    return Pattern.compile(Pattern.quote(route));
   }
 
   private RouteMapping match(HttpRequest request) {
