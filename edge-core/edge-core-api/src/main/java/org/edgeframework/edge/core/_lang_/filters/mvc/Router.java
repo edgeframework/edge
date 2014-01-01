@@ -1,7 +1,9 @@
 package org.edgeframework.edge.core._lang_.filters.mvc;
 
+import java.lang.invoke.MethodHandle;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import org.edgeframework.edge.core._lang_.http.Context;
 import org.edgeframework.edge.core._lang_.http.Filter;
@@ -32,26 +34,41 @@ public class Router implements Filter {
     this.routes.add(mapping);
   }
 
-  private RouteMapping match(HttpRequest request) {
-    for (RouteMapping mapping : routes) {
-      if (mapping.handles(request)) {
-        return mapping;
-      }
-    }
-
-    return null;
-  }
-
   /* Filter Override */
   @Override
   public void call(Context context) {
-    RouteMapping mapping = this.match(context.getRequest());
-
-    if (mapping != null) {
-      ActionResult result = mapping.handle();
-      result.action(context);
-    } else {
-      context.next();
+    // vertx returns empty if the root path is requested so lets turn
+    // it into / for consistency
+    HttpRequest request = context.getRequest();
+    String method = request.getMethod();
+    String path = request.getPath();
+    if (path.isEmpty()) {
+      path = "/";
     }
+
+    for (RouteMapping mapping : this.routes) {
+      if (mapping.getMethod().equals(method)) {
+        continue;
+      }
+
+      Matcher matcher = mapping.getPattern().matcher(path);
+      if (!matcher.matches()) {
+        continue;
+      }
+
+      try {
+        Controller controller = mapping.getController();
+        MethodHandle handle = mapping.getHandle();
+
+        ActionResult result = (ActionResult) handle.invoke(controller);
+        result.action(context);
+      } catch (Throwable e) {
+        // TODO: Handle error
+        e.printStackTrace();
+        context.next();
+      }
+    }
+
+    context.next();
   }
 }
