@@ -1,0 +1,36 @@
+buildscript {
+  repositories {
+    mavenCentral()
+    mavenLocal()
+  }
+}
+
+def apiDir = "$buildDir/api"
+def apiProject = parent.childProjects.'edge-core-api'
+def lang = (project.name - 'edge-core-')
+
+apiProject.afterEvaluate {
+  def generatorTask = apiProject.tasks.findByPath "generate${lang.capitalize()}"
+
+  if(!generatorTask) {
+    return
+  }
+
+  task apiJar(type: Jar) {
+    dependsOn generatorTask
+
+    from files(generatorTask)
+    classifier = 'api'
+  }
+
+  dependencies {
+    provided files(apiJar) { builtBy apiJar }
+  }
+
+  assembleVertx {
+    dependsOn apiJar
+    from(generatorTask)
+  }
+
+  jar { from(generatorTask) }
+}

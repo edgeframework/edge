@@ -1,7 +1,0 @@
-apply plugin: 'groovy'
-
-vertx {
-  platform {
-    groovy '2.0.0-final'
-  }
-}

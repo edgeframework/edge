@@ -1,21 +1,18 @@
-import org.edgeframework.edge.core.groovy.Application
-import org.edgeframework.edge.core.groovy.Edge
-import org.edgeframework.edge.core.groovy.delegates.AppDelegate
-import org.edgeframework.edge.core.groovy.filters.Filter
+import org.edgeframework.edge.core.groovy.app.Application
+import org.edgeframework.edge.core.groovy.app.ApplicationEventHandler
+import org.vertx.java.core.Future
+import org.vertx.java.platform.Verticle
 
-public class MyEdgeApplication extends Edge {
-  @Override
-  public void configure(Application app) {
-//    app.delegates.add(
-//      beforeStart: {
-//        app.filters.add({ ctx ->
-//          println 'Request!'
-//          ctx.response.write('Blah!!!!').close()
-//        } as Filter)
-//      },
-//      beforeStop: { println "$it:stop" },
-//      afterStart: { println "$it:start" },
-//      onError: { println "$app:error" }
-//      )
+public class MyEdgeApplication extends Verticle {
+  public void start(Future<Void> result) {
+    Application app = new Application(vertx)
+
+    System.out.println("Starting")
+
+    app.afterStart({ println("It worked!") } as ApplicationEventHandler)
+
+    app.getRouter().getRoutes().add("")
+
+    app.start()
   }
 }
