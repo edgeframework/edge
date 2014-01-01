@@ -32,8 +32,6 @@ public class Assets implements Filter {
     requested = requested.substring(1);
 
     Path file = this.path.resolve(requested);
-    System.out.println(file);
-
     if (file.equals(this.path)) {
       context.next();
       return;

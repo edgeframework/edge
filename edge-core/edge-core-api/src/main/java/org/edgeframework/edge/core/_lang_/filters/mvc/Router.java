@@ -46,8 +46,10 @@ public class Router implements Filter {
       path = "/";
     }
 
+    System.out.println("Router: matching " + path);
+
     for (RouteMapping mapping : this.routes) {
-      if (mapping.getMethod().equals(method)) {
+      if (!mapping.getMethod().equalsIgnoreCase(method)) {
         continue;
       }
 
@@ -60,7 +62,10 @@ public class Router implements Filter {
         Controller controller = mapping.getController();
         MethodHandle handle = mapping.getHandle();
 
-        ActionResult result = (ActionResult) handle.invoke(controller);
+        List<Object> params = new LinkedList<>();
+        params.add(controller);
+
+        ActionResult result = (ActionResult) handle.invokeWithArguments(params);
         result.action(context);
       } catch (Throwable e) {
         // TODO: Handle error
