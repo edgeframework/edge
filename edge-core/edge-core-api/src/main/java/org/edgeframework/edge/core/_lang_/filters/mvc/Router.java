@@ -65,6 +65,10 @@ public class Router implements Filter {
         List<Object> params = new LinkedList<>();
         params.add(controller);
 
+        for (String key : mapping.getParams()) {
+          params.add(matcher.group(key));
+        }
+
         ActionResult result = (ActionResult) handle.invokeWithArguments(params);
         result.action(context);
       } catch (Throwable e) {
