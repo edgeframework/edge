@@ -46,7 +46,6 @@ public class RouteMapping {
 
     try {
       this.handle = retrieveHandle(controller.getClass(), action, this.getParams());
-      System.out.printf("%s (%s.%s()) mapped to %s\n", pattern, controller.getClass().getName(), action, this.handle.type().toMethodDescriptorString());
     } catch (Exception e) {
       e.printStackTrace();
     }

@@ -40,13 +40,12 @@ public class Router implements Filter {
     // vertx returns empty if the root path is requested so lets turn
     // it into / for consistency
     HttpRequest request = context.getRequest();
+
     String method = request.getMethod();
     String path = request.getPath();
     if (path.isEmpty()) {
       path = "/";
     }
-
-    System.out.println("Router: matching " + path);
 
     for (RouteMapping mapping : this.routes) {
       if (!mapping.getMethod().equalsIgnoreCase(method)) {
